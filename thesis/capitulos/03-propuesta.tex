@@ -50,4 +50,12 @@ AgentProof toma conversaciones reales con un agente y las convierte en una suite
 
 El pipeline funciona de forma completamente automática entre la captura de las trazas y el reporte, y esa es su modalidad normal de operación. La revisión humana de los escenarios inducidos existe como función opcional, pero no forma parte de ese funcionamiento: se emplea como instrumento experimental para medir la fidelidad de la inducción. Por eso las métricas de detección se calculan sobre la suite generada automáticamente y sin curar, de modo que midan el sistema automático y no un híbrido entre persona y máquina.
 \par
+
+\subtituloapa{Patrón de diseño híbrido}
+Siguiendo la distinción entre workflows y agentes \cite{anthropic2024agents}, AgentProof se define como un workflow híbrido: un pipeline determinista cuyo flujo de control reside por completo en código, con la cognición de un modelo de lenguaje delegada en tres puntos. Dos de ellos son transformaciones de una sola pasada con salida estructurada: el inductor de escenarios y el evaluador ciego, que nunca conoce la versión del agente que califica. El tercero es la única etapa genuinamente agéntica: el usuario simulado, un agente conversacional de autonomía acotada, con un bucle de percepción, decisión y acción, un presupuesto máximo de turnos y una condición de parada explícita.
+\par\vspace{6pt}
+La agencia se introduce ahí, y solo ahí, por necesidad. El agente evaluado no es determinista, de modo que una conversación guionada de antemano se rompería en cuanto la nueva versión respondiera algo distinto: la ruta de la conversación no puede predefinirse, y el usuario simulado debe decidir cada turno en función de la respuesta recibida. El resto del pipeline permanece determinista bajo un principio de medición: el instrumento debe ser más predecible que el objeto que mide.
+\par\vspace{6pt}
+El sistema incorpora supervisión humana en cuatro puntos de control: la elicitación del corpus semilla, la revisión opcional de escenarios, la validación del evaluador con anotadores humanos y la compuerta de integración continua, que bloquea e informa pero nunca decide el despliegue ni modifica al agente. En esta versión no se emplea autocrítica iterativa (\textit{reflection}) ni en el inductor ni en el evaluador, por su costo, su estabilidad y la dificultad de medir su efecto; queda propuesta como extensión una ablación que compare el evaluador de una sola pasada con uno con autocrítica, midiendo el cambio en su concordancia con los anotadores.
+\par
 \endgroup
