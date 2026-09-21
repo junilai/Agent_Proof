@@ -16,3 +16,6 @@ wheels/
 
 # Sistema
 .DS_Store
+
+# Tesis: archivos generados al compilar
+thesis/build/
