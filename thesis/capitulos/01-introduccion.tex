@@ -21,4 +21,18 @@ En el área de la ingeniería de software, el trabajo extiende las pruebas de re
 \par\vspace{6pt}
 Para el contexto ecuatoriano, el trabajo aporta en dos frentes. El primero es el idioma: las conversaciones del estudio se elicitan en español con participantes locales, y todo lo que leen los modelos y los anotadores, incluidos los criterios de éxito y la rúbrica de evaluación, está en español. El estándar de evaluación de agentes con usuarios simulados se construyó en inglés \cite{yao2024taubench}, y se ha documentado que la fiabilidad de los usuarios simulados varía según la variedad lingüística de las personas a las que representan, incluso dentro de un mismo idioma \cite{seshadri2026lost}; evaluar en el idioma y con usuarios del contexto de uso forma parte, por tanto, de la validez del resultado. El segundo es la accesibilidad: AgentProof se publica como software de código abierto y opera sobre servicios de API con un costo estimado de pocos centavos de dólar por conversación evaluada, de modo que un equipo local puede adoptarlo sin licencias de plataformas comerciales de evaluación.
 \par
+
+\subtituloapa{Objetivos}
+El objetivo general es diseñar, implementar y validar empíricamente un sistema, AgentProof, capaz de inducir automáticamente escenarios de prueba multi-turno a partir de trazas de interacción de un agente basado en LLM, reejecutarlos de forma adaptativa mediante usuarios simulados y detectar la degradación de comportamiento entre versiones del agente, con un núcleo independiente del framework de orquestación empleado. Los objetivos específicos son:
+\par
+\begin{enumerate}[label=\arabic*.,leftmargin=0.5in,labelwidth=0.25in,labelsep=0pt,align=left,itemsep=0pt,parsep=0pt,topsep=0pt]
+  \item Implementar el pipeline completo y automático de extremo a extremo: captura de trazas, inducción de escenarios, reejecución adaptativa con usuarios simulados, evaluación ciega con un modelo como juez y reporte de regresión con un código de salida apto para integración continua.
+  \item Diseñar un esquema de trazas neutral y un protocolo de sesión que desacoplen el pipeline de los frameworks de agentes, e implementar adaptadores para Claude Agent SDK, LangGraph, CrewAI y smolagents, cuantificando el costo de incorporación de cada uno.
+  \item Construir un corpus semilla de exactamente veinte conversaciones de interacción elicitada con el agente de caso de estudio, mediante un protocolo de participantes múltiples y una matriz de cobertura.
+  \item Formalizar seis degradaciones controladas como operadores de mutación, declarando para cada una el comportamiento que se espera afectar, el conjunto de escenarios expuestos y el predicado que verifica si la mutación produjo el fallo esperado.
+  \item Evaluar la capacidad de detección con un diseño estadístico pre-registrado, que calcule las tasas de verdaderos y falsos positivos a nivel de escenario, con un control negativo de la línea base contra sí misma.
+  \item Validar la confiabilidad del evaluador automático frente a tres anotadores humanos y medir la fidelidad de los escenarios inducidos respecto de las conversaciones que los originaron.
+  \item Replicar el experimento de detección en un segundo framework, manteniendo constantes el dominio, las herramientas, la base de conocimiento y el modelo, para evidenciar la portabilidad del sistema.
+  \item Publicar el sistema como software de código abierto, con documentación, pruebas automatizadas, protocolo pre-registrado y resultados reproducibles.
+\end{enumerate}
 \endgroup
