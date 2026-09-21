@@ -14,7 +14,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Proyecto Python con uv, pytest y ruff (§5)
 - [x] Prueba de invariantes de arquitectura del núcleo (§5.7)
 - [x] Integración continua en GitHub Actions (§5)
-- [ ] **Hito:** integración continua en verde en GitHub
+- [x] **Hito:** integración continua en verde en GitHub. Evidencia: [corrida 35604536772](https://github.com/junilai/Agent_Proof/actions/runs/35604536772), 21-sep-2026
 
 ## F1 Esqueleto de punta a punta — objetivo: 23 sep – 4 oct
 
