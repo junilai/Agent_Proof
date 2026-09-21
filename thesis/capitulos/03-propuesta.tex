@@ -76,4 +76,26 @@ Para que el framework sea la única variable entre ediciones, el dominio del age
 \par\vspace{6pt}
 El objetivo de portabilidad no equivale a agnosticismo universal, y no se presenta como tal. En un prototipo previo se implementaron los cuatro adaptadores, lo que permite adelantar dos observaciones preliminares, verificadas sobre su historial de control de versiones. La primera es que incorporar el primer framework distinto del inicial exigió un refactor único del núcleo, que introdujo el protocolo de sesión y modificó las firmas del simulador y del ejecutor. La segunda es que, una vez realizado ese refactor, los dos frameworks siguientes requirieron 131 y 143 líneas y no obligaron a modificar el simulador, el ejecutor, el evaluador ni el reporte. La lectura que se propone, y que el experimento de replicación deberá confirmar, es que el costo de independizar el sistema del framework se paga una sola vez y que el costo marginal de cada framework adicional es acotado. La implementación final, construida sobre el protocolo desde el inicio, mide para cada adaptador sus líneas de código y los archivos del núcleo que su incorporación modifica.
 \par
+
+\subtituloapa{Selección y fijación de modelos}
+La asignación de modelos sigue tres reglas: calidad donde se valida la ciencia, economía donde hay volumen, y un evaluador distinto y más capaz que el agente evaluado, para mitigar el sesgo de autopreferencia documentado en la literatura sobre LLM-as-a-Judge \cite{yehudai2025survey}. La Tabla~\ref{tab:modelos} resume la asignación.
+\par
+
+\begin{table}[H]
+  \setstretch{0.952}
+  \caption{Modelos fijados para cada componente}
+  \label{tab:modelos}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{1.3in}|>{\raggedright\arraybackslash}p{2.1in}|>{\raggedright\arraybackslash}p{2.35in}|}
+    \hline
+    \textbf{Componente} & \textbf{Identificador fijado} & \textbf{Justificación} \\ \hline
+    Inductor de escenarios & {\small\texttt{claude-opus-5}} & La calidad de los criterios determina la validez de toda la suite; baja frecuencia de invocación \\ \hline
+    Evaluador & {\small\texttt{claude-opus-5}} & Instrumento de medición validado contra anotadores; distinto y más capaz que el agente evaluado \\ \hline
+    Usuario simulado & {\small\texttt{claude-haiku-4-5-20251001}} & Componente de mayor volumen; se mantiene fijo en todas las condiciones como variable controlada \\ \hline
+    Agente evaluado (línea base) & {\small\texttt{claude-sonnet-5}} & Representa un despliegue típico de producción \\ \hline
+    Agente degradado (D3) & {\small\texttt{claude-haiku-4-5-20251001}} & Degradación por reducción de capacidad \\ \hline
+  \end{tabular}
+\end{table}
+
+Los identificadores se fijan de forma explícita, se centralizan en un único módulo del código y se registran junto a cada corrida, con la configuración de razonamiento de cada componente, de modo que los experimentos sean reproducibles y auditables. Se usa la forma con fecha del identificador cuando existe, por ser la que garantiza la reproducibilidad. Dos restricciones de la API se tratan de forma explícita. La primera es que los modelos Opus 5 y Sonnet 5 no admiten fijar la temperatura, por lo que no pueden forzarse a un comportamiento determinista; esa variabilidad es la que el diseño experimental absorbe con repeticiones por escenario. La segunda es que no se activa el mecanismo que sustituye automáticamente un modelo por otro ante un rechazo, porque el instrumento de medición debe ser siempre el mismo; un rechazo se registra como un error visible. Si alguno de los modelos fuera retirado durante la ejecución experimental, se sustituiría por el modelo vigente de capacidad equivalente y se reejecutarían las condiciones afectadas, documentando el cambio.
+\par
 \endgroup
