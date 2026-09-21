@@ -18,10 +18,13 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F1 Esqueleto de punta a punta — objetivo: 23 sep – 4 oct
 
+- [x] Especificación de la fase en `docs/specs/2026-09-21-f1-esqueleto.md`
 - [ ] Esquema de trazas neutral (§5.7)
 - [ ] Identificadores de modelo fijados en un único módulo (§5.6)
 - [ ] Protocolo de sesión (§5.7)
 - [ ] Persistencia de trazas, escenarios y veredictos
+- [ ] Separación entre trazas semilla y trazas de corrida
+- [ ] Motivo de terminación normalizado en la traza (§5.4)
 - [ ] Dominio del caso de estudio con política calculable (§5.4)
 - [ ] Edición Claude Agent SDK y su adaptador (§5.7)
 - [ ] Grabación interactiva de conversaciones
@@ -36,8 +39,6 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 - [ ] Tarjetas de situación y matriz de cobertura de 20 tarjetas (§5.2)
 - [ ] Grabación asociada a su tarjeta (§5.2)
-- [ ] Separación entre trazas semilla y trazas de corrida
-- [ ] Motivo de terminación normalizado en la traza (§5.4)
 - [ ] Protocolo de elicitación (§5.2)
 - [ ] **Hito:** el autor graba 2–3 conversaciones semilla reales, cada una con su tarjeta
 
