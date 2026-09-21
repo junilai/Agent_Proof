@@ -8,7 +8,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 - [x] Planificación aprobada en `docs/planificacion.pdf` (§9)
 - [x] ROADMAP de la tesis (este archivo)
-- [ ] Convenciones de trabajo en `docs/convenciones.md` (§5)
+- [x] Convenciones de trabajo en `docs/convenciones.md` (§5)
 - [ ] Licencia MIT (§9)
 - [ ] README del repositorio (§9)
 - [ ] Proyecto Python con uv, pytest y ruff (§5)
