@@ -11,7 +11,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Convenciones de trabajo en `docs/convenciones.md` (§5)
 - [x] Licencia MIT (§9)
 - [x] README del repositorio (§9)
-- [ ] Proyecto Python con uv, pytest y ruff (§5)
+- [x] Proyecto Python con uv, pytest y ruff (§5)
 - [ ] Prueba de invariantes de arquitectura del núcleo (§5.7)
 - [ ] Integración continua en GitHub Actions (§5)
 - [ ] **Hito:** integración continua en verde en GitHub

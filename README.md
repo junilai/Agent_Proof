@@ -12,6 +12,17 @@ AgentProof toma conversaciones reales con un agente y, de cada una, induce un es
 
 En desarrollo. El avance por fases está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
+## Desarrollo
+
+Requiere [uv](https://docs.astral.sh/uv/); Python 3.12 se instala automáticamente.
+
+```bash
+uv sync                        # entorno y dependencias
+uv run pytest                  # pruebas
+uv run ruff check .            # análisis de estilo
+uv run ruff format --check .   # formato
+```
+
 ## Documentación
 
 - [Planificación aprobada](docs/planificacion.pdf): qué se construye y se demuestra.
