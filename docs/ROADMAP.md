@@ -92,7 +92,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## Redacción
 
-- [ ] T0 Esqueleto con la plantilla USFQ y citas IEEE, compilado en la integración continua — sep
+- [x] T0 Esqueleto con la plantilla USFQ y citas IEEE, compilado en la integración continua — sep. Evidencia: [corrida 35613059520](https://github.com/junilai/Agent_Proof/actions/runs/35613059520), 21-sep-2026
 - [ ] T1 Estado del arte (con réplica de la búsqueda en bases académicas) y descripción de la propuesta — sep – oct
 - [ ] T2 Diseño experimental y pre-registro — oct
 - [ ] T3 Desarrollo del prototipo — nov
