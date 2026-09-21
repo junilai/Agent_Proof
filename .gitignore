@@ -19,3 +19,5 @@ wheels/
 
 # Tesis: archivos generados al compilar
 thesis/build/
+# Tesis: datos personales (código y cédula), nunca se publican
+thesis/privado.tex

@@ -147,6 +147,23 @@
 \setlength{\bibparsep}{0pt}
 \defbibheading{sinTitulo}{}
 
+% ---------- Datos del documento (portada, calificación y derechos de autor) ----------
+\newcommand{\tituloTrabajo}{AgentProof: inducción automática de escenarios multi-turno desde trazas de interacción y reejecución adaptativa con usuarios simulados para la detección de regresiones en agentes basados en LLM}
+\newcommand{\nombreAutor}{Jarod Styph Tierra Medina}
+\newcommand{\nombreColegio}{Ciencias e Ingenierías}
+\newcommand{\nombreCarrera}{Ingeniería en Ciencias de la Computación}
+\newcommand{\tituloObtenido}{\rojo{XXXX}}                          % por confirmar
+\newcommand{\nombreTutor}{Ricardo Flores Moyano, \rojo{título académico}} % título por confirmar
+\newcommand{\fechaDocumento}{27 de septiembre de 2026}
+
+% ---------- Datos personales (no se publican) ----------
+% thesis/privado.tex, ignorado por git, define \codigoEstudiante y \cedulaIdentidad.
+% Sin ese archivo (por ejemplo, en el repositorio público) se muestran marcadores.
+% Si se crea después de haber compilado, forzar la recompilación con: latexmk -g
+\IfFileExists{privado.tex}{\input{privado.tex}}{%
+  \newcommand{\codigoEstudiante}{\rojo{xxxxxxxx}}%
+  \newcommand{\cedulaIdentidad}{\rojo{xxxxxxxxxx}}}
+
 \begin{document}
 
 % Márgenes de 1 pulgada en todo el documento (guía USFQ)
