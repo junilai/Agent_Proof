@@ -73,6 +73,10 @@
 %   La lista de referencias sale numerada en orden de aparición.
 %   Para agregar archivos .bib: colocarlos en la carpeta bib/ y registrarlos aquí.
 \usepackage[backend=biber,style=ieee]{biblatex}
+% Textos de las referencias en línea, como en la planificación: "consultado el ..." y "Disponible en: ..."
+\DefineBibliographyStrings{spanish}{urlseen = {consultado el}, url = {Disponible en}}
+% Los preprints de arXiv se registran como @article con journaltitle = {arXiv:<id>}, para que
+% IEEE imprima «Título,» arXiv:<id>, <año>. Las páginas web (@online) llevan fecha de consulta.
 \addbibresource{bib/referencias.bib}
 % \addbibresource{bib/otro-archivo.bib}   % <- añade aquí más archivos .bib
 \usepackage[hidelinks,hypertexnames=false]{hyperref}
