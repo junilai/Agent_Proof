@@ -1,0 +1,33 @@
+name: Tesis
+
+on:
+  push:
+    paths:
+      - "thesis/**"
+      - ".github/workflows/thesis.yml"
+  workflow_dispatch:
+
+jobs:
+  pdf:
+    name: Compilar PDF
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Instalar TeX Live y la fuente Times New Roman
+        run: |
+          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" \
+            | sudo debconf-set-selections
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-xetex texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-bibtex-extra texlive-lang-spanish biber latexmk \
+            ttf-mscorefonts-installer fontconfig
+          fc-list | grep -i "Times New Roman"
+      - name: Compilar
+        working-directory: thesis
+        run: latexmk -interaction=nonstopmode -halt-on-error main.tex
+      - uses: actions/upload-artifact@v7
+        with:
+          name: tesis-pdf
+          path: thesis/build/main.pdf

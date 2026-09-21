@@ -1,0 +1,201 @@
+% Documento final del proyecto integrador AgentProof.
+% Plantilla: guía de trabajo final de grado de la USFQ (pregrado), versión LaTeX.
+% El preámbulo se conserva como en la plantilla, salvo el estilo bibliográfico (IEEE).
+% Compilar desde esta carpeta con:  latexmk   (ver .latexmkrc)
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage[spanish,es-noindentfirst,es-nolists,es-noshorthands,es-tabla]{babel}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{needspace}
+\usepackage{graphicx}
+\usepackage{float}   % permite [H]: la tabla o figura se coloca exactamente donde se escribe
+% ---------- Índices automáticos (tabla de contenido, índice de tablas e índice de figuras) ----------
+%   Los títulos del cuerpo se crean con \tituloapa, \subtituloapa y \subsubtituloapa
+%   (niveles 1, 2 y 3 de la guía USFQ) y entran solos en la tabla de contenido.
+%   Las tablas y figuras entran en sus índices al usar \caption{} dentro de table/figure.
+%   Compilar dos veces (latexmk lo hace solo) para que los números de página se actualicen.
+\usepackage[titles]{tocloft}
+\renewcommand{\cftdotsep}{1.2}
+\setlength{\cftbeforesecskip}{6pt}        % 6 pt antes de cada entrada (estilo "TDC 1" del .docx)
+\setlength{\cftsecindent}{0pt}
+\setlength{\cftsecnumwidth}{0pt}
+\renewcommand{\cftsecfont}{\normalfont}
+\renewcommand{\cftsecpagefont}{\normalfont}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesubsecskip}{6pt}
+\setlength{\cftsubsecindent}{0.5in}
+\setlength{\cftsubsecnumwidth}{0pt}
+\renewcommand{\cftsubsecfont}{\normalfont}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesubsubsecskip}{6pt}
+\setlength{\cftsubsubsecindent}{1in}
+\setlength{\cftsubsubsecnumwidth}{0pt}
+\renewcommand{\cftsubsubsecfont}{\normalfont}
+\renewcommand{\cftsubsubsecleader}{\cftdotfill{\cftdotsep}}
+% Entradas "Tabla 1. Título ..... 12" y "Figura 1. Título ..... 12"
+\setlength{\cftbeforetabskip}{6pt}
+\setlength{\cfttabindent}{0pt}
+\renewcommand{\cfttabpresnum}{Tabla~}
+\renewcommand{\cfttabaftersnum}{.}
+\setlength{\cfttabnumwidth}{0.75in}
+\renewcommand{\cfttableader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforefigskip}{6pt}
+\setlength{\cftfigindent}{0pt}
+\renewcommand{\cftfigpresnum}{Figura~}
+\renewcommand{\cftfigaftersnum}{.}
+\setlength{\cftfignumwidth}{0.8in}
+\renewcommand{\cftfigleader}{\cftdotfill{\cftdotsep}}
+% Índices sin título propio (el título lo pone \caratula, con el formato de la plantilla)
+\makeatletter
+\newcommand{\tablaDeContenido}{\begingroup\@starttoc{toc}\endgroup}
+\newcommand{\indiceDeTablas}{\begingroup\@starttoc{lot}\endgroup}
+\newcommand{\indiceDeFiguras}{\begingroup\@starttoc{lof}\endgroup}
+\makeatother
+% Leyendas de tablas y figuras: "Tabla 1. Título" / "Figura 1. Título"
+\usepackage{caption}
+\captionsetup{labelsep=period,justification=raggedright,singlelinecheck=false,font=normalsize,skip=6pt}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}\renewcommand{\figurename}{Figura}}
+\setlength{\LTpre}{0pt}\setlength{\LTpost}{0pt}
+\usepackage{fancyhdr}
+\usepackage{csquotes}
+% ---------- Bibliografía: biblatex con estilo IEEE (requiere compilar con biber) ----------
+%   Compilar:  latexmk   (latexmk ejecuta biber solo)
+%   Citas:     \cite{clave}       -> [1]
+%              \cite{a,b}         -> [1], [2]
+%              \cite[p.~12]{clave} -> [1, p. 12]
+%   La lista de referencias sale numerada en orden de aparición.
+%   Para agregar archivos .bib: colocarlos en la carpeta bib/ y registrarlos aquí.
+\usepackage[backend=biber,style=ieee]{biblatex}
+\addbibresource{bib/referencias.bib}
+% \addbibresource{bib/otro-archivo.bib}   % <- añade aquí más archivos .bib
+\usepackage[hidelinks,hypertexnames=false]{hyperref}
+\usepackage{xurl}\urlstyle{same}
+
+% Word no divide palabras con guiones
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+\tolerance=2000 \emergencystretch=2em
+
+% ---------- Colores del documento Word ----------
+\definecolor{rojo}{HTML}{FF0000}
+\definecolor{gris}{HTML}{808080}
+\definecolor{enlace}{HTML}{0070C0}
+\newcommand{\rojo}[1]{\textcolor{rojo}{#1}}
+\newcommand{\enlace}[1]{\href{#1}{\textcolor{enlace}{\underline{#1}}}}
+
+% ---------- Interlineado (Word: Times New Roman 12 pt = 13.8 pt por línea) ----------
+\setstretch{0.952}                 % sencillo  -> 13.8 pt
+\newcommand{\dobleesp}{\setstretch{1.903}} % doble -> 27.6 pt
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% ---------- Líneas en blanco (párrafos vacíos de Word) ----------
+\newcommand{\blank}{\par\vspace{13.8pt}}          % 12 pt
+\newcommand{\blankxiv}{\par\vspace{16.1pt}}       % 14 pt
+\newcommand{\blankx}{\par\vspace{11.5pt}}         % 10 pt
+\newcommand{\blankdoble}{\par\vspace{27.6pt}}     % 12 pt a doble espacio
+
+% ---------- Tamaños de letra ----------
+\newcommand{\xviii}{\fontsize{18pt}{20.7pt}\selectfont}
+\newcommand{\xvi}{\fontsize{16pt}{18.4pt}\selectfont}
+\newcommand{\xiv}{\fontsize{14pt}{16.1pt}\selectfont}
+\newcommand{\xii}{\fontsize{12pt}{13.8pt}\selectfont}
+\newcommand{\xionce}{\fontsize{11pt}{12.7pt}\selectfont}
+\newcommand{\xps}{\fontsize{10pt}{11.5pt}\selectfont}
+
+% ---------- Estilos de título ----------
+% "Título 1 / APA Nivel 1": centrado, negrilla, mayúsculas, 12 pt, 12 pt antes, 24 pt después
+%   Uso: \tituloapa[Texto para la tabla de contenido]{TEXTO DEL TÍTULO}
+%   Si se omite el argumento opcional, en el índice aparece el mismo texto del título.
+\makeatletter
+\newcommand{\tituloapa}[2][\@nil]{%
+  \par\vspace{12pt}\refstepcounter{section}%
+  {\centering\bfseries\xii #2\par}%
+  \def\@tmp{#1}\ifx\@tmp\@nnil\addcontentsline{toc}{section}{#2}\else\addcontentsline{toc}{section}{#1}\fi
+  \vspace{24pt}}
+\makeatother
+% "APA Nivel 2": alineado a la izquierda, negrilla, 12 pt (entra como subsección en el índice)
+\newcommand{\subtituloapa}[1]{\par\vspace{6pt}\refstepcounter{subsection}{\bfseries\xii #1\par}\addcontentsline{toc}{subsection}{#1}\nopagebreak}
+% "APA Nivel 3": con sangría, negrilla, termina en punto; el texto continúa en la misma línea
+\newcommand{\subsubtituloapa}[1]{\par\vspace{6pt}\refstepcounter{subsubsection}\addcontentsline{toc}{subsubsection}{#1}\hspace*{0.5in}{\bfseries\xii #1.}\ }
+% "Carátula Tesis" 12 pt: centrado, negrilla, 12 pt antes, 18 pt después
+\newcommand{\caratula}[1]{\par\vspace{12pt}{\centering\bfseries\xii #1\par}\vspace{18pt}}
+% "Title": centrado, mayúsculas, 18 pt, negrilla, 12 pt antes y después
+\newcommand{\titulogrande}[1]{\par\vspace{12pt}{\centering\bfseries\xviii #1\par}\vspace{12pt}}
+
+% ---------- Tablas ----------
+\setlength{\tabcolsep}{0.08in}
+\renewcommand{\arraystretch}{1}
+\newcommand{\celda}[1]{\vspace{-0.5\baselineskip}#1\par\vspace{-0.5\baselineskip}}
+
+% ---------- Encabezado con número de página (arriba a la derecha) ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\xii\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{14pt}
+
+% Lista de referencias: sangría francesa 0.5 in, 12 pt entre entradas, sin título propio
+\setlength{\bibhang}{0.5in}
+\setlength{\bibitemsep}{12pt}
+\setlength{\bibparsep}{0pt}
+\defbibheading{sinTitulo}{}
+
+% ---------- Datos del documento (portada, calificación y derechos de autor) ----------
+\newcommand{\tituloTrabajo}{AgentProof: inducción automática de escenarios multi-turno desde trazas de interacción y reejecución adaptativa con usuarios simulados para la detección de regresiones en agentes basados en LLM}
+\newcommand{\nombreAutor}{Jarod Styph Tierra Medina}
+\newcommand{\nombreColegio}{Ciencias e Ingenierías}
+\newcommand{\nombreCarrera}{Ingeniería en Ciencias de la Computación}
+\newcommand{\tituloObtenido}{\rojo{XXXX}}                          % por confirmar
+\newcommand{\nombreTutor}{Ricardo Flores Moyano, \rojo{título académico}} % título por confirmar
+\newcommand{\fechaDocumento}{27 de septiembre de 2026}
+
+% ---------- Datos personales (no se publican) ----------
+% thesis/privado.tex, ignorado por git, define \codigoEstudiante y \cedulaIdentidad.
+% Sin ese archivo (por ejemplo, en el repositorio público) se muestran marcadores.
+% Si se crea después de haber compilado, forzar la recompilación con: latexmk -g
+\IfFileExists{privado.tex}{\input{privado.tex}}{%
+  \newcommand{\codigoEstudiante}{\rojo{xxxxxxxx}}%
+  \newcommand{\cedulaIdentidad}{\rojo{xxxxxxxxxx}}}
+
+\begin{document}
+
+% Márgenes de 1 pulgada en todo el documento (guía USFQ)
+\newgeometry{top=1in,bottom=1in,left=1in,right=1in,headheight=14pt,headsep=22pt,footskip=0.5in}
+\setcounter{page}{1}
+
+\input{preliminares/portada}
+\input{preliminares/calificacion}
+\input{preliminares/derechos}
+
+% Páginas preliminares y cuerpo: la numeración continúa desde 4 (guía USFQ)
+\clearpage
+\setcounter{page}{4}
+\input{preliminares/aclaracion}
+\input{preliminares/resumen}
+\input{preliminares/abstract}
+\input{preliminares/indices}
+
+% Cuerpo: capítulos del sumario de contenidos de la planificación (§6)
+\input{capitulos/01-introduccion}
+\input{capitulos/02-estado-del-arte}
+\input{capitulos/03-propuesta}
+\input{capitulos/04-prototipo}
+\input{capitulos/05-diseno-experimental}
+\input{capitulos/06-resultados}
+\input{capitulos/07-conclusiones}
+
+% ---------------------- REFERENCIAS BIBLIOGRÁFICAS ----------------------
+% La lista se genera sola con las obras citadas en el texto (bib/referencias.bib).
+\clearpage
+\blank
+\tituloapa[Referencias bibliográficas]{REFERENCIAS BIBLIOGRÁFICAS}
+\printbibliography[heading=sinTitulo]
+
+\end{document}
