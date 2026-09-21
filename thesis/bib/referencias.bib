@@ -2,3 +2,226 @@
 %  Base de datos bibliográfica de la tesis (estilo IEEE, procesada con biber)
 %  Cada entrada se cita en el texto con \cite{clave}.
 % =====================================================================
+
+% ---------------------------------------------------------------------
+%  Conceptos: agentes, evaluación y taxonomías de fallos
+% ---------------------------------------------------------------------
+
+@online{anthropic2024agents,
+  author  = {{Anthropic}},
+  title   = {Building Effective Agents},
+  year    = {2024},
+  url     = {https://www.anthropic.com/research/building-effective-agents},
+  urldate = {2026-09-21}
+}
+
+@article{yehudai2025survey,
+  author       = {Yehudai, Asaf and Eden, Lilach and Li, Alan and Uziel, Guy and Zhao, Yilun and Bar-Haim, Roy and Cohan, Arman and Shmueli-Scheuer, Michal},
+  title        = {Survey on Evaluation of {LLM}-based Agents},
+  journaltitle = {arXiv:2503.16416},
+  year         = {2025}
+}
+
+@report{msredteam2025taxonomy,
+  author      = {Bryan, Pete and Severi, Giorgio and de Gruyter, Joris and Jones, Daniel and Bullwinkel, Blake and Minnich, Amanda and Chawla, Shiven and Lopez, Gary and Pouliot, Martin and Fourney, Adam and Maxwell, Whitney and Pratt, Katherine and Qi, Saphir and Chikanov, Nina and Lutz, Roman and Dheekonda, Raja Sekhar Rao and Jagdagdorj, Bolor-Erdene and Kim, Eugenia and Song, Justin and Hines, Keegan and Lundeen, Richard and Vaughan, Sam and Westerhoff, Victoria and Zunger, Yonatan and Kawaguchi, Chang and Russinovich, Mark and Siva Kumar, Ram Shankar},
+  title       = {Taxonomy of Failure Mode in Agentic {AI} Systems},
+  type        = {Whitepaper},
+  institution = {Microsoft AI Red Team},
+  date        = {2025-04},
+  url         = {https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/final/en-us/microsoft-brand/documents/Taxonomy-of-Failure-Mode-in-Agentic-AI-Systems-Whitepaper.pdf},
+  urldate     = {2026-09-21}
+}
+
+@report{msredteam2026taxonomy,
+  author      = {{Microsoft AI Red Team}},
+  title       = {Taxonomy of Failure Modes in Agentic {AI} Systems, Version 2.0},
+  type        = {Whitepaper},
+  institution = {Microsoft},
+  date        = {2026-04},
+  url         = {https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/bade/documents/products-and-services/en-us/security/Taxonomy-of-Failure-Modes-in-Agentic-AI-Systems-v2-0.pdf},
+  urldate     = {2026-09-21}
+}
+
+@article{wu2026narratives,
+  author       = {Wu, Wei},
+  title        = {When Errors Become Narratives: A Longitudinal Taxonomy of Silent Failures in a Production {LLM} Agent Runtime},
+  journaltitle = {arXiv:2606.14589},
+  year         = {2026}
+}
+
+% ---------------------------------------------------------------------
+%  Herramientas de evaluación y regresión
+% ---------------------------------------------------------------------
+
+@online{langsmith2026eval,
+  author  = {{LangChain}},
+  title   = {{LangSmith}: {AI} Agent \& {LLM} Model Evaluation Platform},
+  url     = {https://www.langchain.com/langsmith/evaluation},
+  urldate = {2026-09-21}
+}
+
+@online{langsmith2026multiturn,
+  author  = {{LangChain}},
+  title   = {How to simulate multi-turn interactions},
+  note    = {Documentación de LangSmith},
+  url     = {https://docs.langchain.com/langsmith/multi-turn-simulation},
+  urldate = {2026-09-21}
+}
+
+@online{braintrust2026datasets,
+  author  = {{Braintrust}},
+  title   = {Create datasets},
+  note    = {Documentación oficial},
+  url     = {https://www.braintrust.dev/docs/annotate/datasets/create},
+  urldate = {2026-09-21}
+}
+
+@online{microsoft2026foundry,
+  author  = {{Microsoft}},
+  title   = {Generate Synthetic and Simulated Data for Evaluation (classic)},
+  note    = {Documentación de Microsoft Foundry},
+  url     = {https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/simulator-interaction-data},
+  urldate = {2026-09-21}
+}
+
+@online{evalview,
+  author  = {{hidai25}},
+  title   = {{EvalView}: Regression testing for {AI} agents},
+  note    = {Repositorio de código abierto},
+  url     = {https://github.com/hidai25/eval-view},
+  urldate = {2026-09-21}
+}
+
+@online{agentevals,
+  author  = {{LangChain}},
+  title   = {agentevals: Readymade evaluators for agent trajectories},
+  note    = {Repositorio de código abierto},
+  url     = {https://github.com/langchain-ai/agentevals},
+  urldate = {2026-09-21}
+}
+
+@article{kohl2026structural,
+  author       = {Kohl, Jens and Kruse, Otto and Mostafa, Youssef and Luckow, Andre and Schroer, Karsten and Riedl, Thomas and French, Ryan and Katz, David and Luitz, Manuel P. and Takher, Tanrajbir and Friedl, Ken E. and Laurent-Winter, C{\'e}line},
+  title        = {Automated structural testing of {LLM}-based agents: methods, framework, and case studies},
+  journaltitle = {arXiv:2601.18827},
+  year         = {2026}
+}
+
+@online{trace2test,
+  author  = {{felmonon}},
+  title   = {trace2test: Turns failed {AI} agent traces into reproducible regression tests and verified fixes},
+  note    = {Repositorio de código abierto},
+  url     = {https://github.com/felmonon/trace2test},
+  urldate = {2026-09-21}
+}
+
+% ---------------------------------------------------------------------
+%  Trabajos académicos
+% ---------------------------------------------------------------------
+
+@article{yao2024taubench,
+  author       = {Yao, Shunyu and Shinn, Noah and Razavi, Pedram and Narasimhan, Karthik},
+  title        = {{$\tau$}-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains},
+  journaltitle = {arXiv:2406.12045},
+  year         = {2024}
+}
+
+@article{barres2025tau2bench,
+  author       = {Barres, Victor and Dong, Honghua and Ray, Soham and Si, Xujie and Narasimhan, Karthik},
+  title        = {{$\tau^2$}-Bench: Evaluating Conversational Agents in a Dual-Control Environment},
+  journaltitle = {arXiv:2506.07982},
+  year         = {2025}
+}
+
+@online{sierra2026tau3bench,
+  author  = {{Sierra Research}},
+  title   = {{$\tau^3$}-bench},
+  note    = {Proyecto de código abierto},
+  url     = {https://github.com/sierra-research/tau2-bench},
+  urldate = {2026-09-21}
+}
+
+@article{arcadinho2024almita,
+  author       = {Arcadinho, Samuel and Aparicio, David and Almeida, Mariana},
+  title        = {Automated test generation to evaluate tool-augmented {LLMs} as conversational {AI} agents},
+  journaltitle = {arXiv:2409.15934},
+  note         = {2nd GenBench Workshop (EMNLP)},
+  year         = {2024}
+}
+
+@article{komoravolu2025ata,
+  author       = {Komoravolu, Sameer and Mrini, Khalil},
+  title        = {Agent-Testing Agent: A Meta-Agent for Automated Testing and Evaluation of Conversational {AI} Agents},
+  journaltitle = {arXiv:2508.17393},
+  year         = {2025}
+}
+
+@article{seshadri2026lost,
+  author       = {Seshadri, Preethi and Cahyawijaya, Samuel and Odumakinde, Ayomide and Singh, Sameer and Goldfarb-Tarrant, Seraphina},
+  title        = {Lost in Simulation: {LLM}-Simulated Users are Unreliable Proxies for Human Users in Agentic Evaluations},
+  journaltitle = {arXiv:2601.17087},
+  year         = {2026}
+}
+
+@article{zhou2026sim2real,
+  author       = {Zhou, Xuhui and Sun, Weiwei and Ma, Qianou and Xie, Yiqing and Liu, Jiarui and Du, Weihua and Welleck, Sean and Yang, Yiming and Neubig, Graham and Wu, Sherry Tongshuang and Sap, Maarten},
+  title        = {Mind the {Sim2Real} Gap in User Simulation for Agentic Tasks},
+  journaltitle = {arXiv:2603.11245},
+  year         = {2026}
+}
+
+@article{cemri2025mast,
+  author       = {Cemri, Mert and Pan, Melissa Z. and Yang, Shuyi and Agrawal, Lakshya A. and Chopra, Bhavya and Tiwari, Rishabh and Keutzer, Kurt and Parameswaran, Aditya and Klein, Dan and Ramchandran, Kannan and Zaharia, Matei and Gonzalez, Joseph E. and Stoica, Ion},
+  title        = {Why Do Multi-Agent {LLM} Systems Fail?},
+  journaltitle = {arXiv:2503.13657},
+  year         = {2025}
+}
+
+% ---------------------------------------------------------------------
+%  Propuesta: estándares y componentes
+% ---------------------------------------------------------------------
+
+@online{otel2026genai,
+  author  = {{OpenTelemetry}},
+  title   = {{OpenTelemetry} {GenAI} Semantic Conventions},
+  note    = {Convenciones semánticas para sistemas de IA generativa},
+  url     = {https://github.com/open-telemetry/semantic-conventions-genai},
+  urldate = {2026-09-21}
+}
+
+% ---------------------------------------------------------------------
+%  Introducción: contexto y problema
+% ---------------------------------------------------------------------
+
+@report{iasr2026,
+  author      = {Bengio, Yoshua and others},
+  title       = {International {AI} Safety Report 2026},
+  type        = {Informe},
+  number      = {DSIT 2026/001},
+  institution = {{Department for Science, Innovation and Technology}},
+  date        = {2026-02},
+  url         = {https://internationalaisafetyreport.org},
+  urldate     = {2026-09-21}
+}
+
+@article{rabanser2026reliability,
+  author       = {Rabanser, Stephan and Kapoor, Sayash and Kirgis, Peter and Liu, Kangheng and Utpala, Saiteja and Narayanan, Arvind},
+  title        = {Towards a Science of {AI} Agent Reliability},
+  journaltitle = {arXiv:2602.16666},
+  year         = {2026}
+}
+
+% ---------------------------------------------------------------------
+%  Introducción: relevancia
+% ---------------------------------------------------------------------
+
+@article{jia2011mutation,
+  author       = {Jia, Yue and Harman, Mark},
+  title        = {An Analysis and Survey of the Development of Mutation Testing},
+  journaltitle = {IEEE Transactions on Software Engineering},
+  volume       = {37},
+  number       = {5},
+  pages        = {649--678},
+  year         = {2011},
+  doi          = {10.1109/TSE.2010.62}
+}

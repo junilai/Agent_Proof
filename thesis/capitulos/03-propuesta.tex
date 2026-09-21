@@ -6,5 +6,96 @@
 \tituloapa[Descripción de la propuesta]{DESCRIPCIÓN DE LA PROPUESTA}
 \begingroup\dobleesp
 \vspace{6pt}
+Este capítulo describe AgentProof: el recorrido de sus etapas, el patrón de diseño que lo organiza, el esquema de trazas y el protocolo que lo independizan de los frameworks de agentes, y los modelos que emplea.
+\par
+
+\subtituloapa{Visión general}
+AgentProof toma conversaciones reales con un agente y las convierte en una suite de regresión que se reejecuta de forma adaptativa contra cada nueva versión del agente. Su funcionamiento se organiza en cinco etapas encadenadas (Figura~\ref{fig:pipeline}):
+\par
+\begin{enumerate}[label=\arabic*.,leftmargin=0.5in,labelwidth=0.25in,labelsep=0pt,align=left,itemsep=0pt,parsep=0pt,topsep=0pt]
+  \item \textbf{Captura.} Cada conversación con el agente se registra como una traza en un esquema neutral, independiente del framework con el que se construyó el agente. Las conversaciones de partida, llamadas trazas semilla, provienen de personas que interactúan con el agente.
+  \item \textbf{Inducción.} De cada traza semilla se induce un escenario: el objetivo del usuario, un mensaje inicial y entre dos y cinco criterios verificables de éxito, formulados sobre el desenlace que se comunica al usuario y no sobre la trayectoria que sigue el agente.
+  \item \textbf{Reejecución.} Un usuario simulado guiado por el objetivo del escenario conversa con la versión evaluada del agente y decide cada turno en función de lo que el agente responde. Como el agente no es determinista, cada escenario se ejecuta varias veces por versión.
+  \item \textbf{Juicio.} Un evaluador automático califica cada conversación contra los criterios del escenario sin conocer qué versión del agente la produjo.
+  \item \textbf{Reporte.} Se comparan, escenario por escenario, las tasas de aprobación de la versión de referencia y de la versión candidata según un criterio estadístico fijado de antemano, y el sistema termina con un código de salida que un proceso de integración continua puede usar para bloquear un despliegue.
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  \setstretch{1}
+  \begin{tikzpicture}[
+      etapa/.style={draw, rounded corners=3pt, minimum width=2.35cm, minimum height=1.1cm, align=center, font=\small\bfseries},
+      artefacto/.style={font=\footnotesize, align=center, text width=2.35cm},
+      flecha/.style={-{Stealth[length=2mm]}, thick},
+      node distance=0.65cm]
+    \node[etapa] (captura) {Captura};
+    \node[etapa, right=of captura] (induccion) {Inducción};
+    \node[etapa, right=of induccion] (reejecucion) {Reejecución};
+    \node[etapa, right=of reejecucion] (juicio) {Juicio};
+    \node[etapa, right=of juicio] (reporte) {Reporte};
+    \foreach \origen/\destino in {captura/induccion, induccion/reejecucion, reejecucion/juicio, juicio/reporte}
+      \draw[flecha] (\origen) -- (\destino);
+    \node[artefacto, below=0.25cm of captura] {trazas semilla\\(conversaciones reales)};
+    \node[artefacto, below=0.25cm of induccion] {escenarios: objetivo, mensaje inicial y criterios};
+    \node[artefacto, below=0.25cm of reejecucion] {trazas de corrida por escenario y versión};
+    \node[artefacto, below=0.25cm of juicio] {juicios por criterio, a ciegas};
+    \node[artefacto, below=0.25cm of reporte] {regresiones y código de salida};
+    \node[draw, dashed, rounded corners=3pt, align=center, font=\small, text width=8.05cm, minimum width=8.35cm, minimum height=0.9cm, above=1.1cm of induccion] (agente) {\textbf{Agente evaluado}\\{\footnotesize cualquier framework, a través de su adaptador}};
+    \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, dashed] (agente.south -| captura) -- node[right, font=\footnotesize] {personas} (captura);
+    \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, dashed] (agente.south -| reejecucion) -- node[right, font=\footnotesize] {usuario simulado} (reejecucion);
+  \end{tikzpicture}
+  \caption{Etapas del pipeline de AgentProof y artefactos que produce cada una}
+  \label{fig:pipeline}
+\end{figure}
+
+El pipeline funciona de forma completamente automática entre la captura de las trazas y el reporte, y esa es su modalidad normal de operación. La revisión humana de los escenarios inducidos existe como función opcional, pero no forma parte de ese funcionamiento: se emplea como instrumento experimental para medir la fidelidad de la inducción. Por eso las métricas de detección se calculan sobre la suite generada automáticamente y sin curar, de modo que midan el sistema automático y no un híbrido entre persona y máquina.
+\par
+
+\subtituloapa{Patrón de diseño híbrido}
+Siguiendo la distinción entre workflows y agentes \cite{anthropic2024agents}, AgentProof se define como un workflow híbrido: un pipeline determinista cuyo flujo de control reside por completo en código, con la cognición de un modelo de lenguaje delegada en tres puntos. Dos de ellos son transformaciones de una sola pasada con salida estructurada: el inductor de escenarios y el evaluador ciego, que nunca conoce la versión del agente que califica. El tercero es la única etapa genuinamente agéntica: el usuario simulado, un agente conversacional de autonomía acotada, con un bucle de percepción, decisión y acción, un presupuesto máximo de turnos y una condición de parada explícita.
+\par\vspace{6pt}
+La agencia se introduce ahí, y solo ahí, por necesidad. El agente evaluado no es determinista, de modo que una conversación guionada de antemano se rompería en cuanto la nueva versión respondiera algo distinto: la ruta de la conversación no puede predefinirse, y el usuario simulado debe decidir cada turno en función de la respuesta recibida. El resto del pipeline permanece determinista bajo un principio de medición: el instrumento debe ser más predecible que el objeto que mide.
+\par\vspace{6pt}
+El sistema incorpora supervisión humana en cuatro puntos de control: la elicitación del corpus semilla, la revisión opcional de escenarios, la validación del evaluador con anotadores humanos y la compuerta de integración continua, que bloquea e informa pero nunca decide el despliegue ni modifica al agente. En esta versión no se emplea autocrítica iterativa (\textit{reflection}) ni en el inductor ni en el evaluador, por su costo, su estabilidad y la dificultad de medir su efecto; queda propuesta como extensión una ablación que compare el evaluador de una sola pasada con uno con autocrítica, midiendo el cambio en su concordancia con los anotadores.
+\par
+
+\subtituloapa{Esquema de trazas y protocolo de sesión}
+El núcleo de AgentProof depende únicamente de dos contratos: un esquema de trazas neutral y un protocolo de sesión. El conocimiento de cada framework de agentes se confina a un adaptador, de modo que ninguna etapa del pipeline sabe con qué framework se construyó el agente que evalúa.
+\par\vspace{6pt}
+Una traza registra una conversación completa como una secuencia numerada de eventos: mensajes del usuario, mensajes del agente, llamadas a herramientas con su resultado y errores. La acompañan los datos que requiere el análisis: si es una traza semilla o una traza de corrida y, en este último caso, la condición experimental, la corrida, el escenario y el número de repetición; el motivo por el que terminó la conversación, sea que el usuario la dio por terminada, que se agotó el presupuesto de turnos, que el agente agotó su límite de pasos o que falló el agente o el usuario simulado; y la configuración de modelos vigente. Las trazas se guardan como documentos JSON legibles, y el esquema se mantiene conceptualmente alineado con las convenciones semánticas de OpenTelemetry para sistemas de IA generativa \cite{otel2026genai}, documentando la correspondencia campo a campo como ruta de adopción futura.
+\par\vspace{6pt}
+El protocolo de sesión es el único punto de contacto entre el núcleo y un adaptador. Una sesión expone una sola operación: recibe un mensaje del usuario y devuelve el turno del agente, compuesto por la respuesta visible, los eventos de ese turno, el motivo por el que terminó el turno y, cuando el framework lo informa, el consumo de tokens y su costo. El adaptador solo traduce: no numera eventos, no arma trazas ni las guarda. Esa responsabilidad recae en una única función del núcleo, que sirve por igual para grabar una conversación con una persona y para reejecutar un escenario con el usuario simulado, y que produce exactamente una traza por conversación incluso cuando esta falla.
+\par\vspace{6pt}
+El inductor y el evaluador no leen la traza directamente, sino una transcripción ciega derivada de ella, que contiene los mensajes, las llamadas a herramientas y sus resultados, pero excluye los nombres de modelo, la condición, la corrida y las marcas de tiempo. Sin esa exclusión, el evaluador podría inferir, por ejemplo, que una conversación proviene de un agente con el modelo degradado.
+\par
+
+\subtituloapa{Portabilidad entre frameworks}
+Se implementan adaptadores para cuatro frameworks que representan paradigmas de orquestación distintos: Claude Agent SDK, un SDK que provee el bucle completo del agente; LangGraph, basado en grafos; CrewAI, basado en roles; y smolagents, orientado a la invocación ligera de herramientas. Los dos primeros se someten a evaluación experimental completa; los dos restantes se verifican mediante una ejecución del pipeline de extremo a extremo, sin repetición estadística, como evidencia de la versatilidad del diseño.
+\par\vspace{6pt}
+Para que el framework sea la única variable entre ediciones, el dominio del agente de caso de estudio se escribe una sola vez y sin dependencias de ningún framework: la base de conocimiento, la política de reembolsos, las herramientas, el prompt y las degradaciones controladas. Cada edición construye el agente con las piezas nativas de su framework, desde el bucle completamente provisto por Claude Agent SDK hasta el de LangGraph, que se construye explícitamente sobre sus primitivas de grafo. Incorporar un framework consiste en agregar su adaptador y su edición: el núcleo carga los adaptadores por su nombre y una prueba automática verifica, en cada cambio, que ningún módulo del núcleo importe un framework de agentes.
+\par\vspace{6pt}
+El objetivo de portabilidad no equivale a agnosticismo universal, y no se presenta como tal. En un prototipo previo se implementaron los cuatro adaptadores, lo que permite adelantar dos observaciones preliminares, verificadas sobre su historial de control de versiones. La primera es que incorporar el primer framework distinto del inicial exigió un refactor único del núcleo, que introdujo el protocolo de sesión y modificó las firmas del simulador y del ejecutor. La segunda es que, una vez realizado ese refactor, los dos frameworks siguientes requirieron 131 y 143 líneas y no obligaron a modificar el simulador, el ejecutor, el evaluador ni el reporte. La lectura que se propone, y que el experimento de replicación deberá confirmar, es que el costo de independizar el sistema del framework se paga una sola vez y que el costo marginal de cada framework adicional es acotado. La implementación final, construida sobre el protocolo desde el inicio, mide para cada adaptador sus líneas de código y los archivos del núcleo que su incorporación modifica.
+\par
+
+\subtituloapa{Selección y fijación de modelos}
+La asignación de modelos sigue tres reglas: calidad donde se valida la ciencia, economía donde hay volumen, y un evaluador distinto y más capaz que el agente evaluado, para mitigar el sesgo de autopreferencia documentado en la literatura sobre LLM-as-a-Judge \cite{yehudai2025survey}. La Tabla~\ref{tab:modelos} resume la asignación.
+\par
+
+\begin{table}[H]
+  \setstretch{0.952}
+  \caption{Modelos fijados para cada componente}
+  \label{tab:modelos}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{1.3in}|>{\raggedright\arraybackslash}p{2.1in}|>{\raggedright\arraybackslash}p{2.35in}|}
+    \hline
+    \textbf{Componente} & \textbf{Identificador fijado} & \textbf{Justificación} \\ \hline
+    Inductor de escenarios & {\small\texttt{claude-opus-5}} & La calidad de los criterios determina la validez de toda la suite; baja frecuencia de invocación \\ \hline
+    Evaluador & {\small\texttt{claude-opus-5}} & Instrumento de medición validado contra anotadores; distinto y más capaz que el agente evaluado \\ \hline
+    Usuario simulado & {\small\texttt{claude-haiku-4-5-20251001}} & Componente de mayor volumen; se mantiene fijo en todas las condiciones como variable controlada \\ \hline
+    Agente evaluado (línea base) & {\small\texttt{claude-sonnet-5}} & Representa un despliegue típico de producción \\ \hline
+    Agente degradado (D3) & {\small\texttt{claude-haiku-4-5-20251001}} & Degradación por reducción de capacidad \\ \hline
+  \end{tabular}
+\end{table}
+
+Los identificadores se fijan de forma explícita, se centralizan en un único módulo del código y se registran junto a cada corrida, con la configuración de razonamiento de cada componente, de modo que los experimentos sean reproducibles y auditables. Se usa la forma con fecha del identificador cuando existe, por ser la que garantiza la reproducibilidad. Dos restricciones de la API se tratan de forma explícita. La primera es que los modelos Opus 5 y Sonnet 5 no admiten fijar la temperatura, por lo que no pueden forzarse a un comportamiento determinista; esa variabilidad es la que el diseño experimental absorbe con repeticiones por escenario. La segunda es que no se activa el mecanismo que sustituye automáticamente un modelo por otro ante un rechazo, porque el instrumento de medición debe ser siempre el mismo; un rechazo se registra como un error visible. Si alguno de los modelos fuera retirado durante la ejecución experimental, se sustituiría por el modelo vigente de capacidad equivalente y se reejecutarían las condiciones afectadas, documentando el cambio.
 \par
 \endgroup
