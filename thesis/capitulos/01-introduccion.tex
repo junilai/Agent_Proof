@@ -15,4 +15,10 @@ El problema se vuelve concreto cada vez que un agente cambia. Un equipo actualiz
 \par\vspace{6pt}
 Este trabajo aborda ese problema: detectar de forma automática, y con evidencia estadística, que una nueva versión de un agente conversacional se comporta peor que la anterior, tomando como punto de partida las conversaciones reales que el agente ya sostuvo y reejecutándolas de una forma que tolere la variabilidad propia de los agentes.
 \par
+
+\subtituloapa{Relevancia}
+En el área de la ingeniería de software, el trabajo extiende las pruebas de regresión y la integración continua a un tipo de sistema cuyo no determinismo las deja sin efecto. Lo hace, además, con una evaluación empírica controlada: degradaciones introducidas de forma deliberada como operadores de mutación, en el sentido clásico de las pruebas de mutación \cite{jia2011mutation}, una verdad de referencia independiente del sistema evaluado y métricas cuantitativas de detección, un tipo de evidencia que las plataformas comerciales de evaluación de agentes no publican.
+\par\vspace{6pt}
+Para el contexto ecuatoriano, el trabajo aporta en dos frentes. El primero es el idioma: las conversaciones del estudio se elicitan en español con participantes locales, y todo lo que leen los modelos y los anotadores, incluidos los criterios de éxito y la rúbrica de evaluación, está en español. El estándar de evaluación de agentes con usuarios simulados se construyó en inglés \cite{yao2024taubench}, y se ha documentado que la fiabilidad de los usuarios simulados varía según la variedad lingüística de las personas a las que representan, incluso dentro de un mismo idioma \cite{seshadri2026lost}; evaluar en el idioma y con usuarios del contexto de uso forma parte, por tanto, de la validez del resultado. El segundo es la accesibilidad: AgentProof se publica como software de código abierto y opera sobre servicios de API con un costo estimado de pocos centavos de dólar por conversación evaluada, de modo que un equipo local puede adoptarlo sin licencias de plataformas comerciales de evaluación.
+\par
 \endgroup
