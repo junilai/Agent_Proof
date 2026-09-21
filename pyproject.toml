@@ -1,0 +1,30 @@
+[project]
+name = "agentproof"
+version = "0.1.0"
+description = "Induces multi-turn test scenarios from agent interaction traces and replays them with goal-driven simulated users to detect regressions in LLM-based agents."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Jarod Tierra Medina", email = "jarodtierra@gmail.com" }]
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.11.7,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.8",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

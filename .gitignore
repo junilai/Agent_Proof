@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Entornos y herramientas
+.venv
+.pytest_cache/
+.ruff_cache/
+
+# Secretos
+.env
+
+# Sistema
+.DS_Store
