@@ -35,4 +35,10 @@ El objetivo general es diseñar, implementar y validar empíricamente un sistema
   \item Replicar el experimento de detección en un segundo framework, manteniendo constantes el dominio, las herramientas, la base de conocimiento y el modelo, para evidenciar la portabilidad del sistema.
   \item Publicar el sistema como software de código abierto, con documentación, pruebas automatizadas, protocolo pre-registrado y resultados reproducibles.
 \end{enumerate}
+
+\subtituloapa{Contribuciones y estructura del documento}
+Ninguno de los ingredientes de AgentProof es, por separado, una novedad: la construcción automática de casos de prueba a partir de trazas ya existe, y también la reejecución multi-turno con usuarios simulados. La contribución de este trabajo es su combinación: que el artefacto inducido desde la traza no sea un contrato sobre la trayectoria sino un escenario conversacional, con un objetivo de usuario y criterios de éxito verificables, y que ese objetivo guíe a un usuario simulado que genera una conversación nueva, adaptada a las respuestas de la versión evaluada, para después comparar versiones y detectar regresiones con integración continua. A ella se suma la validación empírica de la metodología mediante experimentos con verdad de referencia conocida y métricas cuantitativas, y su publicación como software de código abierto con adaptadores para cuatro frameworks de agentes.
+\par\vspace{6pt}
+El documento se organiza como sigue. El estado del arte presenta los conceptos, las herramientas y los trabajos académicos más cercanos, y la brecha que motiva la propuesta. La descripción de la propuesta expone la arquitectura de AgentProof, su patrón de diseño, su esquema de trazas y los modelos que emplea. El desarrollo del prototipo detalla la implementación, el agente de caso de estudio y sus degradaciones controladas. El diseño experimental presenta el protocolo pre-registrado, y los capítulos finales reportan los resultados de los experimentos y las conclusiones, con las limitaciones del estudio y el trabajo futuro. El siguiente capítulo comienza por el estado del arte.
+\par
 \endgroup
