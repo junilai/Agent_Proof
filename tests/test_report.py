@@ -69,3 +69,11 @@ def test_rendering_shows_the_regressions(tmp_path):
     assert BASE in text and CAND in text and "REGRESIÓN" in text
     assert "-100%" in text
     assert "1 regresión(es)" in text
+
+
+def test_rendering_shows_no_change_as_plus_zero(tmp_path):
+    store = Store(tmp_path)
+    fill(store, BASE, "sc-a", [True, True])
+    fill(store, CAND, "sc-a", [True, True])
+    text = render_comparison(compare_runs(store, BASE, CAND))
+    assert "+0%" in text and "-0%" not in text

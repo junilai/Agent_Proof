@@ -101,7 +101,7 @@ def render_comparison(comparison: RunComparison) -> str:
     lines = [title, header, "-" * 60]
     for c in comparison.comparisons:
         rates = f"{_rate(c.baseline):>6} {_rate(c.candidate):>6}"
-        change = "     —" if c.drop is None else f"{-float(c.drop):+6.0%}"
+        change = "     —" if c.drop is None else f"{float(-c.drop):+6.0%}"
         status = "REGRESIÓN" if c.regressed else "ok"
         lines.append(f"{c.scenario_id:<24} {rates} {change:>7}  {status}")
     regressions, total = len(comparison.regressions), len(comparison.comparisons)
