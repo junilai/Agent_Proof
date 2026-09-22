@@ -66,6 +66,13 @@ class EchoSession:
         )
 
 
+class CrashingSession(EchoSession):
+    """Its agent fails on every message."""
+
+    async def send(self, message: str) -> AgentTurn:
+        raise RuntimeError("se cayó la conexión")
+
+
 def ticking_clock(start: datetime = datetime(2026, 10, 1, 12, 0, tzinfo=UTC)) -> Callable:
     current = [start]
 

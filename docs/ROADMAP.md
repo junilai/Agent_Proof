@@ -30,7 +30,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [ ] Grabación interactiva de conversaciones
 - [x] Inductor de escenarios con criterios sobre el desenlace (§5.1)
 - [x] Usuario simulado con presupuesto de turnos y condición de parada (§5.1)
-- [ ] Runner con exactamente una traza por repetición (§5.1)
+- [x] Runner con exactamente una traza por repetición (§5.1)
 - [x] Evaluador ciego (§5.1)
 - [ ] Reporte con código de salida para integración continua (§3)
 - [ ] **Hito:** corrida real de punta a punta (1 conversación → 1 escenario → 2 reejecuciones → juicios → reporte)

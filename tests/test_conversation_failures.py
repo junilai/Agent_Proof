@@ -2,16 +2,11 @@ import asyncio
 
 from agentproof.conversation import converse
 from agentproof.session import AgentEvent, AgentTurn
-from tests.fakes import RUN, SEED, EchoSession, ScriptedUser, ticking_clock
+from tests.fakes import RUN, SEED, CrashingSession, EchoSession, ScriptedUser, ticking_clock
 
 
 def talk(user, factory, context=RUN):
     return asyncio.run(converse(factory, user, context, clock=ticking_clock()))
-
-
-class CrashingSession(EchoSession):
-    async def send(self, message):
-        raise RuntimeError("se cayó la conexión")
 
 
 class StepLimitSession(EchoSession):
