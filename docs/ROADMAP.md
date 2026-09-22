@@ -59,6 +59,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [ ] Criterio de regresión: Fisher + Benjamini-Hochberg + caída ≥ 0.4 (§5.5)
 - [ ] Matriz de confusión, TPR, FPR y pass^k (§5.5, §5.8)
 - [ ] Registro de costo y latencia por componente (§5.8)
+- [ ] Revisión del prompt del inductor antes del pre-registro (§5.1): el mensaje inicial revela solo lo que el cliente dijo al abrir la conversación, para que la reejecución conserve los turnos de la semilla (en el hito de F1 adelantó el número de pedido), y los criterios exigen el desenlace, no la justificación del agente, para no inflar los falsos positivos de E3
 - [ ] Pre-registro del protocolo (§5.5)
 - [ ] **Hito:** tag `preregistro-v1` y piloto de 5 escenarios × 2 repeticiones × 2 condiciones (§7c)
 
