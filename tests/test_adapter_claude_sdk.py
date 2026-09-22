@@ -1,7 +1,11 @@
+import asyncio
 import json
+import os
 
+import pytest
 from claude_agent_sdk import (
     AssistantMessage,
+    ClaudeAgentOptions,
     ResultMessage,
     TextBlock,
     ToolResultBlock,
@@ -9,7 +13,12 @@ from claude_agent_sdk import (
     UserMessage,
 )
 
-from agentproof.adapters.claude_sdk import tool_name, turn_from_messages
+from agentproof.adapters.claude_sdk import (
+    ClaudeSDKSession,
+    session_factory,
+    tool_name,
+    turn_from_messages,
+)
 from agentproof.schema import Usage
 
 LOOKUP = {"pedido": "AT-1001", "estado": "entregado", "dias_desde_entrega": 10}
@@ -106,3 +115,80 @@ def test_an_api_error_reports_its_http_status():
 def test_a_stream_without_result_is_an_error():
     turn = turn_from_messages(lookup_messages())
     assert turn.stop_reason == "error" and turn.events[-1].kind == "error"
+
+
+class FakeSDKClient:
+    def __init__(self, options):
+        self.options, self.queries, self.connected = options, [], False
+        self.dirs_during_session = []
+
+    async def connect(self):
+        self.connected = True
+
+    async def query(self, prompt):
+        self.queries.append(prompt)
+        self.dirs_during_session = [
+            os.path.isdir(self.options.cwd),
+            os.path.isdir(self.options.env["CLAUDE_CONFIG_DIR"]),
+        ]
+
+    async def receive_response(self):
+        for message in [*lookup_messages(), result()]:
+            yield message
+
+    async def disconnect(self):
+        self.connected = False
+
+
+def test_each_session_runs_isolated_and_cleans_up():
+    clients = []
+
+    def factory(options):
+        clients.append(FakeSDKClient(options))
+        return clients[-1]
+
+    async def talk():
+        options = ClaudeAgentOptions(model="claude-sonnet-5", env={"OTRA": "1"})
+        async with ClaudeSDKSession(options, client_factory=factory) as session:
+            return await session.send("hola")
+
+    turn = asyncio.run(talk())
+    client = clients[0]
+    assert turn.reply.endswith("Su reembolso procede.") and client.queries == ["hola"]
+    assert client.dirs_during_session == [True, True]
+    assert client.options.env["OTRA"] == "1"
+    assert not os.path.exists(client.options.cwd)
+    assert not os.path.exists(client.options.env["CLAUDE_CONFIG_DIR"])
+    assert not client.connected
+
+
+def test_session_factory_builds_the_agent_of_the_variant():
+    seen = []
+
+    def build(variant):
+        seen.append(variant)
+        return ClaudeAgentOptions(model="m")
+
+    session = session_factory(build, "baseline")()
+    assert isinstance(session, ClaudeSDKSession) and seen == ["baseline"]
+
+
+def test_a_failed_connection_leaves_nothing_behind():
+    clients = []
+
+    class RefusingClient(FakeSDKClient):
+        async def connect(self):
+            raise ConnectionError("sin CLI")
+
+    def factory(options):
+        clients.append(RefusingClient(options))
+        return clients[-1]
+
+    async def talk():
+        async with ClaudeSDKSession(ClaudeAgentOptions(model="m"), client_factory=factory):
+            pass
+
+    with pytest.raises(ConnectionError):
+        asyncio.run(talk())
+    assert not os.path.exists(clients[0].options.cwd)
+    assert not os.path.exists(clients[0].options.env["CLAUDE_CONFIG_DIR"])

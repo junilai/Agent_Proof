@@ -4,16 +4,25 @@ The only module of AgentProof that imports ``claude_agent_sdk``. Tool names lose
 the MCP prefix (``mcp__store__lookup_order`` -> ``lookup_order``) so traces are
 comparable across frameworks, and hitting the step limit is a ``step_limit``
 turn, not an error.
+
+Each session runs in a fresh working directory with its own empty SDK
+configuration directory, so nothing from the machine (settings, instruction files,
+memory, plugins, account connectors) reaches the agent under test.
 """
 
 from __future__ import annotations
 
+import dataclasses
 import json
-from collections.abc import Sequence
+import shutil
+import tempfile
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from claude_agent_sdk import (
     AssistantMessage,
+    ClaudeAgentOptions,
+    ClaudeSDKClient,
     ResultMessage,
     TextBlock,
     ToolResultBlock,
@@ -22,7 +31,7 @@ from claude_agent_sdk import (
 )
 
 from agentproof.schema import Usage
-from agentproof.session import AgentEvent, AgentTurn, StopReason
+from agentproof.session import AgentEvent, AgentTurn, SessionFactory, StopReason
 
 _INPUT_TOKEN_KEYS = ("input_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")
 
@@ -100,3 +109,51 @@ def turn_from_messages(messages: Sequence[Any]) -> AgentTurn:
         stop = "error"
         events.append(AgentEvent(kind="error", text="la sesión terminó sin mensaje de resultado"))
     return AgentTurn(reply="\n".join(texts), events=events, stop_reason=stop, usage=usage)
+
+
+class ClaudeSDKSession:
+    """One conversation with a Claude Agent SDK agent, isolated from the machine."""
+
+    def __init__(
+        self,
+        options: ClaudeAgentOptions,
+        client_factory: Callable[[ClaudeAgentOptions], Any] = ClaudeSDKClient,
+    ) -> None:
+        self.options = options
+        self.client_factory = client_factory
+        self._client: Any = None
+        self._dirs: list[str] = []
+
+    async def __aenter__(self) -> ClaudeSDKSession:
+        workdir = tempfile.mkdtemp(prefix="agentproof-agent-")
+        config = tempfile.mkdtemp(prefix="agentproof-claude-config-")
+        self._dirs = [workdir, config]
+        env = {**self.options.env, "CLAUDE_CONFIG_DIR": config}
+        try:
+            self._client = self.client_factory(
+                dataclasses.replace(self.options, cwd=workdir, env=env)
+            )
+            await self._client.connect()
+        except BaseException:
+            self._cleanup()
+            raise
+        return self
+
+    async def send(self, message: str) -> AgentTurn:
+        await self._client.query(message)
+        return turn_from_messages([m async for m in self._client.receive_response()])
+
+    async def __aexit__(self, *exc_info: object) -> None:
+        try:
+            await self._client.disconnect()
+        finally:
+            self._cleanup()
+
+    def _cleanup(self) -> None:
+        for path in self._dirs:
+            shutil.rmtree(path, ignore_errors=True)
+
+
+def session_factory(agent: Callable[[str], ClaudeAgentOptions], variant: str) -> SessionFactory:
+    """The adapter convention: a fresh isolated session per conversation."""
+    return lambda: ClaudeSDKSession(agent(variant))
