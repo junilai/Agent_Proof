@@ -10,6 +10,7 @@ missing results are never filled in.
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
@@ -20,6 +21,7 @@ from agentproof.conversation import utc_now
 from agentproof.llm import structured_call
 from agentproof.models import JUDGE
 from agentproof.schema import CriterionResult, Scenario, Trace, Verdict
+from agentproof.store import Store
 from agentproof.transcript import render_transcript
 
 JUDGE_RUBRIC = "\n".join(
@@ -92,3 +94,39 @@ def judge_trace(
         output_type=JudgeOutput,
         validate=to_verdict,
     )
+
+
+@dataclass
+class JudgingSummary:
+    judged: list[str] = field(default_factory=list)
+    kept: list[str] = field(default_factory=list)
+    skipped: list[str] = field(default_factory=list)
+    failed: dict[str, str] = field(default_factory=dict)
+
+
+def judge_run(
+    store: Store,
+    run_id: str,
+    judge: Callable[[Scenario, Trace], Verdict] = judge_trace,
+) -> JudgingSummary:
+    """Judge every trace of a run that has no verdict yet.
+
+    Traces that ended in ``simulator_error`` are skipped: the failure was not the
+    agent's, so they are invalid repetitions rather than failed ones.
+    """
+    summary = JudgingSummary()
+    for run_trace in store.run_traces(run_id):
+        if run_trace.termination == "simulator_error":
+            summary.skipped.append(run_trace.trace_id)
+            continue
+        if store.has_verdict(run_id, run_trace.trace_id):
+            summary.kept.append(run_trace.trace_id)
+            continue
+        try:
+            scenario = store.scenario(run_trace.scenario_id or "")
+            store.save_verdict(judge(scenario, run_trace))
+        except Exception as exc:
+            summary.failed[run_trace.trace_id] = f"{type(exc).__name__}: {exc}"
+        else:
+            summary.judged.append(run_trace.trace_id)
+    return summary
