@@ -19,7 +19,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 ## F1 Esqueleto de punta a punta — objetivo: 23 sep – 4 oct
 
 - [x] Especificación de la fase en `docs/specs/2026-09-21-f1-esqueleto.md`
-- [ ] Esquema de trazas neutral (§5.7)
+- [x] Esquema de trazas neutral (§5.7)
 - [ ] Identificadores de modelo fijados en un único módulo (§5.6)
 - [ ] Protocolo de sesión (§5.7)
 - [ ] Persistencia de trazas, escenarios y veredictos
