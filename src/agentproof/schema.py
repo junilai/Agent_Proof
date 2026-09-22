@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, computed_field, model_validator
 
 EventKind = Literal["user_message", "agent_message", "tool_call", "error"]
 TraceKind = Literal["seed", "run"]
@@ -83,3 +83,61 @@ class Trace(BaseModel):
 
 def new_trace_id() -> str:
     return f"tr-{uuid.uuid4().hex[:12]}"
+
+
+class Scenario(BaseModel):
+    """Induced from one seed trace: the input of the simulated user and of the judge."""
+
+    scenario_id: str
+    seed_trace_id: str
+    user_goal: str
+    opening_message: str
+    success_criteria: list[str] = Field(min_length=2, max_length=5)
+    induced_by: str
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def _id_follows_the_seed(self) -> Scenario:
+        if self.scenario_id != scenario_id_for(self.seed_trace_id):
+            raise ValueError("scenario_id must be derived from seed_trace_id")
+        return self
+
+
+class CriterionResult(BaseModel):
+    criterion: str
+    met: bool
+    justification: str
+
+
+class Verdict(BaseModel):
+    trace_id: str
+    scenario_id: str
+    run_id: str
+    criteria: list[CriterionResult] = Field(min_length=1)
+    judged_by: str
+    created_at: datetime
+
+    @computed_field
+    @property
+    def passed(self) -> bool:
+        return all(c.met for c in self.criteria)
+
+
+class RunManifest(BaseModel):
+    run_id: str
+    condition: str
+    variant: str
+    adapter: str
+    agent: str
+    repetitions: int = Field(ge=1)
+    turn_budget: int = Field(ge=1)
+    models: dict[str, Any]
+    created_at: datetime
+
+
+def scenario_id_for(seed_trace_id: str) -> str:
+    return f"sc-{seed_trace_id}"
+
+
+def run_id_for(condition: str, when: datetime) -> str:
+    return f"{condition}-{when:%Y%m%d-%H%M%S}"
