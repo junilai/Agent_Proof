@@ -23,6 +23,35 @@ uv run ruff check .            # análisis de estilo
 uv run ruff format --check .   # formato
 ```
 
+## Uso
+
+La clave de la API de Anthropic va en un archivo `.env` en la raíz del repositorio, con la línea `ANTHROPIC_API_KEY=<su clave>`; git lo ignora. El agente del caso de estudio se indica con el adaptador de su framework y su constructor como `modulo:atributo`; el adaptador de Claude Agent SDK necesita el extra `claude-sdk`, que el entorno de desarrollo ya incluye.
+
+```bash
+# graba una conversación con una persona como traza semilla
+uv run --env-file .env agentproof record --adapter claude_sdk \
+  --agent casestudy.editions.claude_sdk:build_options --data datos
+
+# induce los escenarios que faltan
+uv run --env-file .env agentproof induce --data datos
+
+# reejecuta los escenarios con el usuario simulado
+uv run --env-file .env agentproof run --adapter claude_sdk \
+  --agent casestudy.editions.claude_sdk:build_options --condition baseline-a --data datos
+
+# juzga una corrida y compara dos
+uv run --env-file .env agentproof judge --run <corrida> --data datos
+uv run --env-file .env agentproof report --baseline <corrida-a> --candidate <corrida-b> --data datos
+```
+
+`--data` es la carpeta que guarda `corpus/` y `results/` (por defecto, la actual). `run` repite cada escenario 5 veces con un presupuesto de 10 turnos (`--repetitions`, `--turn-budget`). `report` termina con 2 si detecta regresiones, con 0 si no y con 1 ante un error de uso.
+
+Las pruebas en vivo llaman a la API real y tienen costo; se excluyen por defecto y nunca corren en integración continua:
+
+```bash
+uv run --env-file .env pytest -m live -s
+```
+
 ## Documentación
 
 - [Planificación aprobada](docs/planificacion.pdf): qué se construye y se demuestra.

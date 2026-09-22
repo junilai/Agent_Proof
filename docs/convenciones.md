@@ -12,7 +12,8 @@ Reglas con las que se construye este repositorio. Provienen de la Sección 4 del
 
 ## Commits
 
-- Una idea por commit, con su código y sus pruebas juntos. Como guía, menos de ~300 líneas modificadas sin contar `uv.lock`; si algo crece más, se divide.
+- Una idea por commit, con su código y sus pruebas juntos, que pueda explicarse en una frase.
+- Tamaño: en código, entre 50 y 150 líneas modificadas (código más pruebas, sin contar `uv.lock`); por encima de ~200 se divide por comportamiento. En documentos y en la tesis, una sección por commit.
 - Cada commit deja el repositorio funcionando. No hay commits "WIP" ni commits que arreglan el anterior.
 - Las dependencias se agregan en commits `build:` separados.
 - Título: `tipo(alcance): resumen`, en minúsculas, sin punto final y con hasta 72 caracteres. El alcance es opcional.

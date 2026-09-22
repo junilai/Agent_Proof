@@ -7,7 +7,19 @@ license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Jarod Tierra Medina", email = "jarodtierra@gmail.com" }]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "anthropic>=1.7.0",
+    "pydantic>=2.13.5",
+    "typer>=0.27.2",
+]
+
+[project.scripts]
+agentproof = "agentproof.cli:app"
+
+[project.optional-dependencies]
+claude-sdk = [
+    "claude-agent-sdk>=0.2.157",
+]
 
 [build-system]
 requires = ["uv_build>=0.11.7,<0.12.0"]
@@ -15,6 +27,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "claude-agent-sdk>=0.2.157",
     "pytest>=9.1.1",
     "ruff>=0.16.8",
 ]
@@ -28,3 +41,8 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["live: calls the real Anthropic API; run with: uv run --env-file .env pytest -m live"]
+addopts = "-m 'not live'"
+
+[tool.uv.build-backend]
+module-name = ["agentproof", "casestudy", "experiments"]

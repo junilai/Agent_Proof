@@ -1,0 +1,6 @@
+AgentProof: baseline-a-20260922-120459 -> baseline-b-20260922-120538
+escenario                  base   cand  cambio  estado
+------------------------------------------------------------
+sc-tr-0a7510c36f69         100%   100%     +0%  ok
+------------------------------------------------------------
+0 regresión(es) en 1 escenario(s)

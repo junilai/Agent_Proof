@@ -18,26 +18,29 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F1 Esqueleto de punta a punta — objetivo: 23 sep – 4 oct
 
-- [ ] Esquema de trazas neutral (§5.7)
-- [ ] Identificadores de modelo fijados en un único módulo (§5.6)
-- [ ] Protocolo de sesión (§5.7)
-- [ ] Persistencia de trazas, escenarios y veredictos
-- [ ] Dominio del caso de estudio con política calculable (§5.4)
-- [ ] Edición Claude Agent SDK y su adaptador (§5.7)
-- [ ] Grabación interactiva de conversaciones
-- [ ] Inductor de escenarios con criterios sobre el desenlace (§5.1)
-- [ ] Usuario simulado con presupuesto de turnos y condición de parada (§5.1)
-- [ ] Runner con exactamente una traza por repetición (§5.1)
-- [ ] Evaluador ciego (§5.1)
-- [ ] Reporte con código de salida para integración continua (§3)
-- [ ] **Hito:** corrida real de punta a punta (1 conversación → 1 escenario → 2 reejecuciones → juicios → reporte)
+- [x] Especificación de la fase en `docs/specs/2026-09-21-f1-esqueleto.md`
+- [x] Esquema de trazas neutral (§5.7)
+- [x] Identificadores de modelo fijados en un único módulo (§5.6)
+- [x] Protocolo de sesión (§5.7)
+- [x] Persistencia de trazas, escenarios y veredictos
+- [x] Separación entre trazas semilla y trazas de corrida
+- [x] Motivo de terminación normalizado en la traza (§5.4)
+- [x] Dominio del caso de estudio con política calculable (§5.4)
+- [x] Edición Claude Agent SDK y su adaptador (§5.7)
+- [x] Grabación interactiva de conversaciones
+- [x] Inductor de escenarios con criterios sobre el desenlace (§5.1)
+- [x] Usuario simulado con presupuesto de turnos y condición de parada (§5.1)
+- [x] Runner con exactamente una traza por repetición (§5.1)
+- [x] Evaluador ciego (§5.1)
+- [x] Reporte con código de salida para integración continua (§3)
+- [x] Verificación en vivo del inductor, el usuario simulado y el evaluador (§5.6). Evidencia: 4 pruebas `live` en verde contra la API, 21-sep-2026, costo USD 0.034
+- [x] Verificación en vivo del agente aislado (§5.7). Evidencia: 4 pruebas `live` en verde en 3 corridas seguidas, 22-sep-2026, USD 0.025 por corrida; la prueba canario con control positivo confirma que el agente no lee un archivo de instrucciones de su carpeta de trabajo
+- [x] **Hito:** corrida real de punta a punta (1 conversación → 1 escenario → 2 reejecuciones → juicios → reporte). Evidencia: [`evidence/f1-hito/`](../evidence/f1-hito/), 22-sep-2026. El autor grabó una conversación de 4 turnos sobre un monitor defectuoso entregado hace 90 días (reclamo de garantía, regla 4); el escenario inducido tiene 4 criterios; baseline-a y baseline-b con 2 repeticiones cada una, las 4 terminadas por el usuario simulado y con 4 de 4 criterios cumplidos; `report` salió con 0 (100 % → 100 %, sin regresiones). Tiempo automático ≈ 2 min (inducción 8 s, corridas 38 s y 40 s, juicios 14 s y 17 s). Costo del agente medido: USD 0.212 (semilla 0.068 + reejecuciones 0.144); el inductor, el usuario simulado y el juez aún no registran su consumo
 
 ## F2 Listo para el corpus — objetivo: 5–11 oct
 
 - [ ] Tarjetas de situación y matriz de cobertura de 20 tarjetas (§5.2)
 - [ ] Grabación asociada a su tarjeta (§5.2)
-- [ ] Separación entre trazas semilla y trazas de corrida
-- [ ] Motivo de terminación normalizado en la traza (§5.4)
 - [ ] Protocolo de elicitación (§5.2)
 - [ ] **Hito:** el autor graba 2–3 conversaciones semilla reales, cada una con su tarjeta
 
@@ -55,7 +58,8 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [ ] Predicados de fallo y conjunto manifestado (§5.4)
 - [ ] Criterio de regresión: Fisher + Benjamini-Hochberg + caída ≥ 0.4 (§5.5)
 - [ ] Matriz de confusión, TPR, FPR y pass^k (§5.5, §5.8)
-- [ ] Registro de costo y latencia por componente (§5.8)
+- [ ] Registro de costo y latencia por componente (§5.8), en tokens y en USD con la fecha de los precios, conciliado con la facturación de la consola de Anthropic; gasto total del proyecto, incluidos el desarrollo y la depuración, frente al presupuesto de USD 150–300 (§7). Línea base: USD 0.60 según la consola al cierre de F1 (22-sep-2026)
+- [ ] Revisión del prompt del inductor antes del pre-registro (§5.1): el mensaje inicial revela solo lo que el cliente dijo al abrir la conversación, para que la reejecución conserve los turnos de la semilla (en el hito de F1 adelantó el número de pedido), y los criterios exigen el desenlace, no la justificación del agente, para no inflar los falsos positivos de E3
 - [ ] Pre-registro del protocolo (§5.5)
 - [ ] **Hito:** tag `preregistro-v1` y piloto de 5 escenarios × 2 repeticiones × 2 condiciones (§7c)
 
