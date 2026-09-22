@@ -28,11 +28,18 @@ uv run ruff format --check .   # formato
 La clave de la API de Anthropic va en un archivo `.env` en la raíz del repositorio, con la línea `ANTHROPIC_API_KEY=<su clave>`; git lo ignora. El agente del caso de estudio se indica con el adaptador de su framework y su constructor como `modulo:atributo`; el adaptador de Claude Agent SDK necesita el extra `claude-sdk`, que el entorno de desarrollo ya incluye.
 
 ```bash
-A="--adapter claude_sdk --agent casestudy.editions.claude_sdk:build_options"
+# graba una conversación con una persona como traza semilla
+uv run --env-file .env agentproof record --adapter claude_sdk \
+  --agent casestudy.editions.claude_sdk:build_options --data datos
 
-uv run --env-file .env agentproof record $A --data datos    # graba una conversación con una persona
-uv run --env-file .env agentproof induce --data datos       # induce los escenarios que faltan
-uv run --env-file .env agentproof run $A --condition baseline-a --data datos
+# induce los escenarios que faltan
+uv run --env-file .env agentproof induce --data datos
+
+# reejecuta los escenarios con el usuario simulado
+uv run --env-file .env agentproof run --adapter claude_sdk \
+  --agent casestudy.editions.claude_sdk:build_options --condition baseline-a --data datos
+
+# juzga una corrida y compara dos
 uv run --env-file .env agentproof judge --run <corrida> --data datos
 uv run --env-file .env agentproof report --baseline <corrida-a> --candidate <corrida-b> --data datos
 ```
