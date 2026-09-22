@@ -28,7 +28,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Dominio del caso de estudio con política calculable (§5.4)
 - [ ] Edición Claude Agent SDK y su adaptador (§5.7)
 - [ ] Grabación interactiva de conversaciones
-- [ ] Inductor de escenarios con criterios sobre el desenlace (§5.1)
+- [x] Inductor de escenarios con criterios sobre el desenlace (§5.1)
 - [ ] Usuario simulado con presupuesto de turnos y condición de parada (§5.1)
 - [ ] Runner con exactamente una traza por repetición (§5.1)
 - [ ] Evaluador ciego (§5.1)
