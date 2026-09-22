@@ -66,6 +66,11 @@ class EchoSession:
         )
 
 
+def echo_agent(variant: str) -> EchoSession:
+    """Agent builder for the command-line tests, used with ``tests.fake_adapter``."""
+    return EchoSession()
+
+
 class CrashingSession(EchoSession):
     """Its agent fails on every message."""
 
