@@ -31,6 +31,8 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["live: calls the real Anthropic API; run with: uv run --env-file .env pytest -m live"]
+addopts = "-m 'not live'"
 
 [tool.uv.build-backend]
 module-name = ["agentproof", "casestudy", "experiments"]

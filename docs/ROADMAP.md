@@ -33,6 +33,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Runner con exactamente una traza por repetición (§5.1)
 - [x] Evaluador ciego (§5.1)
 - [x] Reporte con código de salida para integración continua (§3)
+- [x] Verificación en vivo del inductor, el usuario simulado y el evaluador (§5.6). Evidencia: 4 pruebas `live` en verde contra la API, 21-sep-2026, costo USD 0.034
 - [ ] **Hito:** corrida real de punta a punta (1 conversación → 1 escenario → 2 reejecuciones → juicios → reporte)
 
 ## F2 Listo para el corpus — objetivo: 5–11 oct
