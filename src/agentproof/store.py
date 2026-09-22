@@ -18,7 +18,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from agentproof.schema import Scenario, Trace
+from agentproof.schema import RunManifest, Scenario, Trace, Verdict
 
 
 def _write(path: Path, model: BaseModel) -> None:
@@ -73,3 +73,49 @@ class Store:
 
     def scenarios(self) -> list[Scenario]:
         return _read_all(self.scenarios_dir, Scenario)
+
+    def _manifest_path(self, run_id: str) -> Path:
+        return self.runs_dir / run_id / "manifest.json"
+
+    def _require_run(self, run_id: str) -> Path:
+        if not self._manifest_path(run_id).exists():
+            raise KeyError(run_id)
+        return self.runs_dir / run_id
+
+    def create_run(self, manifest: RunManifest) -> Path:
+        path = self._manifest_path(manifest.run_id)
+        if path.exists():
+            raise FileExistsError(f"run already exists: {manifest.run_id}")
+        _write(path, manifest)
+        return path.parent
+
+    def manifest(self, run_id: str) -> RunManifest:
+        return _read(self._require_run(run_id) / "manifest.json", RunManifest)
+
+    def runs(self) -> list[str]:
+        if not self.runs_dir.is_dir():
+            return []
+        return sorted(p.parent.name for p in self.runs_dir.glob("*/manifest.json"))
+
+    def save_run_trace(self, trace: Trace) -> Path:
+        if trace.kind != "run" or trace.run_id is None:
+            raise ValueError(f"not a run trace: {trace.trace_id}")
+        path = self._require_run(trace.run_id) / "traces" / f"{trace.trace_id}.json"
+        _write(path, trace)
+        return path
+
+    def run_traces(self, run_id: str) -> list[Trace]:
+        traces = _read_all(self._require_run(run_id) / "traces", Trace)
+        return sorted(traces, key=lambda t: (t.scenario_id or "", t.repetition or 0))
+
+    def has_verdict(self, run_id: str, trace_id: str) -> bool:
+        return (self.runs_dir / run_id / "verdicts" / f"{trace_id}.json").exists()
+
+    def save_verdict(self, verdict: Verdict) -> Path:
+        """One verdict per trace: judging a trace again replaces its verdict."""
+        path = self._require_run(verdict.run_id) / "verdicts" / f"{verdict.trace_id}.json"
+        _write(path, verdict)
+        return path
+
+    def verdicts(self, run_id: str) -> list[Verdict]:
+        return _read_all(self._require_run(run_id) / "verdicts", Verdict)
