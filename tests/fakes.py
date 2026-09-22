@@ -2,7 +2,10 @@
 
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
 from typing import Self
+
+from pydantic import BaseModel, ValidationError
 
 from agentproof.conversation import Exchange, TraceContext
 from agentproof.schema import Usage
@@ -71,3 +74,39 @@ def ticking_clock(start: datetime = datetime(2026, 10, 1, 12, 0, tzinfo=UTC)) ->
         return current[0]
 
     return tick
+
+
+class _FakeParseMessages:
+    def __init__(self, outcomes: list) -> None:
+        self.outcomes = outcomes
+        self.calls: list[dict] = []
+
+    def parse(self, **kwargs):
+        self.calls.append(kwargs)
+        outcome = self.outcomes.pop(0)
+        if isinstance(outcome, Exception):
+            raise outcome
+        return outcome
+
+
+class FakeLLM:
+    """Stands in for ``anthropic.Anthropic``: each call returns the next scripted outcome."""
+
+    def __init__(self, *outcomes) -> None:
+        self.messages = _FakeParseMessages(list(outcomes))
+
+
+def parsed(value, stop_reason: str = "end_turn") -> SimpleNamespace:
+    return SimpleNamespace(parsed_output=value, stop_reason=stop_reason)
+
+
+class _Anything(BaseModel):
+    required: int
+
+
+def validation_error() -> ValidationError:
+    try:
+        _Anything.model_validate_json("{}")
+    except ValidationError as exc:
+        return exc
+    raise AssertionError("unreachable")
