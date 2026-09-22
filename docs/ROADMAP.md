@@ -21,7 +21,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Especificación de la fase en `docs/specs/2026-09-21-f1-esqueleto.md`
 - [x] Esquema de trazas neutral (§5.7)
 - [x] Identificadores de modelo fijados en un único módulo (§5.6)
-- [ ] Protocolo de sesión (§5.7)
+- [x] Protocolo de sesión (§5.7)
 - [ ] Persistencia de trazas, escenarios y veredictos
 - [ ] Separación entre trazas semilla y trazas de corrida
 - [ ] Motivo de terminación normalizado en la traza (§5.4)
