@@ -110,3 +110,25 @@ def validation_error() -> ValidationError:
     except ValidationError as exc:
         return exc
     raise AssertionError("unreachable")
+
+
+class _FakeCreateMessages:
+    def __init__(self, replies: list) -> None:
+        self.replies = replies
+        self.calls: list[dict] = []
+
+    async def create(self, **kwargs):
+        self.calls.append(kwargs)
+        return self.replies.pop(0)
+
+
+class FakeAsyncLLM:
+    """Stands in for ``anthropic.AsyncAnthropic`` in the simulated user."""
+
+    def __init__(self, *replies) -> None:
+        self.messages = _FakeCreateMessages(list(replies))
+
+
+def reply(text: str, stop_reason: str = "end_turn") -> SimpleNamespace:
+    content = [SimpleNamespace(type="text", text=text)]
+    return SimpleNamespace(content=content, stop_reason=stop_reason)
