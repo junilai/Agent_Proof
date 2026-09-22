@@ -9,6 +9,7 @@ contract.
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
@@ -19,6 +20,7 @@ from agentproof.conversation import utc_now
 from agentproof.llm import structured_call
 from agentproof.models import INDUCER
 from agentproof.schema import Scenario, Trace, scenario_id_for
+from agentproof.store import Store
 from agentproof.transcript import render_transcript
 
 INDUCTION_SYSTEM = "\n".join(
@@ -80,3 +82,29 @@ def induce_scenario(
         output_type=ScenarioDraft,
         validate=to_scenario,
     )
+
+
+@dataclass
+class InductionSummary:
+    created: list[str] = field(default_factory=list)
+    kept: list[str] = field(default_factory=list)
+    failed: dict[str, str] = field(default_factory=dict)
+
+
+def induce_missing(
+    store: Store, induce: Callable[[Trace], Scenario] = induce_scenario
+) -> InductionSummary:
+    """Induce the scenario of every seed that does not have one yet; never twice."""
+    summary = InductionSummary()
+    for seed in store.seeds():
+        scenario_id = scenario_id_for(seed.trace_id)
+        if store.has_scenario(scenario_id):
+            summary.kept.append(scenario_id)
+            continue
+        try:
+            store.save_scenario(induce(seed))
+        except Exception as exc:
+            summary.failed[scenario_id] = f"{type(exc).__name__}: {exc}"
+        else:
+            summary.created.append(scenario_id)
+    return summary
