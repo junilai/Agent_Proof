@@ -26,7 +26,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Separación entre trazas semilla y trazas de corrida
 - [x] Motivo de terminación normalizado en la traza (§5.4)
 - [x] Dominio del caso de estudio con política calculable (§5.4)
-- [ ] Edición Claude Agent SDK y su adaptador (§5.7)
+- [x] Edición Claude Agent SDK y su adaptador (§5.7)
 - [ ] Grabación interactiva de conversaciones
 - [x] Inductor de escenarios con criterios sobre el desenlace (§5.1)
 - [x] Usuario simulado con presupuesto de turnos y condición de parada (§5.1)
