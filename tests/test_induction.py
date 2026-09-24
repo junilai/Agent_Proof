@@ -27,6 +27,12 @@ def test_instructions_ask_for_outcome_criteria_not_a_trajectory():
     assert "desenlace" in INDUCTION_SYSTEM
     assert "nunca qué herramienta" in INDUCTION_SYSTEM
     assert "entre 2 y 5" in INDUCTION_SYSTEM
+    assert "no exijas que el agente justifique" in INDUCTION_SYSTEM
+
+
+def test_instructions_keep_the_pace_of_the_seed_conversation():
+    assert "solo lo que el cliente reveló en su primer mensaje" in INDUCTION_SYSTEM
+    assert "no adelantes" in INDUCTION_SYSTEM
 
 
 def test_builds_the_scenario_of_the_seed():
