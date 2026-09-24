@@ -51,7 +51,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F3 Aparato experimental — objetivo: 12–31 oct
 
-- [ ] Condiciones y corridas (§5.5)
+- [ ] Condiciones y corridas (§5.5), con la regla de repeticiones inválidas de [D-001](decisiones.md)
 - [ ] Mutaciones D1–D6 en el dominio (§5.4)
 - [ ] Extracción del desenlace por reglas y cola de anotación manual a ciegas (§5.4)
 - [ ] Conjuntos expuestos por operador (§5.4)
