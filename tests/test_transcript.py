@@ -45,3 +45,9 @@ def test_never_reveals_the_run_metadata_or_the_model():
     for secret in (*secrets, T0.isoformat(), "2026-10-01"):
         assert secret not in text
     assert f"NotFoundError: model {MODEL_MASK} not found" in text
+
+
+def test_the_card_is_not_part_of_the_transcript():
+    """The inducer and the judge read this text: neither may learn the ground truth."""
+    rendered = render_transcript(trace(card_id="tc-03"))
+    assert "tc-03" not in rendered
