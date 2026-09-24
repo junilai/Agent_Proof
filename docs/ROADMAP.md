@@ -39,9 +39,9 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F2 Listo para el corpus — objetivo: 5–11 oct
 
-- [ ] Tarjetas de situación y matriz de cobertura de 20 tarjetas (§5.2)
-- [ ] Grabación asociada a su tarjeta (§5.2)
-- [ ] Protocolo de elicitación (§5.2)
+- [x] Tarjetas de situación y matriz de cobertura de 20 tarjetas (§5.2), con informe de cobertura para las sesiones
+- [x] Grabación asociada a su tarjeta (§5.2)
+- [x] [Protocolo de elicitación](protocolo-elicitacion.md) (§5.2), con consentimiento y sin datos personales
 - [ ] **Hito:** el autor graba 2–3 conversaciones semilla reales, cada una con su tarjeta
 
 ## Corpus — objetivo: 12–25 oct
