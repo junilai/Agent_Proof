@@ -33,6 +33,7 @@ DATA = typer.Option(Path("."), "--data", help="Carpeta que contiene corpus/ y re
 ADAPTER = typer.Option(..., "--adapter", help="Adaptador del framework, por ejemplo claude_sdk.")
 AGENT = typer.Option(..., "--agent", help="Constructor del agente, como modulo:atributo.")
 VARIANT = typer.Option("baseline", "--variant", help="Variante del agente.")
+CARD = typer.Option(None, "--card", help="Tarjeta de situación que se le entregó a la persona.")
 
 
 def load_object(path: str) -> Any:
@@ -91,10 +92,16 @@ def _unknown_run(run_id: object) -> typer.Exit:
 
 
 @app.command()
-def record(adapter: str = ADAPTER, agent: str = AGENT, variant: str = VARIANT, data: Path = DATA):
+def record(
+    adapter: str = ADAPTER,
+    agent: str = AGENT,
+    variant: str = VARIANT,
+    card: str | None = CARD,
+    data: Path = DATA,
+):
     """Graba una conversación con una persona como traza semilla."""
     factory = session_factory_for(adapter, agent, variant)
-    context = TraceContext(kind="seed", adapter=adapter, agent=agent, variant=variant)
+    context = TraceContext(kind="seed", adapter=adapter, agent=agent, variant=variant, card_id=card)
     typer.echo("Escriba sus mensajes. Una línea vacía termina la conversación.")
     trace = asyncio.run(converse(factory, HumanUser(), context))
     if not any(event.kind == "user_message" for event in trace.events):

@@ -56,6 +56,8 @@ class Trace(BaseModel):
     run_id: str | None = None
     scenario_id: str | None = None
     repetition: int | None = None
+    card_id: str | None = None
+    """Situation the conversation was elicited with; opaque to the core (§5.2)."""
     termination: Termination
     events: list[TraceEvent]
     models: dict[str, Any]

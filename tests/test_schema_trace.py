@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -55,3 +57,13 @@ def test_usage_adds_tokens_and_known_costs():
 def test_new_trace_id_format():
     first, second = new_trace_id(), new_trace_id()
     assert first.startswith("tr-") and len(first) == 15 and first != second
+
+
+def test_a_seed_trace_remembers_the_card_it_was_recorded_with():
+    assert trace(card_id="tc-01").card_id == "tc-01"
+    assert trace().card_id is None
+
+
+def test_traces_saved_before_the_card_field_still_load():
+    saved = Path("evidence/f1-hito/corpus/seeds/tr-0a7510c36f69.json").read_text(encoding="utf-8")
+    assert Trace.model_validate_json(saved).card_id is None

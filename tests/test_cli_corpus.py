@@ -55,3 +55,16 @@ def test_induce_reports_created_and_failed_seeds(tmp_path, monkeypatch):
     result = runner.invoke(cli.app, ["induce", "--data", str(tmp_path)])
     assert result.exit_code == 1
     assert "creado: sc-tr-a" in result.output and "falló: sc-tr-b" in result.output
+
+
+def test_record_stores_the_card_of_the_session(tmp_path):
+    result = runner.invoke(
+        cli.app, ["record", *AGENT, "--card", "tc-03", "--data", str(tmp_path)], input="hola\n\n"
+    )
+    assert result.exit_code == 0, result.output
+    assert Store(tmp_path).seeds()[0].card_id == "tc-03"
+
+
+def test_record_without_a_card_leaves_it_empty(tmp_path):
+    record(tmp_path, "hola\n\n")
+    assert Store(tmp_path).seeds()[0].card_id is None
