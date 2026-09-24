@@ -42,7 +42,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Tarjetas de situación y matriz de cobertura de 20 tarjetas (§5.2), con informe de cobertura para las sesiones
 - [x] Grabación asociada a su tarjeta (§5.2)
 - [x] [Protocolo de elicitación](protocolo-elicitacion.md) (§5.2), con consentimiento y sin datos personales
-- [ ] **Hito:** el autor graba 2–3 conversaciones semilla reales, cada una con su tarjeta
+- [x] **Hito:** el autor graba 2–3 conversaciones semilla, cada una con su tarjeta. Evidencia: `corpus/seeds/`, 24-sep-2026. Tres conversaciones de 4, 5 y 6 turnos del cliente con las tarjetas tc-01 (procede), tc-13 (escalamiento por garantía) y tc-20 (sin decisión); en las tres el desenlace coincide con el resultado esperado de su tarjeta y ninguna terminó por error. Costo USD 0.199. Con solo tres conversaciones, los conjuntos expuesto y de control de D1, D4 y D6 ya son no vacíos
 
 ## Corpus — objetivo: 12–25 oct
 
