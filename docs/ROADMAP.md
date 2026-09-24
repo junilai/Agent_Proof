@@ -35,14 +35,14 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Reporte con código de salida para integración continua (§3)
 - [x] Verificación en vivo del inductor, el usuario simulado y el evaluador (§5.6). Evidencia: 4 pruebas `live` en verde contra la API, 21-sep-2026, costo USD 0.034
 - [x] Verificación en vivo del agente aislado (§5.7). Evidencia: 4 pruebas `live` en verde en 3 corridas seguidas, 22-sep-2026, USD 0.025 por corrida; la prueba canario con control positivo confirma que el agente no lee un archivo de instrucciones de su carpeta de trabajo
-- [x] **Hito:** corrida real de punta a punta (1 conversación → 1 escenario → 2 reejecuciones → juicios → reporte). Evidencia: [`evidence/f1-hito/`](../evidence/f1-hito/), 22-sep-2026. El autor grabó una conversación de 4 turnos sobre un monitor defectuoso entregado hace 90 días (reclamo de garantía, regla 4); el escenario inducido tiene 4 criterios; baseline-a y baseline-b con 2 repeticiones cada una, las 4 terminadas por el usuario simulado y con 4 de 4 criterios cumplidos; `report` salió con 0 (100 % → 100 %, sin regresiones). Tiempo automático ≈ 2 min (inducción 8 s, corridas 38 s y 40 s, juicios 14 s y 17 s). Costo del agente medido: USD 0.212 (semilla 0.068 + reejecuciones 0.144); el inductor, el usuario simulado y el juez aún no registran su consumo
+- [x] **Hito:** corrida real de punta a punta (1 conversación → 1 escenario → 2 reejecuciones → juicios → reporte). Evidencia: [`evidence/f1-hito/`](../evidence/f1-hito/), 22-sep-2026. El autor grabó una conversación de 4 turnos sobre un monitor defectuoso entregado hace 90 días (reclamo de garantía, regla 4); el escenario inducido tiene 4 criterios; baseline-a y baseline-b con 2 repeticiones cada una, las 4 terminadas por el usuario simulado y con 4 de 4 criterios cumplidos; `report` salió con 0 (100 % → 100 %, sin regresiones). Tiempo automático ≈ 2 min (inducción 8 s, corridas 38 s y 40 s, juicios 14 s y 17 s). Costo del agente medido: USD 0.212 (semilla 0.068 + reejecuciones 0.144); el inductor, el usuario simulado y el juez aún no registran su consumo. El escenario de esta evidencia se indujo con el prompt anterior al ajuste del 23-sep-2026 y se conserva tal cual, porque documenta por qué se hizo ese ajuste
 
 ## F2 Listo para el corpus — objetivo: 5–11 oct
 
-- [ ] Tarjetas de situación y matriz de cobertura de 20 tarjetas (§5.2)
-- [ ] Grabación asociada a su tarjeta (§5.2)
-- [ ] Protocolo de elicitación (§5.2)
-- [ ] **Hito:** el autor graba 2–3 conversaciones semilla reales, cada una con su tarjeta
+- [x] Tarjetas de situación y matriz de cobertura de 20 tarjetas (§5.2), con informe de cobertura para las sesiones
+- [x] Grabación asociada a su tarjeta (§5.2)
+- [x] [Protocolo de elicitación](protocolo-elicitacion.md) (§5.2), con consentimiento y sin datos personales
+- [x] **Hito:** el autor graba 2–3 conversaciones semilla, cada una con su tarjeta. Evidencia: `corpus/seeds/`, 24-sep-2026. Tres conversaciones de 4, 5 y 6 turnos del cliente con las tarjetas tc-01 (procede), tc-13 (escalamiento por garantía) y tc-20 (sin decisión); en las tres el desenlace coincide con el resultado esperado de su tarjeta y ninguna terminó por error. Costo USD 0.199. Con solo tres conversaciones, los conjuntos expuesto y de control de D1, D4 y D6 ya son no vacíos
 
 ## Corpus — objetivo: 12–25 oct
 
@@ -51,7 +51,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F3 Aparato experimental — objetivo: 12–31 oct
 
-- [ ] Condiciones y corridas (§5.5)
+- [ ] Condiciones y corridas (§5.5), con la regla de repeticiones inválidas de [D-001](decisiones.md)
 - [ ] Mutaciones D1–D6 en el dominio (§5.4)
 - [ ] Extracción del desenlace por reglas y cola de anotación manual a ciegas (§5.4)
 - [ ] Conjuntos expuestos por operador (§5.4)
@@ -59,7 +59,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [ ] Criterio de regresión: Fisher + Benjamini-Hochberg + caída ≥ 0.4 (§5.5)
 - [ ] Matriz de confusión, TPR, FPR y pass^k (§5.5, §5.8)
 - [ ] Registro de costo y latencia por componente (§5.8), en tokens y en USD con la fecha de los precios, conciliado con la facturación de la consola de Anthropic; gasto total del proyecto, incluidos el desarrollo y la depuración, frente al presupuesto de USD 150–300 (§7). Línea base: USD 0.60 según la consola al cierre de F1 (22-sep-2026)
-- [ ] Revisión del prompt del inductor antes del pre-registro (§5.1): el mensaje inicial revela solo lo que el cliente dijo al abrir la conversación, para que la reejecución conserve los turnos de la semilla (en el hito de F1 adelantó el número de pedido), y los criterios exigen el desenlace, no la justificación del agente, para no inflar los falsos positivos de E3
+- [x] Revisión del prompt del inductor antes del pre-registro (§5.1), hecha el 23-sep-2026 en F2, antes de inducir el corpus: el mensaje inicial revela solo lo que el cliente dijo al abrir la conversación, para que la reejecución conserve los turnos de la semilla (en el hito de F1 adelantó el número de pedido), y los criterios exigen el desenlace, no la justificación del agente, para no inflar los falsos positivos de E3
 - [ ] Pre-registro del protocolo (§5.5)
 - [ ] **Hito:** tag `preregistro-v1` y piloto de 5 escenarios × 2 repeticiones × 2 condiciones (§7c)
 

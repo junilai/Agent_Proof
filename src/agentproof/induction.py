@@ -31,13 +31,16 @@ INDUCTION_SYSTEM = "\n".join(
         "- user_goal: qué quería lograr el cliente, en una oración, con los datos concretos que "
         "aportó (por ejemplo, el número de pedido y el motivo).",
         "- opening_message: el primer mensaje natural con el que un cliente iniciaría una "
-        "conversación equivalente. Conserva la intención y los identificadores concretos, pero "
-        "no copies el mensaje original palabra por palabra.",
+        "conversación equivalente. Conserva la intención y solo lo que el cliente reveló en su "
+        "primer mensaje; no adelantes datos que dio más adelante, como el número de pedido "
+        "cuando el agente se lo pidió después. No copies el mensaje original palabra por "
+        "palabra.",
         "- success_criteria: entre 2 y 5 afirmaciones verificables sobre el desenlace que el "
         "agente debe comunicar al cliente para resolver bien el caso, según los datos del pedido "
         "y la política que aparecen en la transcripción. Cada criterio debe poder comprobarse "
         "leyendo solo una transcripción. Describe qué debe saber o recibir el cliente al final, "
-        "nunca qué herramienta debe usar el agente ni en qué orden.",
+        "nunca qué herramienta debe usar el agente ni en qué orden, y no exijas que el agente "
+        "justifique su decisión ni repita los plazos o montos que la sustentan.",
         "Escribe todo en español.",
     ]
 )

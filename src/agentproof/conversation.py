@@ -48,6 +48,7 @@ class TraceContext:
     run_id: str | None = None
     scenario_id: str | None = None
     repetition: int | None = None
+    card_id: str | None = None
 
 
 def utc_now() -> datetime:

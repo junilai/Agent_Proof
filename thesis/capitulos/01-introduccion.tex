@@ -5,7 +5,7 @@
 \tituloapa[Introducción]{INTRODUCCIÓN}
 \begingroup\dobleesp
 \vspace{6pt}
-Los agentes basados en modelos de lenguaje (LLM) son sistemas que ejecutan tareas de extremo a extremo combinando un modelo con acceso a herramientas externas, y son cada vez más capaces de realizar trabajo útil con una supervisión humana limitada \cite{iasr2026}. Este trabajo presenta AgentProof, un sistema para detectar cuándo una nueva versión de un agente se comporta peor que la anterior, a partir de las conversaciones reales que el agente ya sostuvo.
+Los agentes basados en modelos de lenguaje (LLM) son sistemas que ejecutan tareas de extremo a extremo combinando un modelo con acceso a herramientas externas, y son cada vez más capaces de realizar trabajo útil con una supervisión humana limitada \cite{iasr2026}. Este trabajo presenta AgentProof, un sistema para detectar cuándo una nueva versión de un agente se comporta peor que la anterior, a partir de las conversaciones que el agente ya sostuvo.
 \par
 
 \subtituloapa{Contexto y problema}
@@ -13,7 +13,7 @@ La adopción de agentes enfrenta un problema abierto que el International AI Saf
 \par\vspace{6pt}
 El problema se vuelve concreto cada vez que un agente cambia. Un equipo actualiza el modelo, recorta el prompt o modifica una herramienta, y necesita saber si la nueva versión atiende peor a sus usuarios que la anterior. Las pruebas de regresión tradicionales suponen un sistema determinista que, ante la misma entrada, produce la misma salida, y un agente no cumple esa condición. Si una conversación grabada se reproduce tal cual contra la nueva versión, un camino distinto pero legítimo se reporta como fallo, y una degradación que solo aparece cuando el usuario reacciona de otra forma nunca llega a ejercitarse. Tampoco basta con evaluar turnos aislados: en atención al cliente, los agentes aciertan la mayoría de las respuestas individuales pero resuelven correctamente muy pocas conversaciones completas \cite{arcadinho2024almita}.
 \par\vspace{6pt}
-Este trabajo aborda ese problema: detectar de forma automática, y con evidencia estadística, que una nueva versión de un agente conversacional se comporta peor que la anterior, tomando como punto de partida las conversaciones reales que el agente ya sostuvo y reejecutándolas de una forma que tolere la variabilidad propia de los agentes.
+Este trabajo aborda ese problema: detectar de forma automática, y con evidencia estadística, que una nueva versión de un agente conversacional se comporta peor que la anterior, tomando como punto de partida las conversaciones que el agente ya sostuvo y reejecutándolas de una forma que tolere la variabilidad propia de los agentes.
 \par
 
 \subtituloapa{Relevancia}

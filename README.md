@@ -58,6 +58,8 @@ uv run --env-file .env pytest -m live -s
 - [Plan maestro](docs/specs/2026-09-21-plan-maestro.md): cómo se construye.
 - [ROADMAP](docs/ROADMAP.md): estado del trabajo.
 - [Convenciones](docs/convenciones.md): reglas de verificación y de commits.
+- [Protocolo de elicitación](docs/protocolo-elicitacion.md): cómo se obtienen las conversaciones del corpus.
+- [Decisiones](docs/decisiones.md): decisiones de diseño que no se deducen del código, con su motivo.
 
 ## Licencia
 

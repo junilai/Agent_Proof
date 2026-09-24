@@ -10,7 +10,7 @@ Este capítulo describe AgentProof: el recorrido de sus etapas, el patrón de di
 \par
 
 \subtituloapa{Visión general}
-AgentProof toma conversaciones reales con un agente y las convierte en una suite de regresión que se reejecuta de forma adaptativa contra cada nueva versión del agente. Su funcionamiento se organiza en cinco etapas encadenadas (Figura~\ref{fig:pipeline}):
+AgentProof toma conversaciones de interacción genuina con un agente y las convierte en una suite de regresión que se reejecuta de forma adaptativa contra cada nueva versión del agente. Su funcionamiento se organiza en cinco etapas encadenadas (Figura~\ref{fig:pipeline}):
 \par
 \begin{enumerate}[label=\arabic*.,leftmargin=0.5in,labelwidth=0.25in,labelsep=0pt,align=left,itemsep=0pt,parsep=0pt,topsep=0pt]
   \item \textbf{Captura.} Cada conversación con el agente se registra como una traza en un esquema neutral, independiente del framework con el que se construyó el agente. Las conversaciones de partida, llamadas trazas semilla, provienen de personas que interactúan con el agente.
@@ -35,7 +35,7 @@ AgentProof toma conversaciones reales con un agente y las convierte en una suite
     \node[etapa, right=of juicio] (reporte) {Reporte};
     \foreach \origen/\destino in {captura/induccion, induccion/reejecucion, reejecucion/juicio, juicio/reporte}
       \draw[flecha] (\origen) -- (\destino);
-    \node[artefacto, below=0.25cm of captura] {trazas semilla\\(conversaciones reales)};
+    \node[artefacto, below=0.25cm of captura] {trazas semilla\\(interacción elicitada)};
     \node[artefacto, below=0.25cm of induccion] {escenarios: objetivo, mensaje inicial y criterios};
     \node[artefacto, below=0.25cm of reejecucion] {trazas de corrida por escenario y versión};
     \node[artefacto, below=0.25cm of juicio] {juicios por criterio, a ciegas};

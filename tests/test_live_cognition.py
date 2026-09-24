@@ -85,6 +85,12 @@ def test_inducer_returns_a_spanish_scenario_with_two_to_five_criteria(scenario):
     assert "AT-1001" in scenario.opening_message + scenario.user_goal
 
 
+def test_inducer_keeps_the_pace_of_the_seed(scenario):
+    """El cliente dio el número de pedido recién en su segundo mensaje: no debe adelantarse."""
+    assert "AT-1001" not in scenario.opening_message
+    assert "AT-1001" in scenario.user_goal
+
+
 def test_simulated_user_answers_with_the_dated_haiku_identifier(scenario):
     user = SimulatedUser(scenario, client=Recorder(anthropic.AsyncAnthropic()))
     history = [Exchange(scenario.opening_message, "Lo siento. ¿Me indica su número de pedido?")]
