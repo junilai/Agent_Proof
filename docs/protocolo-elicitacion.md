@@ -4,7 +4,7 @@ Cómo se obtienen las veinte conversaciones que originan la suite de pruebas (§
 
 ## Qué son estas conversaciones
 
-Son **interacción elicitada**: personas reales conversando con el agente del caso de estudio a partir de una situación que se les entrega. No provienen de un sistema en producción ni de usuarios finales, y el documento de tesis nunca las llama tráfico de producción. La generalización hacia tráfico real se declara como limitación del estudio.
+Son **interacción elicitada**: personas reales conversando con el agente del caso de estudio a partir de una situación que se les entrega. No provienen de un sistema en producción ni de usuarios finales, y el documento de tesis nunca las llama tráfico de producción. La generalización hacia tráfico de producción se declara como limitación del estudio.
 
 De cada conversación se induce exactamente un escenario, así que las veinte conversaciones producen los veinte escenarios sobre los que se aplica el análisis estadístico. El número es fijo: si una conversación no permite inducir un escenario utilizable, se elicita otra hasta completar veinte.
 

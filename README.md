@@ -6,7 +6,7 @@ Proyecto integrador de Ingeniería en Ciencias de la Computación, Universidad S
 
 ## Qué hace
 
-AgentProof toma conversaciones reales con un agente y, de cada una, induce un escenario de prueba: el objetivo del usuario, un mensaje inicial y criterios verificables de éxito. Después reejecuta ese escenario contra otra versión del agente mediante un usuario simulado que adapta la conversación a lo que el agente responde. Un evaluador ciego califica cada conversación, y el reporte compara versiones y termina con un código de salida apto para integración continua cuando detecta una regresión.
+AgentProof toma las conversaciones que un agente ya sostuvo y, de cada una, induce un escenario de prueba: el objetivo del usuario, un mensaje inicial y criterios verificables de éxito. Después reejecuta ese escenario contra otra versión del agente mediante un usuario simulado que adapta la conversación a lo que el agente responde. Un evaluador ciego califica cada conversación, y el reporte compara versiones y termina con un código de salida apto para integración continua cuando detecta una regresión.
 
 ## Estado
 
