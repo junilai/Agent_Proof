@@ -26,7 +26,7 @@ from agentproof.transcript import render_transcript
 INDUCTION_SYSTEM = "\n".join(
     [
         "Construyes una suite de pruebas de regresión para un agente de atención al cliente.",
-        "Recibirás la transcripción de una conversación real entre un cliente y el agente. "
+        "Recibirás la transcripción de una conversación entre un cliente y el agente. "
         "A partir de ella, induce un escenario de prueba:",
         "- user_goal: qué quería lograr el cliente, en una oración, con los datos concretos que "
         "aportó (por ejemplo, el número de pedido y el motivo).",

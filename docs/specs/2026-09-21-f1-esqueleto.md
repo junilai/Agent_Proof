@@ -9,7 +9,7 @@
 
 F1 construye la versión mínima pero completa del pipeline, con un solo framework (Claude Agent SDK): grabar una conversación, inducir su escenario, reejecutarlo con un usuario simulado, juzgar cada ejecución y comparar dos corridas con un código de salida apto para integración continua.
 
-**Hito:** una conversación real grabada por el autor → un escenario inducido → dos corridas del **mismo** agente (`baseline-a` y `baseline-b`), con dos repeticiones cada una → cuatro juicios → reporte con código de salida 0. Es un control negativo en miniatura: al ser el mismo agente, no debe declararse regresión. Los datos del hito se guardan en `evidence/f1-hito/` y no en `corpus/`, porque el corpus de la §5.2 debe tener exactamente 20 conversaciones elicitadas. El costo real se anota en el ROADMAP.
+**Hito:** una conversación de interacción elicitada grabada por el autor → un escenario inducido → dos corridas del **mismo** agente (`baseline-a` y `baseline-b`), con dos repeticiones cada una → cuatro juicios → reporte con código de salida 0. Es un control negativo en miniatura: al ser el mismo agente, no debe declararse regresión. Los datos del hito se guardan en `evidence/f1-hito/` y no en `corpus/`, porque el corpus de la §5.2 debe tener exactamente 20 conversaciones elicitadas. El costo real se anota en el ROADMAP.
 
 **Fuera de F1:** mutaciones D1–D6 y condiciones del experimento (F3), tarjetas de situación y matriz de cobertura (F2), prueba de Fisher con Benjamini-Hochberg (F3), análisis de costo y latencia (F3), otros frameworks (F4).
 
