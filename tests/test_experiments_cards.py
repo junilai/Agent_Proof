@@ -1,9 +1,12 @@
 from collections import Counter
 
+from typer.testing import CliRunner
+
 from casestudy.domain.catalog import ORDERS_BY_ID
 from casestudy.domain.policy import Decision, decide
-from experiments.cards import CARDS, CARDS_BY_ID, cards_expecting, cards_with_decision
+from experiments.cards import CARDS, CARDS_BY_ID, app, cards_expecting, cards_with_decision
 
+runner = CliRunner()
 DECISIONS = {
     "procede": Decision.APPROVED,
     "no_procede": Decision.DENIED,
@@ -55,3 +58,23 @@ def test_every_card_describes_a_situation_and_names_its_orders():
     for card in CARDS:
         assert len(card.text) >= 60, card.card_id
         assert all(order in card.text for order in card.orders), card.card_id
+
+
+def test_showing_a_card_reveals_only_its_text():
+    for card in CARDS:
+        result = runner.invoke(app, [card.card_id])
+        assert result.exit_code == 0, result.output
+        assert card.text in result.output.replace("\n", " ")
+        for hidden in (card.expected, card.tone, card.intent):
+            assert hidden not in result.output, (card.card_id, hidden)
+
+
+def test_without_an_identifier_it_prints_the_sheet_of_all_cards():
+    result = runner.invoke(app, [])
+    assert result.exit_code == 0
+    assert all(card.card_id in result.output for card in CARDS)
+
+
+def test_an_unknown_card_is_an_error():
+    result = runner.invoke(app, ["tc-99"])
+    assert result.exit_code == 1 and "tc-99" in result.output

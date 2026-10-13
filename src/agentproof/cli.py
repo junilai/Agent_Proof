@@ -51,8 +51,15 @@ def session_factory_for(adapter: str, agent: str, variant: str) -> SessionFactor
     return load_adapter(adapter).session_factory(load_object(agent), variant)
 
 
+WAITING = "(el agente está respondiendo, puede tardar unos segundos…)"
+
+
 class HumanUser:
-    """A person at the terminal; an empty line ends the conversation."""
+    """A person at the terminal; an empty line ends the conversation.
+
+    After every message it says the agent is answering: a reply takes several
+    seconds and a participant who does not know the tool could think it hung.
+    """
 
     def __init__(
         self,
@@ -64,14 +71,18 @@ class HumanUser:
     async def first_message(self) -> str:
         while not (message := self.read("usted> ").strip()):
             pass
+        self.write(WAITING)
         return message
 
     async def next_message(self, history: Sequence[Exchange]) -> str | None:
         self.write(f"agente> {history[-1].agent}")
         try:
-            return self.read("usted> ").strip() or None
+            message = self.read("usted> ").strip() or None
         except EOFError:  # Ctrl+D also ends the conversation
             return None
+        if message is not None:
+            self.write(WAITING)
+        return message
 
 
 def _induce(seed: Trace) -> Scenario:
