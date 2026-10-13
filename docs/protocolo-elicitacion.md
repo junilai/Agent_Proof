@@ -14,7 +14,11 @@ Entre cuatro y seis personas: el autor y estudiantes de la carrera ajenos al pro
 
 ## Materiales
 
-- Una [tarjeta de situación](../src/experiments/cards.py) por conversación, de las veinte del catálogo.
+- Una tarjeta de situación por conversación, de las veinte del catálogo. Al participante se le muestra **solo su texto**, con:
+  ```bash
+  uv run python -m experiments.cards tc-01
+  ```
+  Nunca se le muestra el [catálogo](../src/experiments/cards.py), porque junto a cada texto están el resultado esperado y el tono, que son la verdad de referencia del experimento. Sin identificador, el comando imprime la hoja con las veinte.
 - Una terminal con el proyecto instalado y la clave de la API configurada.
 
 ## Antes de empezar
@@ -38,7 +42,7 @@ uv run --env-file .env agentproof record --adapter claude_sdk \
   --agent casestudy.editions.claude_sdk:build_options --card tc-01 --data .
 ```
 
-Una línea vacía termina la conversación. Cada respuesta del agente tarda unos segundos.
+Una línea vacía termina la conversación. Cada respuesta del agente tarda unos segundos, y la terminal lo avisa después de cada mensaje.
 
 Durante la conversación **no** se hace nada de esto:
 

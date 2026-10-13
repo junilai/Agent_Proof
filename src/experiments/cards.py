@@ -11,8 +11,11 @@ converse. The expected outcome is never written by hand against the policy: a
 test derives it from the domain's computable policy.
 """
 
+import textwrap
 from dataclasses import dataclass
 from typing import Literal
+
+import typer
 
 from casestudy.domain.policy import Reason
 
@@ -163,3 +166,29 @@ def cards_with_decision() -> list[Card]:
 
 def cards_expecting(expected: Expected) -> list[Card]:
     return [card for card in CARDS if card.expected == expected]
+
+
+app = typer.Typer(help="Tarjetas de situación del corpus.")
+CARD_ID = typer.Argument(None, help="Identificador de la tarjeta, por ejemplo tc-05.")
+
+
+def _for_the_participant(card: Card) -> str:
+    """What a participant may read: the identifier and the situation, nothing else."""
+    return f"Tarjeta {card.card_id}\n\n{textwrap.fill(card.text, width=78)}"
+
+
+@app.command()
+def show(card_id: str | None = CARD_ID):
+    """Muestra solo el texto de una tarjeta, o la hoja con las veinte si no se indica ninguna."""
+    if card_id is None:
+        typer.echo("\n\n".join(_for_the_participant(card) for card in CARDS))
+        return
+    card = CARDS_BY_ID.get(card_id)
+    if card is None:
+        typer.echo(f"No existe la tarjeta {card_id}.", err=True)
+        raise typer.Exit(1)
+    typer.echo(_for_the_participant(card))
+
+
+if __name__ == "__main__":
+    app()
