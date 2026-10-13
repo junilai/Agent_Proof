@@ -96,3 +96,8 @@ def test_the_card_never_reaches_the_agent(tmp_path):
     (session,) = SEEN
     assert session.sent == ["hola", "adiós"]
     assert Store(tmp_path).seeds()[0].card_id == "tc-03"
+
+
+def test_record_tells_the_person_the_agent_is_answering(tmp_path):
+    result = record(tmp_path, "hola\ngracias\n\n")
+    assert result.output.count("el agente está respondiendo") == 2
