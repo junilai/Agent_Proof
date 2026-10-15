@@ -20,8 +20,16 @@ def _join(items: list[str]) -> str:
     return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " y " + items[-1]
 
 
+def _exclusions(policy: RefundPolicy) -> str:
+    if not policy.excluded_categories:
+        return (
+            "2. Ninguna categoría de productos queda excluida: todas siguen las reglas siguientes."
+        )
+    labels = _join(sorted(CATEGORY_LABELS.get(c, c) for c in policy.excluded_categories))
+    return f"2. No se reembolsan, por ningún motivo, los productos de estas categorías: {labels}."
+
+
 def policy_text(policy: RefundPolicy = TRUE_POLICY) -> str:
-    excluded = _join(sorted(CATEGORY_LABELS.get(c, c) for c in policy.excluded_categories))
     window, warranty = policy.window_days, policy.warranty_days
     threshold = _money(policy.supervisor_threshold_usd)
     return "\n".join(
@@ -30,8 +38,7 @@ def policy_text(policy: RefundPolicy = TRUE_POLICY) -> str:
             "1. Solo se reembolsan pedidos entregados. Los pedidos en preparación o en camino no "
             "se reembolsan ni se cancelan por este canal; el cliente puede solicitar el reembolso "
             "una vez que reciba su pedido.",
-            "2. No se reembolsan, por ningún motivo, los productos de estas categorías: "
-            f"{excluded}.",
+            _exclusions(policy),
             f"3. Hasta {window} días después de la entrega, el reembolso procede por cualquier "
             f"motivo, sea un producto defectuoso o un arrepentimiento. Si el monto del pedido "
             f"supera {threshold}, el caso se escala a un supervisor mediante un ticket.",
