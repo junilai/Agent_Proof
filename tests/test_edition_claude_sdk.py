@@ -3,10 +3,12 @@ import json
 
 import pytest
 
-from agentproof.models import TARGET_BASELINE_MODEL
-from casestudy.domain.prompt import SYSTEM_PROMPT
+from agentproof.models import TARGET_BASELINE_MODEL, TARGET_DOWNGRADED_MODEL
+from casestudy.domain.mutations import CORRUPT_POLICY, MUTATIONS
+from casestudy.domain.policy_text import policy_text
+from casestudy.domain.prompt import SYSTEM_PROMPT, system_prompt
 from casestudy.domain.tools import get_refund_policy
-from casestudy.editions.claude_sdk import TOOLS, build_options
+from casestudy.editions.claude_sdk import TOOLS, VARIANTS, build_options, tools_for
 
 
 def call(tool, args):
@@ -40,4 +42,30 @@ def test_tools_wrap_the_domain():
 
 def test_unknown_variants_are_rejected():
     with pytest.raises(ValueError):
-        build_options("d1")
+        build_options("d9")
+
+
+def test_every_mutation_is_a_variant():
+    assert VARIANTS == tuple(MUTATIONS)
+
+
+def test_d1_loses_the_order_tool():
+    options = build_options("d1")
+    assert "mcp__store__lookup_order" not in options.allowed_tools
+    assert [t.name for t in tools_for(MUTATIONS["d1"])] == ["get_refund_policy", "create_ticket"]
+    assert options.system_prompt == SYSTEM_PROMPT
+
+
+def test_d4_reads_the_corrupt_policy():
+    _, policy, _ = tools_for(MUTATIONS["d4"])
+    assert call(policy, {}) == policy_text(CORRUPT_POLICY)
+    assert call(policy, {}) != get_refund_policy()
+
+
+def test_prompt_model_and_step_limit_follow_the_mutation():
+    assert build_options("d2").system_prompt == system_prompt(MUTATIONS["d2"]) != SYSTEM_PROMPT
+    assert build_options("d5").system_prompt == system_prompt(MUTATIONS["d5"]) != SYSTEM_PROMPT
+    assert build_options("d3").model == TARGET_DOWNGRADED_MODEL
+    assert build_options("d6").max_turns == 2
+    for name in ("d1", "d2", "d3", "d4", "d5"):
+        assert build_options(name).max_turns == 10
