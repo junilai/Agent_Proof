@@ -56,3 +56,36 @@ Medido sobre las trazas disponibles al diseñar F3: la respuesta final contiene 
 ### Por qué no cambia lo que se mide
 
 La regla precisa cómo se localiza el desenlace comunicado; no cambia qué cuenta como fallo, que sigue siendo un desenlace incorrecto respecto de una verdad fijada con independencia del sistema. Se pre-registra junto con el resto del protocolo, antes de ejecutar cualquier experimento.
+
+## D-003 · Límite de pasos de D6 en Claude Agent SDK
+
+- **Fecha:** 13 de octubre de 2026
+- **Estado:** decidida e implementada
+- **Origen:** calibración de las mutaciones de F3
+
+La §5.4 define D6 como "el límite de pasos se reduce a dos" y su conjunto expuesto como los escenarios cuya traza semilla tiene tres o más llamadas a herramientas. "Paso" no significa lo mismo en cada framework, así que el valor se calibró midiendo qué alcanza a hacer el agente con cada límite, en un solo turno y con tres casos que necesitan una, dos y tres llamadas:
+
+| Límite | Una llamada | Dos llamadas | Tres llamadas |
+|---|---|---|---|
+| 2 | completa | completa | se trunca |
+| 3 | completa | completa | completa |
+| 4 | completa | completa | completa |
+
+Con 2, el agente consulta el pedido y la política en paralelo en el primer paso y responde en el segundo; cuando además debe crear un ticket, se queda sin pasos para responder. Eso es exactamente el conjunto expuesto de la §5.4, así que en esta edición D6 usa un límite de 2. La sonda costó USD 0.095. En F4 se repite la calibración en cada framework y se registra su valor.
+
+## D-004 · Política corrupta de D4
+
+- **Fecha:** 13 de octubre de 2026
+- **Estado:** decidida e implementada
+- **Origen:** calibración de las mutaciones de F3
+
+D4 hace que la herramienta de política devuelva datos corruptos. Para que la mutación sea medible, la corrupción tiene que cambiar la decisión correcta en una parte de los escenarios, no en todos ni en ninguno. Calculado contra el catálogo para las quince tarjetas con decisión:
+
+| Corrupción | Decisiones que cambia |
+|---|---|
+| Solo el umbral (500 → 100) | 1 |
+| Solo las categorías excluidas (ninguna) | 2 |
+| Solo la ventana (30 → 90 días) | 3 |
+| Ventana de 90 días, umbral de USD 5000 y sin categorías excluidas | **7** |
+
+Se adopta la última: cambia la decisión en tc-06, tc-07, tc-08, tc-11, tc-12, tc-13 y tc-15, y deja intactas las otras ocho, de modo que la mutación tiene dónde manifestarse y dónde no. Todas las corrupciones van en la misma dirección, hacia aprobar más, lo que la hace una política coherente y no ruido. Una prueba fija ese conjunto de siete tarjetas.
