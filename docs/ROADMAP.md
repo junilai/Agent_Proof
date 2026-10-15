@@ -52,7 +52,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 ## F3 Aparato experimental — objetivo: 12–31 oct
 
 - [ ] Condiciones y corridas (§5.5), con la regla de repeticiones inválidas de [D-001](decisiones.md)
-- [ ] Mutaciones D1–D6 en el dominio (§5.4)
+- [x] Mutaciones D1–D6 en el dominio (§5.4), aplicadas por la edición Claude Agent SDK, con D6 y D4 calibrados ([D-003, D-004](decisiones.md)). Evidencia: 8 pruebas `live` en verde, 14-oct-2026, USD 0.078: D1 no consulta el pedido, D4 enuncia la ventana corrupta de 90 días, D6 trunca solo la conversación de tres llamadas y la línea base resuelve el reembolso como antes
 - [ ] Extracción del desenlace por reglas y cola de anotación manual a ciegas (§5.4)
 - [ ] Conjuntos expuestos por operador (§5.4)
 - [ ] Predicados de fallo y conjunto manifestado (§5.4)
