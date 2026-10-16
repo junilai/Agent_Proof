@@ -23,13 +23,47 @@ def fill(store, run_id, scenario_id, outcomes):
             )
 
 
-def test_a_drop_of_four_tenths_is_a_regression(tmp_path):
+def test_an_isolated_drop_of_four_tenths_is_only_a_weak_signal(tmp_path):
+    """5/5 to 3/5 gives p = 0.44: the drop is there, the evidence is not (§5.5)."""
     store = Store(tmp_path)
     fill(store, BASE, "sc-a", [True] * 5)
     fill(store, CAND, "sc-a", [True, True, True, False, False])
     comparison = compare_runs(store, BASE, CAND)
-    assert comparison.comparisons[0].drop == Fraction(2, 5)
-    assert comparison.regressions[0].scenario_id == "sc-a" and comparison.exit_code == 2
+    only = comparison.comparisons[0]
+    assert only.drop == Fraction(2, 5) and only.p_value == Fraction(4, 9)
+    assert only.status == "señal débil" and not only.regressed
+    assert comparison.weak_signals == [only] and comparison.exit_code == 0
+
+
+def twenty(store, flipped, base=True, cand=False):
+    """Twenty scenarios at 5/5 in both runs, except `flipped` of them go from base to cand."""
+    for i in range(20):
+        changed = i < flipped
+        fill(store, BASE, f"sc-{i:02d}", [base if changed else True] * 5)
+        fill(store, CAND, f"sc-{i:02d}", [cand if changed else True] * 5)
+
+
+def test_four_joint_regressions_among_twenty_fail_the_build(tmp_path):
+    store = Store(tmp_path)
+    twenty(store, 4)
+    comparison = compare_runs(store, BASE, CAND)
+    assert [c.scenario_id for c in comparison.regressions] == ["sc-00", "sc-01", "sc-02", "sc-03"]
+    assert comparison.exit_code == 2
+
+
+def test_three_joint_regressions_among_twenty_are_weak_signals(tmp_path):
+    store = Store(tmp_path)
+    twenty(store, 3)
+    comparison = compare_runs(store, BASE, CAND)
+    assert comparison.regressions == [] and len(comparison.weak_signals) == 3
+    assert comparison.exit_code == 0
+
+
+def test_a_significant_improvement_is_never_a_regression(tmp_path):
+    store = Store(tmp_path)
+    twenty(store, 4, base=False, cand=True)
+    comparison = compare_runs(store, BASE, CAND)
+    assert {c.status for c in comparison.comparisons} == {"ok"} and comparison.exit_code == 0
 
 
 def test_a_drop_of_two_tenths_is_not(tmp_path):
@@ -67,8 +101,8 @@ def test_rendering_shows_the_regressions(tmp_path):
     fill(store, CAND, "sc-a", [False] * 5)
     text = render_comparison(compare_runs(store, BASE, CAND))
     assert BASE in text and CAND in text and "REGRESIÓN" in text
-    assert "-100%" in text
-    assert "1 regresión(es)" in text
+    assert "-100%" in text and "0.0079" in text
+    assert "1 regresión(es) y 0 señal(es) débil(es)" in text
 
 
 def test_rendering_shows_no_change_as_plus_zero(tmp_path):
@@ -77,3 +111,20 @@ def test_rendering_shows_no_change_as_plus_zero(tmp_path):
     fill(store, CAND, "sc-a", [True, True])
     text = render_comparison(compare_runs(store, BASE, CAND))
     assert "+0%" in text and "-0%" not in text
+
+
+def test_pairs_with_fewer_valid_repetitions_than_planned_are_marked(tmp_path):
+    store = Store(tmp_path)
+    fill(store, BASE, "sc-a", [True, True])
+    fill(store, CAND, "sc-a", [True, None])
+    text = render_comparison(compare_runs(store, BASE, CAND))
+    assert "100%*" in text and "D-001" in text
+
+
+def test_a_scenario_without_valid_repetitions_is_not_tested(tmp_path):
+    store = Store(tmp_path)
+    fill(store, BASE, "sc-a", [True, True])
+    fill(store, CAND, "sc-a", [None, None])
+    comparison = compare_runs(store, BASE, CAND)
+    assert comparison.comparisons[0].p_value is None
+    assert "sin juicio" in render_comparison(comparison)

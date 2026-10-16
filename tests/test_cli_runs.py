@@ -10,7 +10,7 @@ AGENT = ["--adapter", "tests.fake_adapter", "--agent", "tests.fakes:echo_agent"]
 
 
 def run(tmp_path, condition):
-    args = ["run", *AGENT, "--condition", condition, "--repetitions", "2", "--data", str(tmp_path)]
+    args = ["run", *AGENT, "--condition", condition, "--repetitions", "5", "--data", str(tmp_path)]
     return runner.invoke(cli.app, args)
 
 
@@ -35,10 +35,11 @@ def test_run_then_judge_then_report(tmp_path, monkeypatch):
         assert result.exit_code == 0, result.output
     store = Store(tmp_path)
     base, cand = store.runs()
-    assert len(store.run_traces(base)) == 2 and store.manifest(base).repetitions == 2
+    assert len(store.run_traces(base)) == 5 and store.manifest(base).repetitions == 5
 
     def fake_judge(sc, trace):
-        passed = trace.run_id == base or trace.repetition == 1
+        """5/5 against 0/5 in the only scenario: significant (p = 0.0079) and a drop of 1."""
+        passed = trace.run_id == base
         return verdict(
             [passed], trace_id=trace.trace_id, run_id=trace.run_id, scenario_id=sc.scenario_id
         )
