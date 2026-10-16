@@ -157,3 +157,11 @@ Hasta F2 solo el agente registraba su consumo: el inductor, el usuario simulado 
 3. **El agente es un caso aparte.** Usa caché de prompts, que tiene tarifas propias, así que multiplicar sus tokens por la tabla no da su costo. Se reporta además la estimación que entrega su SDK.
 4. **Las cifras de la herramienta son cálculos propios.** Al cerrar el piloto se concilian con la facturación de la consola de Anthropic, y la diferencia se informa. Así se registró en F1 y F2, cuando la consola marcó menos que la suma de las estimaciones del SDK.
 5. **Los artefactos anteriores a este registro** se cuentan como "sin registro", nunca como costo cero.
+
+**Verificación en vivo (16 de octubre de 2026).** Corrida de dos repeticiones sobre el escenario del hito de F1, interrumpida después de la primera traza.
+
+- Con el proceso original todavía vivo, `resume` se negó a continuar. Tras matarlo de forma abrupta, tomó el control y completó la repetición que faltaba sin duplicar ninguna.
+- Un primer intento, hecho antes de existir el candado de ejecución, dejó una repetición duplicada. La señal de interrupción no había detenido la corrida original. Eso motivó el candado.
+- Costo de la corrida verificada, según la herramienta: USD 0.16 en total. El agente gastó 0.056 por conversación según su SDK, con 14 s medios; el usuario simulado, 0.003, con 3 s; el evaluador, 0.023 por juicio, con 6.5 s.
+- Con ambos intentos, la verificación costó unos USD 0.32.
+- Extrapolado a 0.08 por repetición, E1 (~800 conversaciones) costaría unos USD 65 y E4 (~400), unos 33. Es una cifra orientativa: sale de un solo escenario. El piloto dará la estimación que se use.
