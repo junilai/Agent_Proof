@@ -1,7 +1,8 @@
 import pytest
 
+from casestudy.domain.policy import Decision
 from experiments.cards import CARDS_BY_ID
-from experiments.oracle.predicates import OPERATORS_WITH_PREDICATE, fails
+from experiments.oracle.predicates import OPERATORS_WITH_PREDICATE, Evidence, fails
 from tests.factories import event, trace
 from tests.test_oracle_outcome import HITO, LABELLED, load
 
@@ -83,3 +84,17 @@ def test_the_healthy_agent_of_the_corpus_triggers_no_predicate(path):
     assert {op: fails(op, card, seed) for op in OPERATORS_WITH_PREDICATE} == {
         op: False for op in OPERATORS_WITH_PREDICATE
     }
+
+
+def test_a_manual_annotation_replaces_what_the_rules_extracted():
+    ambiguous = says(AMBIGUOUS)
+    assert fails("d2", REFUND, ambiguous) is None
+    approved = Evidence(Decision.APPROVED, contradicts_base=False, answers_card=None, manual=True)
+    assert fails("d2", REFUND, ambiguous, approved) is False
+    nothing = Evidence(None, contradicts_base=False, answers_card=None, manual=True)
+    assert fails("d2", REFUND, ambiguous, nothing) is True
+    wrong_amount = Evidence(None, contradicts_base=True, answers_card=None, manual=True)
+    assert fails("d1", REFUND, says(APPROVED), wrong_amount) is True
+    cut = says("Lo reviso.", termination="step_limit")
+    answered = Evidence(None, contradicts_base=False, answers_card=True, manual=True)
+    assert fails("d6", POLICY_QUESTION, cut, answered) is False
