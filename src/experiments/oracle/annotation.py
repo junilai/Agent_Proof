@@ -5,20 +5,25 @@ with a fixed seed, through the same blind transcript the judge reads: no
 condition, variant or model. The author annotates what the agent communicated
 against the card and the knowledge base; the annotation is stored as manual and
 replaces the extracted evidence of that trace for every operator.
+
+    python -m experiments.oracle.annotation --data .
 """
 
 from __future__ import annotations
 
 import random
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
+import typer
 from pydantic import BaseModel, TypeAdapter
 
 from agentproof.schema import Trace
 from agentproof.store import Store
+from agentproof.transcript import render_transcript
+from casestudy.domain.catalog import ORDERS_BY_ID
 from casestudy.domain.policy import Decision
 from experiments.cards import CARDS_BY_ID, Card
 from experiments.conditions import CONDITIONS_BY_NAME
@@ -109,3 +114,65 @@ def pending(store: Store, run_ids: list[str]) -> list[Case]:
     queue.sort(key=lambda case: case.trace.trace_id)
     random.Random(QUEUE_SEED).shuffle(queue)
     return queue
+
+
+def _order_facts(card: Card) -> str:
+    if not card.orders:
+        return "(la tarjeta no involucra pedidos)"
+    order = ORDERS_BY_ID[card.orders[0]]
+    delivered = order.delivery_date.isoformat() if order.delivery_date else "—"
+    return (
+        f"{order.order_id} · {order.product} · USD {order.amount_usd:.2f} · "
+        f"{order.status.value} · compra {order.purchase_date.isoformat()} · entrega {delivered}"
+    )
+
+
+def present(case: Case, position: int, total: int) -> str:
+    """What the annotator sees: the situation, the order and the blind transcript."""
+    return "\n".join(
+        [
+            f"=== Caso {position} de {total} ===",
+            f"Situación: {case.card.text}",
+            f"Pedido en la base: {_order_facts(case.card)}",
+            "",
+            render_transcript(case.trace),
+            "",
+        ]
+    )
+
+
+_DECISIONS = {"p": "procede", "n": "no procede", "e": "escalamiento", "x": None}
+
+app = typer.Typer(help="Anotación manual a ciegas de los casos que las reglas no resuelven.")
+DATA = typer.Option(Path("."), "--data", help="Carpeta que contiene corpus/ y results/.")
+
+
+@app.command()
+def main(data: Path = DATA):
+    """Presenta cada caso pendiente y guarda la anotación en results/annotations.json."""
+    store = Store(data)
+    queue = pending(store, store.runs())
+    if not queue:
+        typer.echo("No hay casos pendientes de anotación.")
+        return
+    for position, case in enumerate(queue, start=1):
+        typer.echo(present(case, position, len(queue)))
+        key = ""
+        while key not in _DECISIONS:
+            key = typer.prompt(
+                "Decisión comunicada [p]rocede, [n]o procede, [e]scalamiento, ninguna [x]"
+            ).strip()
+        annotation = Annotation(
+            run_id=case.run_id,
+            trace_id=case.trace.trace_id,
+            decision=_DECISIONS[key],
+            contradicts_base=typer.confirm("¿Algún importe, fecha o estado contradice la base?"),
+            answers_card=typer.confirm("¿El agente entregó lo que la situación pedía?"),
+            annotated_at=datetime.now(UTC),
+        )
+        save_annotation(store, annotation)
+    typer.echo(f"Anotados {len(queue)} casos.")
+
+
+if __name__ == "__main__":
+    app()

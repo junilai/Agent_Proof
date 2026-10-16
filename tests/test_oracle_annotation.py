@@ -1,10 +1,14 @@
+from typer.testing import CliRunner
+
 from agentproof.schema import scenario_id_for
 from agentproof.store import Store
 from experiments.oracle.annotation import (
     Annotation,
+    app,
     load_annotations,
     operators_for,
     pending,
+    present,
     save_annotation,
 )
 from tests.factories import T0, event, manifest, trace
@@ -91,3 +95,21 @@ def test_an_annotation_settles_the_case_and_is_stored_as_manual(tmp_path):
 def test_the_queue_order_is_random_but_fixed(tmp_path):
     store = populated(tmp_path)
     assert pending(store, store.runs()) == pending(store, store.runs())
+
+
+def test_the_annotator_never_sees_the_condition(tmp_path):
+    case = pending(populated(tmp_path), ["baseline-a-20261016-120000"])[0]
+    shown = present(case, 1, 1)
+    assert "audífonos Sony" in shown and "AT-1001" in shown and AMBIGUOUS in shown
+    for hidden in ("baseline", "d5", "20261016", "procede\n", "expected"):
+        assert hidden not in shown.replace(AMBIGUOUS, "")
+
+
+def test_the_command_asks_and_saves(tmp_path):
+    store = populated(tmp_path)
+    result = CliRunner().invoke(app, ["--data", str(tmp_path)], input="q\np\nn\ny\n")
+    assert result.exit_code == 0, result.output
+    saved = load_annotations(store)["tr-a00000000001"]
+    assert (saved.decision, saved.contradicts_base, saved.answers_card) == ("procede", False, True)
+    again = CliRunner().invoke(app, ["--data", str(tmp_path)])
+    assert "No hay casos pendientes" in again.output
