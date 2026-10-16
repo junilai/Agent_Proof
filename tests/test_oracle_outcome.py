@@ -99,6 +99,7 @@ def test_each_rule(text, expected):
         "No se ofrecen créditos en tienda ni reembolsos parciales.",
         "Puedo ayudarte con consultas de pedidos y solicitudes de reembolso.",
         "El sistema con el que gestiono los tickets está vinculado a un pedido.",
+        "Con esa confirmación, escalo tu caso como reclamo de garantía.",
     ],
 )
 def test_negations_purposes_questions_and_conditionals_state_no_decision(text):

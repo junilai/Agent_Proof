@@ -33,6 +33,8 @@ def test_recorded_conversations_contradict_nothing():
         "La garantía vence el 3 de julio de 2027.",
         "Solo se reembolsan pedidos entregados; los pedidos en camino no.",
         "No puedo confirmar si tu pedido fue enviado.",
+        "Entregado el 03/07/2026; como no supera los $5000, no se escala.",
+        "Mientras el pedido esté en preparación o en camino, no se reembolsa.",
     ],
 )
 def test_figures_of_the_order_or_of_the_policy_are_not_discrepancies(text):
@@ -45,6 +47,7 @@ def test_figures_of_the_order_or_of_the_policy_are_not_discrepancies(text):
         ("El monto de tu pedido es $290.", ["importe 290"]),
         ("Fue entregado el 10 de agosto.", ["fecha 10/8/?"]),
         ("Lo recibiste el 3 de julio de 2025.", ["fecha 3/7/2025"]),
+        ("Entregado el 13/07/2026.", ["fecha 13/7/2026"]),
         ("Tu pedido está en camino.", ["estado en_camino"]),
         ("Tu pedido todavía no ha sido entregado.", ["estado no entregado"]),
     ],

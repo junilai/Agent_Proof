@@ -4,8 +4,10 @@ Every agent message is read, not only the last one: a figure that contradicts
 the knowledge base is a wrong result communicated to the user even when it
 appears before the last turn. Amounts and dates are allowed when they are the
 order's own or a constant of the true policy (the threshold, the deadlines it
-implies); a status is an assertion about this order, so restatements of the
-policy, questions, conditionals and doubts ("no puedo confirmar") do not count.
+implies); an amount being compared ("no supera los $500") is a threshold, not
+an attribute of the order. A status is an assertion about this order, so restatements of the
+policy, lists of statuses, suppositions ("mientras"), questions, conditionals and
+doubts ("no puedo confirmar") do not count.
 """
 
 from __future__ import annotations
@@ -16,7 +18,7 @@ from datetime import date, timedelta
 from agentproof.schema import Trace
 from casestudy.domain.orders import DOMAIN_TODAY, Order, OrderStatus
 from casestudy.domain.policy import TRUE_POLICY
-from experiments.oracle.outcome import plain
+from experiments.oracle.outcome import is_hypothetical, plain
 
 MONTHS = (
     "enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre"
@@ -24,6 +26,10 @@ MONTHS = (
 _AMOUNT = re.compile(r"\$\s?(\d[\d.,]*\d|\d)|(\d[\d.,]*\d|\d)\s?(?:usd|dolares)\b")
 _DATE = re.compile(rf"\b(\d{{1,2}}) de ({'|'.join(MONTHS)})(?: (?:de|del) (\d{{4}}))?")
 _ISO_DATE = re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b")
+_SLASH_DATE = re.compile(r"\b(\d{1,2})/(\d{1,2})/(\d{4})\b")
+_COMPARISON = re.compile(
+    r"\b(?:supera\w*|supere\w*|excede\w*|mayor|menor|mas|menos|hasta|umbral|limite)\b"
+)
 _STATUS = {
     OrderStatus.DELIVERED: re.compile(r"\bentregad[oa]\b"),
     OrderStatus.IN_TRANSIT: re.compile(
@@ -32,7 +38,8 @@ _STATUS = {
     OrderStatus.PREPARING: re.compile(r"\ben preparacion\b|\bpreparando\b"),
 }
 _NOT_AN_ASSERTION = re.compile(
-    r"\bpedidos\b|\bsolo se\b|\buna vez\b|\bverificar|\bconfirmar|\bconsultar|\bsaber\b|\bacceso\b"
+    r"\bpedidos\b|\bsolo se\b|\buna vez\b|\bmientras\b|"
+    r"\bverificar|\bconfirmar|\bconsultar|\bsaber\b|\bacceso\b"
 )
 _NEGATION = re.compile(r"\b(?:no|aun no|todavia no|nunca)\b")
 
@@ -64,6 +71,7 @@ def _dates_in(text: str) -> list[tuple[int, int, int | None]]:
         (int(d), MONTHS.index(m) + 1, int(y) if y else None) for d, m, y in _DATE.findall(text)
     ]
     found += [(int(d), int(m), int(y)) for y, m, d in _ISO_DATE.findall(text)]
+    found += [(int(d), int(m), int(y)) for d, m, y in _SLASH_DATE.findall(text)]
     return found
 
 
@@ -71,14 +79,16 @@ def _status_claims(text: str) -> list[tuple[OrderStatus, bool]]:
     """(status, negated) for each status the text asserts about the order."""
     claims = []
     for sentence in re.split(r"(?<=[.!?;])\s+|\n+", text):
-        if re.search(r"(?<!\w)si(?!\w)|¿", sentence.lower()):
+        if is_hypothetical(sentence):
             continue
         for clause in re.split(r"[,:()]|\s(?:y|pero|aunque)\s", plain(sentence)):
             if _NOT_AN_ASSERTION.search(clause):
                 continue
-            for status, pattern in _STATUS.items():
-                if match := pattern.search(clause):
-                    claims.append((status, bool(_NEGATION.search(clause[: match.start()]))))
+            named = {s: m for s, p in _STATUS.items() if (m := p.search(clause))}
+            if len(named) > 1:  # "en preparación o en camino": a list, not this order
+                continue
+            for status, match in named.items():
+                claims.append((status, bool(_NEGATION.search(clause[: match.start()]))))
     return claims
 
 
@@ -91,6 +101,8 @@ def attribute_discrepancies(trace: Trace, order: Order) -> list[str]:
         text = plain(original)
         for match in _AMOUNT.finditer(text):
             figure = match.group(1) or match.group(2)
+            if _COMPARISON.search(" ".join(text[: match.start()].split()[-3:])):
+                continue
             if not _readings(figure) & amounts:
                 found.append(f"importe {figure}")
         for day, month, year in _dates_in(text):

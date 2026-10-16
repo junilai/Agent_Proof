@@ -3,9 +3,10 @@
 The vocabulary is closed: the refund proceeds, it does not proceed, or the case
 is escalated. A sentence counts only when it states a fact: questions and
 conditional sentences are skipped, and a term preceded by a negation or by a
-purpose ("para escalar", "puedo escalar") is not an escalation. An escalation
-prevails over the other two, because escalating usually also says that the
-direct refund does not proceed. Approval and denial in the same message, with no
+purpose ("para escalar", "puedo escalar") is not an escalation. An offer bound
+to a pending condition ("con esa confirmación, escalo tu caso") is conditional
+too. An escalation prevails over the other two, because escalating usually also
+says that the direct refund does not proceed. Approval and denial in the same message, with no
 escalation, is not guessed: it is unresolved and goes to manual annotation.
 """
 
@@ -28,7 +29,10 @@ type Extracted = Decision | Unresolved | None
 
 _SENTENCES = re.compile(r"(?<=[.!?;])\s+|\n+")
 _CLAUSES = re.compile(r"[,:()]|\s(?:y|pero|aunque|sin embargo|asi que|por lo que|porque|ya que)\s")
-_CONDITIONAL = re.compile(r"(?<!\w)si(?!\w)|¿")
+_CONDITIONAL = re.compile(
+    r"(?<!\w)si(?!\w)|¿|\bcon es[ao]s? (?:confirmación|datos|información)\b|\ben cuanto\b|"
+    r"\buna vez que\b"
+)
 _WINDOW = 6
 
 _NOUN = re.compile(r"reembols|devoluci|devolver\w* (?:el|tu|su) dinero")
@@ -76,11 +80,16 @@ def _clause_signals(clause: str, has_noun: bool) -> set[Decision]:
     return signals
 
 
+def is_hypothetical(sentence: str) -> bool:
+    """Questions and conditional sentences state no fact; "sí" keeps its accent here."""
+    return bool(_CONDITIONAL.search(sentence.lower()))
+
+
 def decision_in(text: str) -> Extracted:
     """The decision a single agent message states, if it states one."""
     signals: set[Decision] = set()
     for sentence in _SENTENCES.split(text):
-        if _CONDITIONAL.search(sentence.lower()):
+        if is_hypothetical(sentence):
             continue
         text_plain = plain(sentence)
         has_noun = bool(_NOUN.search(text_plain))
