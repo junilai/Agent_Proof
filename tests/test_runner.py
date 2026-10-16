@@ -1,6 +1,9 @@
 import asyncio
 
+import pytest
+
 from agentproof.runner import run_suite
+from agentproof.session import AgentTurn
 from agentproof.store import Store
 from tests.factories import manifest, scenario
 from tests.fakes import CrashingSession, EchoSession, ScriptedUser, ticking_clock
@@ -43,3 +46,71 @@ def test_traces_carry_the_run_context_and_its_models(tmp_path):
     first = traces[0]
     assert (first.kind, first.condition, first.variant) == ("run", "baseline-a", "baseline")
     assert first.models == manifest().models
+
+
+class BrokenUser(ScriptedUser):
+    async def first_message(self) -> str:
+        raise RuntimeError("el usuario simulado no respondió")
+
+
+def failing_first(times):
+    """A user factory whose first `times` users fail before the conversation starts."""
+    made = []
+
+    def user_for(s):
+        made.append(s)
+        broken = len(made) <= times
+        return BrokenUser() if broken else ScriptedUser(s.opening_message, "gracias")
+
+    return user_for
+
+
+def run_with(tmp_path, user_for, repetitions=1, factory=EchoSession, turn_budget=4):
+    store = Store(tmp_path)
+    asyncio.run(
+        run_suite(
+            [scenario()],
+            factory,
+            manifest(repetitions=repetitions, turn_budget=turn_budget),
+            store,
+            user_for=user_for,
+            clock=ticking_clock(),
+        )
+    )
+    return [(t.repetition, t.attempt, t.termination) for t in store.run_traces(manifest().run_id)]
+
+
+def test_a_conversation_the_simulated_user_broke_is_run_again_and_kept(tmp_path):
+    found = run_with(tmp_path, failing_first(1))
+    assert sorted(found) == [(1, 1, "simulator_error"), (1, 2, "user_ended")]
+
+
+def test_two_retries_per_repetition_at_most(tmp_path):
+    found = run_with(tmp_path, failing_first(99))
+    assert sorted(found) == [(1, a, "simulator_error") for a in (1, 2, 3)]
+
+
+def test_five_retries_per_scenario_at_most(tmp_path):
+    """Repetitions 1 and 2 spend two retries each; the third gets the last one."""
+    attempts = sorted((r, a) for r, a, _ in run_with(tmp_path, failing_first(99), repetitions=3))
+    assert attempts == [(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3), (3, 1), (3, 2)]
+
+
+class StepLimitSession(EchoSession):
+    async def send(self, message: str) -> AgentTurn:
+        turn = await super().send(message)
+        return turn.model_copy(update={"stop_reason": "step_limit"})
+
+
+@pytest.mark.parametrize(
+    ("factory", "user", "turn_budget", "termination"),
+    [
+        (EchoSession, ("hola",), 4, "user_ended"),
+        (EchoSession, ("hola", "otra", "más"), 1, "turn_budget"),
+        (StepLimitSession, ("hola",), 4, "step_limit"),
+        (CrashingSession, ("hola",), 4, "agent_error"),
+    ],
+)
+def test_what_the_agent_did_is_never_retried(tmp_path, factory, user, turn_budget, termination):
+    found = run_with(tmp_path, lambda s: ScriptedUser(*user), 2, factory, turn_budget)
+    assert sorted(found) == [(1, 1, termination), (2, 1, termination)]
