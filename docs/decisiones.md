@@ -89,3 +89,33 @@ D4 hace que la herramienta de política devuelva datos corruptos. Para que la mu
 | Ventana de 90 días, umbral de USD 5000 y sin categorías excluidas | **7** |
 
 Se adopta la última: cambia la decisión en tc-06, tc-07, tc-08, tc-11, tc-12, tc-13 y tc-15, y deja intactas las otras ocho, de modo que la mutación tiene dónde manifestarse y dónde no. Todas las corrupciones van en la misma dirección, hacia aprobar más, lo que la hace una política coherente y no ruido. Una prueba fija ese conjunto de siete tarjetas.
+
+## D-005 · Calibración del oráculo con respuestas de agentes degradados
+
+- **Fecha:** 16 de octubre de 2026
+- **Estado:** decidida e implementada
+- **Origen:** construcción del oráculo de F3
+
+Hasta F3 las únicas respuestas grabadas eran del agente sano: 37 mensajes, todos escalamientos, aprobaciones o mensajes sin decisión. No había ningún ejemplo de cómo se expresa un agente degradado cuando se equivoca, y las reglas del oráculo se congelan en el pre-registro. Por eso se calibran antes, contra respuestas generadas para eso y no contra corridas del experimento.
+
+**Procedimiento.** Un turno real de cada agente degradado con predicado (D1, D2, D4, D5 y D6) sobre situaciones de las tarjetas, en dos lotes:
+
+| Lote | Respuestas | Situaciones | Uso |
+|---|---|---|---|
+| Ajuste | 17 | 10 | Se etiquetaron a mano y las reglas se corrigieron mirándolas |
+| Reserva | 11 | 8 | Se etiquetaron a ciegas antes de correr las reglas |
+
+Costo: USD 0.335 según el SDK. Las 28 respuestas y sus etiquetas quedan en `tests/fixtures/oracle_replies.json`, y una prueba exige que ninguna quede clasificada al revés.
+
+**Resultados.**
+
+- *Ajuste, primera pasada:* una inversión (una oferta condicionada, "con esa confirmación, escalo tu caso", leída como escalamiento) y dos fallas de extracción: las fechas en formato `27/08/2025` y el umbral de la política corrupta de D4 ("no supera los $5000") leído como importe del pedido. Se corrigieron con reglas generales: las ofertas sujetas a una condición pendiente son condicionales, se leen las fechas con barras y un importe que se compara es un umbral, no un atributo.
+- *Reserva:* 11 de 11 decisiones y 11 de 11 predicados correctos, ninguno sin resolver. Hubo un falso positivo de estado ("mientras el pedido esté en preparación o en camino" leído como afirmación de que está en camino) que no cambió el predicado de su operador, D5, pero sí lo habría cambiado en D1. Se corrigió: una enumeración de estados o un supuesto con "mientras" no es una afirmación sobre el pedido.
+- *Estado final:* 28 de 28 decisiones y predicados correctos, ninguno a la cola manual. Sobre los 37 mensajes del agente sano: 35 exactos, 2 omitidos y ninguno al revés.
+
+**Limitaciones que se declaran.**
+
+1. Ninguna respuesta degradada enunció un atributo falso: sin la herramienta de pedidos, D1 pidió los datos en lugar de inventarlos. Los casos positivos de discrepancia de atributos están probados solo con texto escrito para la prueba, y la regla de estados no tiene una medición independiente limpia, porque se corrigió con la reserva.
+2. En los dos cortes de D6 que terminaron con texto, el agente ya había anunciado el escalamiento ("voy a escalar tu caso") antes de que el límite impidiera crear el ticket. Según la §5.4 cuenta la decisión comunicada, así que ahí el predicado no falla: D6 se manifiesta solo cuando el corte llega antes de que el agente enuncie el desenlace.
+
+**Observación para el análisis.** En siete respuestas de D5 el agente no aprobó ningún reembolso que la política negara, y D2 siguió consultando la política. Son mutaciones de propensión: es esperable que su conjunto manifestado sea chico, y eso es un resultado, no un defecto del oráculo.
