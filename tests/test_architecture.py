@@ -93,6 +93,54 @@ def test_case_study_imports_nothing_from_agentproof_but_models():
     assert offending == {}
 
 
+ORACLE = SRC / "experiments" / "oracle"
+SYSTEM_UNDER_EVALUATION = {
+    "agentproof.induction",
+    "agentproof.judge",
+    "agentproof.llm",
+    "agentproof.simulator",
+    "anthropic",
+}
+
+
+def test_the_oracle_exists():
+    assert (ORACLE / "__init__.py").exists()
+
+
+def imported_names(source: str) -> set[str]:
+    """Like ``imported_modules``, but ``from a import b`` also yields ``a.b``."""
+    names = imported_modules(source)
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+            names.update(f"{node.module}.{alias.name}" for alias in node.names)
+    return names
+
+
+def uses_any(names: set[str], banned: set[str]) -> set[str]:
+    return {n for n in names for b in banned if n == b or n.startswith(b + ".")}
+
+
+def test_detects_modules_imported_by_name():
+    names = imported_names("from agentproof import judge\nimport anthropic.types\n")
+    assert uses_any(names, SYSTEM_UNDER_EVALUATION) == {"agentproof.judge", "anthropic.types"}
+
+
+def test_the_oracle_does_not_depend_on_the_system_it_evaluates():
+    found = {
+        str(path.relative_to(SRC)): uses_any(
+            imported_names(path.read_text()), SYSTEM_UNDER_EVALUATION
+        )
+        for path in ORACLE.rglob("*.py")
+    }
+    assert {k: v for k, v in found.items() if v} == {}
+
+
+def test_the_oracle_never_reads_induced_scenarios():
+    for path in ORACLE.rglob("*.py"):
+        source = path.read_text()
+        assert ".scenario(" not in source and ".scenarios(" not in source, path
+
+
 def test_case_study_domain_imports_no_agent_framework():
     found = {
         str(p.relative_to(SRC)): imported_top_level_modules(p.read_text()) & AGENT_FRAMEWORKS
