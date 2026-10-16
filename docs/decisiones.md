@@ -165,3 +165,30 @@ Hasta F2 solo el agente registraba su consumo: el inductor, el usuario simulado 
 - Costo de la corrida verificada, según la herramienta: USD 0.16 en total. El agente gastó 0.056 por conversación según su SDK, con 14 s medios; el usuario simulado, 0.003, con 3 s; el evaluador, 0.023 por juicio, con 6.5 s.
 - Con ambos intentos, la verificación costó unos USD 0.32.
 - Extrapolado a 0.08 por repetición, E1 (~800 conversaciones) costaría unos USD 65 y E4 (~400), unos 33. Es una cifra orientativa: sale de un solo escenario. El piloto dará la estimación que se use.
+
+## D-008 · Lo que el pre-registro fija además de la planificación
+
+- **Fecha:** 16 de octubre de 2026
+- **Estado:** decidida; se pre-registra
+- **Origen:** preparación del pre-registro (parte E de F3)
+
+La planificación fija el criterio, los conjuntos, los predicados, la regla de agregación y el tamaño muestral. Para congelar el protocolo faltan cinco cosas.
+
+1. **Es un estudio de estimación, sin umbrales de éxito.** Los objetivos de la planificación son evaluar la capacidad de detección y medir la concordancia y la fidelidad, no alcanzar una cifra. Por eso no se declara ninguna TPR, FPR ni κ mínimos que harían "exitosa" a la herramienta. Fijarlos ahora sería agregar un compromiso que la planificación aprobada no contiene. Sí se registran, antes de ver los datos, las expectativas que la planificación ya enuncia, para que el resultado pueda contrastarse con ellas:
+   - con R = 5, una regresión aislada no supera la corrección; solo se declaran regresiones que afectan a varios escenarios a la vez (§5.5);
+   - la familia A, cuyo conjunto expuesto es inequívoco, debería detectarse mejor que la familia B, que solo altera la propensión del agente (§5.4); la calibración de D-005 ya mostró una propensión débil en D2 y D5;
+   - el control negativo mide el ruido del sistema: se espera que marque pocos escenarios, sin fijar cuántos.
+2. **El piloto.**
+   - Corre `baseline-a` y `d4` sobre 5 escenarios con 2 repeticiones cada uno. Se eligió D4 porque es la mutación que más escenarios expone, así que el piloto ejercita también el oráculo y la detección.
+   - Los 5 escenarios se sortean entre los 20 con la semilla `20261017`.
+   - Sus datos no entran en el análisis de E1.
+   - Si el costo proyectado de E1 y E4, sumado a lo ya gastado, supera el límite de USD 300 del presupuesto, se activa la palanca de la §7c: tres repeticiones en E4. Si aun así no alcanza, se informa al tutor antes de seguir.
+3. **Semillas.** Se fijan antes de ver cualquier dato:
+   - la de la cola de anotación del oráculo, `20261016`, que ya está en el código;
+   - la del sorteo del piloto, `20261017`;
+   - la de la muestra de 40 pares de E2, `20261018`.
+4. **Enmiendas.**
+   - Un cambio posterior al tag `preregistro-v1` se declara en la sección de enmiendas del pre-registro, con fecha, motivo y efecto esperado.
+   - Actualiza la tabla de huellas y lleva un tag nuevo (`preregistro-v2`, y así sucesivamente).
+   - La tesis reporta toda enmienda. Cambiar el protocolo sigue siendo posible, pero no sin dejar rastro.
+5. **Escenarios inducidos.** Antes del tag se revisan los 20 escenarios, sin editarlos a mano, porque eso sería intervenir el instrumento. Un escenario que tome como criterio de éxito algo que el agente semilla inventó, o que no permita reejecutar la conversación, se reemplaza elicitando una conversación nueva con la misma tarjeta (§5.2). Cada reemplazo se declara como desvío.
