@@ -6,5 +6,16 @@
 \tituloapa[Diseño experimental y pre-registro]{DISEÑO EXPERIMENTAL Y PRE-REGISTRO}
 \begingroup\dobleesp
 \vspace{6pt}
+Este capítulo describe cómo se evalúa AgentProof: de dónde salen los escenarios de prueba, qué degradaciones se introducen en el agente y cómo se sabe, con independencia del propio sistema, si cada una produjo un fallo; con qué criterio se declara una regresión y cuántas repeticiones exige; qué métricas se calculan; y cómo se validan el evaluador automático y la inducción de escenarios. Todo el protocolo se fijó y se registró antes de ejecutar cualquier experimento, en un documento de pre-registro que acompaña al repositorio.
+\par
+
+\subtituloapa{Corpus semilla y escenarios}
+Los escenarios de prueba se inducen a partir de un corpus semilla de veinte conversaciones de interacción elicitada con el agente del caso de estudio: personas que conversan con el agente a partir de una situación que se les entrega, y no usuarios de un sistema en producción. El número es fijo y no un mínimo. De cada conversación se induce exactamente un escenario, de modo que las veinte conversaciones producen los veinte escenarios sobre los que se aplica todo el análisis estadístico, y esos veinte escenarios son las veinte hipótesis que se contrastan para cada degradación. Si una conversación no permite inducir un escenario utilizable, se elicita otra con la misma situación en lugar de reducir el conjunto.
+\par
+Participan entre cuatro y seis personas: el autor y estudiantes de la carrera ajenos al proyecto. Cada una recibe una o varias tarjetas de situación, por ejemplo, ``compraste unos audífonos y uno de los lados dejó de sonar a los pocos días; quieres el dinero de vuelta'', y conversa libremente con el agente, sin instrucciones sobre el tono ni sobre qué preguntar. Antes de empezar se le informa que la conversación se publicará en un repositorio público y que no debe escribir datos personales reales; la traza conserva solo el identificador de la tarjeta, no la identidad de la persona. Durante la sesión nadie corrige al agente ni pide repetir una conversación porque haya salido mal: que el agente falle es precisamente la información que se busca.
+\par
+Las veinte tarjetas se distribuyen según una matriz de cobertura que cruza la intención del usuario, su tono y el desenlace que corresponde según la política de la tienda. Hay cinco tarjetas para cada desenlace: el reembolso procede, no procede, debe escalarse a un supervisor o a una garantía, o la situación no plantea una decisión de reembolso, como una consulta por el estado de un pedido. Los tonos directo, confundido e insistente se reparten entre ellas. Cada tarjeta declara de antemano su desenlace correcto y los pedidos que involucra, de modo que la verdad de referencia queda fijada antes de que exista ninguna conversación. Al participante se le muestra solo el texto de la situación, nunca el desenlace esperado.
+\par
+Los veinte escenarios inducidos se revisan antes de congelar el protocolo, sin editarlos a mano, porque eso sería intervenir el instrumento que se evalúa. Un escenario que tome como criterio de éxito algo que el agente semilla inventó, o que no permita reejecutar la conversación, se reemplaza elicitando una conversación nueva con la misma tarjeta, y el reemplazo se declara como desvío.
 \par
 \endgroup
