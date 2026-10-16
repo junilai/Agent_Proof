@@ -53,9 +53,9 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 - [ ] Condiciones y corridas (§5.5), con la regla de repeticiones inválidas de [D-001](decisiones.md)
 - [x] Mutaciones D1–D6 en el dominio (§5.4), aplicadas por la edición Claude Agent SDK, con D6 y D4 calibrados ([D-003, D-004](decisiones.md)). Evidencia: 8 pruebas `live` en verde, 14-oct-2026, USD 0.078: D1 no consulta el pedido, D4 enuncia la ventana corrupta de 90 días, D6 trunca solo la conversación de tres llamadas y la línea base resuelve el reembolso como antes
-- [ ] Extracción del desenlace por reglas y cola de anotación manual a ciegas (§5.4)
-- [ ] Conjuntos expuestos por operador (§5.4)
-- [ ] Predicados de fallo y conjunto manifestado (§5.4)
+- [x] Extracción del desenlace por reglas y cola de anotación manual a ciegas (§5.4), con la regla de [D-002](decisiones.md) y calibrada con respuestas reales de agentes degradados ([D-005](decisiones.md)): 28 de 28 respuestas bien clasificadas, ninguna al revés. Cola: `python -m experiments.oracle.annotation --data .`
+- [x] Conjuntos expuestos por operador (§5.4), con una sola regla que comparte el informe de cobertura
+- [x] Predicados de fallo y conjunto manifestado (§5.4), con el análisis de sensibilidad a 0.2, 0.4 y 0.6. El agente sano no dispara ningún predicado en las corridas del hito de F1 ni en el corpus
 - [ ] Criterio de regresión: Fisher + Benjamini-Hochberg + caída ≥ 0.4 (§5.5)
 - [ ] Matriz de confusión, TPR, FPR y pass^k (§5.5, §5.8)
 - [ ] Registro de costo y latencia por componente (§5.8), en tokens y en USD con la fecha de los precios, conciliado con la facturación de la consola de Anthropic; gasto total del proyecto, incluidos el desarrollo y la depuración, frente al presupuesto de USD 150–300 (§7). Línea base: USD 0.60 según la consola al cierre de F1 (22-sep-2026)
