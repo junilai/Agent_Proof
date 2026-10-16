@@ -16,6 +16,7 @@ from datetime import datetime
 
 from agentproof import retries
 from agentproof.conversation import TraceContext, UserDriver, converse, utc_now
+from agentproof.llm import Meter
 from agentproof.schema import RunManifest, Scenario, Trace
 from agentproof.session import SessionFactory
 from agentproof.simulator import SimulatedUser
@@ -63,14 +64,19 @@ async def run_suite(
                     repetition=repetition,
                     attempt=attempt,
                 )
+                user = user_for(scenario)
                 trace = await converse(
                     session_factory,
-                    user_for(scenario),
+                    user,
                     context,
                     turn_budget=manifest.turn_budget,
                     model_config=manifest.models,
                     clock=clock,
                 )
+                meter = getattr(user, "meter", None)
+                if isinstance(meter, Meter):
+                    measured = {"simulator_usage": meter.usage, "simulator_seconds": meter.seconds}
+                    trace = trace.model_copy(update=measured)
                 store.save_run_trace(trace)
                 traces.append(trace)
                 if on_trace is not None:

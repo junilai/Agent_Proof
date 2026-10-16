@@ -4,9 +4,18 @@ import pytest
 
 from agentproof.runner import run_suite
 from agentproof.session import AgentTurn
+from agentproof.simulator import END_TOKEN, SimulatedUser
 from agentproof.store import Store
 from tests.factories import manifest, scenario
-from tests.fakes import CrashingSession, EchoSession, ScriptedUser, ticking_clock
+from tests.fakes import (
+    CrashingSession,
+    EchoSession,
+    FakeAsyncLLM,
+    ScriptedUser,
+    reply,
+    ticking_clock,
+    tokens,
+)
 
 
 def run(tmp_path, factory=EchoSession, repetitions=3):
@@ -177,3 +186,15 @@ def test_resuming_never_exceeds_the_retries_already_spent(tmp_path):
     store = Store(tmp_path)
     suite(store, failing_first(99), repetitions=1)
     assert suite(store, good_user, resume=True, repetitions=1) == []
+
+
+def test_traces_record_the_simulated_user_and_the_agent_apart(tmp_path):
+    def simulated(s):
+        return SimulatedUser(s, client=FakeAsyncLLM(reply(END_TOKEN, usage=tokens(70, 2))))
+
+    store = Store(tmp_path)
+    asyncio.run(run_suite([scenario()], EchoSession, manifest(repetitions=1), store, simulated))
+    (only,) = store.run_traces(manifest().run_id)
+    assert (only.simulator_usage.input_tokens, only.simulator_usage.output_tokens) == (70, 2)
+    assert only.usage.input_tokens == 10 and only.usage.cost_usd == 0.25
+    assert only.simulator_seconds is not None and only.agent_seconds is not None

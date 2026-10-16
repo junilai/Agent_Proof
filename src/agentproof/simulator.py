@@ -5,18 +5,20 @@ and the agent's replies, never tool calls), writes one short message per turn
 and answers exactly ``[FIN]`` when the goal is solved or can no longer be.
 Its first message is the scenario's opening message. The whole conversation is
 sent as a single ``user`` message, because the API requires the first message
-to come from the ``user`` role.
+to come from the ``user`` role. Its ``meter`` adds up the tokens and seconds of
+the conversation (D-007).
 """
 
 from __future__ import annotations
 
+import time
 from collections.abc import Sequence
 from typing import Any
 
 import anthropic
 
 from agentproof.conversation import Exchange
-from agentproof.llm import LLMCallError
+from agentproof.llm import LLMCallError, Meter
 from agentproof.models import SIM_USER
 from agentproof.schema import Scenario
 
@@ -49,17 +51,20 @@ class SimulatedUser:
     def __init__(self, scenario: Scenario, client: Any = None) -> None:
         self.scenario = scenario
         self.client = client or anthropic.AsyncAnthropic()
+        self.meter = Meter()
 
     async def first_message(self) -> str:
         return self.scenario.opening_message
 
     async def next_message(self, history: Sequence[Exchange]) -> str | None:
+        started = time.perf_counter()
         response = await self.client.messages.create(
             model=SIM_USER.model,
             max_tokens=SIM_USER.max_tokens,
             system=SIM_USER_SYSTEM.format(goal=self.scenario.user_goal),
             messages=[{"role": "user", "content": history_prompt(history)}],
         )
+        self.meter.add(response, started)
         if response.stop_reason == "refusal":
             raise LLMCallError("el usuario simulado rechazó continuar")
         text = "".join(b.text for b in response.content if b.type == "text").strip()

@@ -7,7 +7,7 @@ from agentproof.llm import LLMCallError
 from agentproof.models import SIM_USER
 from agentproof.simulator import END_TOKEN, SimulatedUser, history_prompt
 from tests.factories import scenario
-from tests.fakes import FakeAsyncLLM, reply
+from tests.fakes import FakeAsyncLLM, reply, tokens
 
 HISTORY = [Exchange("Hola, mis audífonos llegaron dañados", "¿Me da su número de pedido?")]
 
@@ -48,3 +48,16 @@ def test_the_end_token_ends_the_conversation():
 def test_a_refusal_or_an_empty_answer_is_a_simulator_failure(answer):
     with pytest.raises(LLMCallError):
         ask(FakeAsyncLLM(answer))
+
+
+def test_the_meter_adds_up_the_whole_conversation():
+    user = SimulatedUser(
+        scenario(),
+        client=FakeAsyncLLM(
+            reply("Es el AT-1001", usage=tokens(40, 6)), reply("Gracias", usage=tokens(60, 3))
+        ),
+    )
+    asyncio.run(user.next_message(HISTORY))
+    asyncio.run(user.next_message(HISTORY))
+    assert (user.meter.usage.input_tokens, user.meter.usage.output_tokens) == (100, 9)
+    assert user.meter.seconds >= 0

@@ -10,6 +10,7 @@ events and a termination reason, never ordinary exceptions.
 
 from __future__ import annotations
 
+import time
 from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
@@ -80,6 +81,7 @@ class _Outcome:
 
     termination: Termination = "agent_error"
     usage: Usage = field(default_factory=Usage)
+    agent_seconds: float = 0.0
 
     def end(self, termination: Termination) -> None:
         self.termination = termination
@@ -96,11 +98,14 @@ async def _dialogue(
     history: list[Exchange] = []
     while True:
         recorder.add("user_message", text=message)
+        started = time.perf_counter()
         try:
             turn = await session.send(message)
         except Exception as exc:
             recorder.add("error", text=_describe(exc))
             return outcome.end("agent_error")
+        finally:
+            outcome.agent_seconds += time.perf_counter() - started
         recorder.add_turn(turn)
         if turn.usage is not None:
             outcome.usage += turn.usage
@@ -150,6 +155,7 @@ async def converse(
         events=recorder.events,
         models=model_config if model_config is not None else models.snapshot(),
         usage=outcome.usage,
+        agent_seconds=outcome.agent_seconds,
         started_at=started_at,
         ended_at=clock(),
     )
