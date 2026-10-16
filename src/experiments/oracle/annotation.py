@@ -51,7 +51,7 @@ _ANNOTATIONS = TypeAdapter(list[Annotation])
 
 
 def annotations_path(store: Store) -> Path:
-    return store.root / "results" / "annotations.json"
+    return store.root / "results" / "oracle" / "annotations.json"
 
 
 def load_annotations(store: Store) -> dict[str, Annotation]:
@@ -166,7 +166,7 @@ DATA = typer.Option(Path("."), "--data", help="Carpeta que contiene corpus/ y re
 
 @app.command()
 def main(data: Path = DATA):
-    """Presenta cada caso pendiente y guarda la anotación en results/annotations.json."""
+    """Presenta cada caso pendiente y guarda la anotación en results/oracle/annotations.json."""
     store = Store(data)
     queue = pending(store, store.runs())
     if not queue:

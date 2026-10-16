@@ -87,6 +87,7 @@ def test_an_annotation_settles_the_case_and_is_stored_as_manual(tmp_path):
     store = populated(tmp_path)
     save_annotation(store, annotation())
     assert pending(store, store.runs()) == []
+    assert (tmp_path / "results" / "oracle" / "annotations.json").exists()
     stored = load_annotations(store)["tr-a00000000001"]
     assert stored.manual is True and stored.evidence().manual
     save_annotation(store, annotation(decision="no procede"))
