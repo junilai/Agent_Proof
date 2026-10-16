@@ -4,7 +4,8 @@ import pytest
 
 from agentproof.schema import Trace
 from casestudy.domain.policy import Decision
-from experiments.oracle.outcome import UNRESOLVED, decision_in
+from experiments.oracle.outcome import UNRESOLVED, communicated_decision, decision_in
+from tests.factories import event, trace
 
 ROOT = Path(__file__).resolve().parents[1]
 HITO = "evidence/f1-hito/results/runs"
@@ -107,3 +108,35 @@ def test_negations_purposes_questions_and_conditionals_state_no_decision(text):
 def test_approval_and_denial_without_escalation_is_not_guessed():
     text = "Tu reembolso fue aprobado. Normalmente estos productos no son reembolsables."
     assert decision_in(text) is UNRESOLVED
+
+
+def conversation(*agent_texts):
+    events = [event(1, "user_message", text="hola")]
+    events += [event(i, "agent_message", text=t) for i, t in enumerate(agent_texts, start=2)]
+    return trace(events=events)
+
+
+@pytest.mark.parametrize("path", LABELLED)
+def test_the_communicated_decision_of_every_recorded_conversation(path):
+    """D-002: the latest message that states a decision, as labelled by hand."""
+    stated = [label for _, label in sorted(LABELLED[path].items()) if label is not None]
+    assert communicated_decision(load(path)) == (stated[-1] if stated else None)
+
+
+def test_later_messages_without_a_decision_do_not_replace_it():
+    assert (
+        communicated_decision(conversation("El reembolso procede.", "¡Que tengas buen día!")) == PRO
+    )
+
+
+def test_when_the_agent_changes_its_mind_the_last_decision_counts():
+    talk = conversation("El reembolso procede.", "Corrijo: el reembolso no procede.")
+    assert communicated_decision(talk) == NO
+
+
+def test_an_unresolved_last_decision_is_not_skipped():
+    talk = conversation(
+        "El reembolso procede.", "Tu reembolso fue aprobado, el reembolso no procede."
+    )
+    assert communicated_decision(talk) is UNRESOLVED
+    assert communicated_decision(conversation("Hola", "¿En qué te ayudo?")) is None

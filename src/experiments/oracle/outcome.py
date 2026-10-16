@@ -15,6 +15,7 @@ import re
 import unicodedata
 from enum import Enum
 
+from agentproof.schema import Trace
 from casestudy.domain.policy import Decision
 
 
@@ -48,7 +49,7 @@ _HYPOTHETICAL = {"para", "puedo", "podemos", "podria", "podre", "necesitaria", "
 _OUT_OF_SCOPE = re.compile(r"parcial|credito")
 
 
-def _plain(text: str) -> str:
+def plain(text: str) -> str:
     text = unicodedata.normalize("NFKD", text.replace("*", "").lower())
     return "".join(c for c in text if not unicodedata.combining(c))
 
@@ -81,12 +82,22 @@ def decision_in(text: str) -> Extracted:
     for sentence in _SENTENCES.split(text):
         if _CONDITIONAL.search(sentence.lower()):
             continue
-        plain = _plain(sentence)
-        has_noun = bool(_NOUN.search(plain))
-        for clause in _CLAUSES.split(plain):
+        text_plain = plain(sentence)
+        has_noun = bool(_NOUN.search(text_plain))
+        for clause in _CLAUSES.split(text_plain):
             signals |= _clause_signals(clause, has_noun)
     if Decision.ESCALATED in signals:
         return Decision.ESCALATED
     if len(signals) > 1:
         return UNRESOLVED
     return signals.pop() if signals else None
+
+
+def communicated_decision(trace: Trace) -> Extracted:
+    """D-002: the decision of the most recent agent message that states one."""
+    for event in reversed(trace.events):
+        if event.kind == "agent_message":
+            found = decision_in(event.text or "")
+            if found is not None:
+                return found
+    return None
