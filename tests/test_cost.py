@@ -1,5 +1,7 @@
 import pytest
+from typer.testing import CliRunner
 
+from agentproof import cli
 from agentproof.cost import cost_summary, render_cost
 from agentproof.models import SIM_USER
 from agentproof.schema import Usage
@@ -59,3 +61,12 @@ def test_a_model_without_a_price_is_reported_not_guessed(tmp_path):
     assert judge.usd is None and judge.unpriced == {"otro-modelo"}
     text = render_cost(components)
     assert "sin precio en la tabla: otro-modelo" in text and "parcial" in text
+
+
+def test_the_command_prints_the_date_of_the_prices(tmp_path):
+    measured_store(tmp_path)
+    result = CliRunner().invoke(cli.app, ["cost", "--data", str(tmp_path), "--run", RUN_ID])
+    assert result.exit_code == 0, result.output
+    assert "precios al 2026-10-16" in result.output and "evaluador" in result.output
+    unknown = CliRunner().invoke(cli.app, ["cost", "--data", str(tmp_path), "--run", "x"])
+    assert unknown.exit_code == 1

@@ -51,14 +51,19 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F3 Aparato experimental — objetivo: 12–31 oct
 
-- [ ] Condiciones y corridas (§5.5), con la regla de repeticiones inválidas de [D-001](decisiones.md). Si un reintento repite la conversación, la traza anterior queda marcada como reemplazada, porque el oráculo rechaza dos trazas válidas de la misma repetición
+- [x] Condiciones y corridas (§5.5), con la regla de repeticiones inválidas de [D-001](decisiones.md):
+  - Si el usuario simulado falla, la conversación se repite y el intento fallido se conserva con su número.
+  - Si falla un juicio, se vuelve a juzgar la misma traza.
+  - Los topes son compartidos entre las dos etapas.
+  - El reporte informa los reintentos por corrida.
+  - `agentproof resume --run <corrida>` retoma una corrida interrumpida sin repetir lo hecho.
 - [x] Mutaciones D1–D6 en el dominio (§5.4), aplicadas por la edición Claude Agent SDK, con D6 y D4 calibrados ([D-003, D-004](decisiones.md)). Evidencia: 8 pruebas `live` en verde, 14-oct-2026, USD 0.078: D1 no consulta el pedido, D4 enuncia la ventana corrupta de 90 días, D6 trunca solo la conversación de tres llamadas y la línea base resuelve el reembolso como antes
 - [x] Extracción del desenlace por reglas y cola de anotación manual a ciegas (§5.4), con la regla de [D-002](decisiones.md) y calibrada con respuestas reales de agentes degradados ([D-005](decisiones.md)): 28 de 28 respuestas bien clasificadas, ninguna al revés. Cola: `python -m experiments.oracle.annotation --data .`
 - [x] Conjuntos expuestos por operador (§5.4), con una sola regla que comparte el informe de cobertura
 - [x] Predicados de fallo y conjunto manifestado (§5.4), con el análisis de sensibilidad a 0.2, 0.4 y 0.6. El agente sano no dispara ningún predicado en las corridas del hito de F1 ni en el corpus
 - [x] Criterio de regresión: Fisher + Benjamini-Hochberg + caída ≥ 0.4 (§5.5). El reporte tiene tres estados: regresión (sale con 2), señal débil y ok. Las pruebas fijan los valores p de la §5.5 y que, con R = 5, la corrección exige al menos cuatro escenarios regresando juntos. Decisiones abiertas fijadas en [D-006](decisiones.md)
 - [x] Matriz de confusión, TPR, FPR y pass^k (§5.5, §5.8), con desglose de falsos positivos, sensibilidad, control negativo, distribución conjunta de fallos y tamaño de efecto. Se calculan solo sin casos pendientes de anotación. Los escenarios sin repeticiones válidas se listan como desvío, y los pares con menos repeticiones válidas que las previstas se marcan (D-001, regla 4). Comando: `python -m experiments.analysis --data . --reference <corrida> --control <corrida> --candidate <corrida> ...`
-- [ ] Registro de costo y latencia por componente (§5.8), en tokens y en USD con la fecha de los precios, conciliado con la facturación de la consola de Anthropic; gasto total del proyecto, incluidos el desarrollo y la depuración, frente al presupuesto de USD 150–300 (§7). Línea base: USD 0.60 según la consola al cierre de F1 (22-sep-2026)
+- [ ] Registro de costo y latencia por componente (§5.8), en tokens y en USD con la fecha de los precios, conciliado con la facturación de la consola de Anthropic; gasto total del proyecto, incluidos el desarrollo y la depuración, frente al presupuesto de USD 150–300 (§7). Línea base: USD 0.60 según la consola al cierre de F1 (22-sep-2026) *Hecho en la parte D:* el inductor, el usuario simulado, el agente y el evaluador registran tokens y segundos, y `agentproof cost` los reporta con precios verificados el 16-oct-2026. *Falta:* conciliar con la consola al cerrar el piloto.
 - [x] Revisión del prompt del inductor antes del pre-registro (§5.1), hecha el 23-sep-2026 en F2, antes de inducir el corpus: el mensaje inicial revela solo lo que el cliente dijo al abrir la conversación, para que la reejecución conserve los turnos de la semilla (en el hito de F1 adelantó el número de pedido), y los criterios exigen el desenlace, no la justificación del agente, para no inflar los falsos positivos de E3
 - [ ] Pre-registro del protocolo (§5.5). Su huella cubre también las reglas del oráculo (`src/experiments/oracle/`), que se congelan con el resto
 - [ ] **Hito:** tag `preregistro-v1` y piloto de 5 escenarios × 2 repeticiones × 2 condiciones (§7c)

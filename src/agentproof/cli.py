@@ -1,4 +1,4 @@
-"""AgentProof command line: record | induce | run | resume | judge | report.
+"""AgentProof command line: record | induce | run | resume | judge | report | cost.
 
 The adapter is loaded by name (``claude_sdk`` -> ``agentproof.adapters.claude_sdk``,
 or a full module path) and the agent by ``module:attribute``, so adding a
@@ -17,6 +17,7 @@ import typer
 
 from agentproof import models
 from agentproof.conversation import Exchange, TraceContext, UserDriver, converse, utc_now
+from agentproof.cost import cost_summary, render_cost
 from agentproof.induction import induce_missing, induce_scenario
 from agentproof.judge import judge_run, judge_trace
 from agentproof.report import compare_runs, render_comparison
@@ -34,6 +35,7 @@ ADAPTER = typer.Option(..., "--adapter", help="Adaptador del framework, por ejem
 AGENT = typer.Option(..., "--agent", help="Constructor del agente, como modulo:atributo.")
 VARIANT = typer.Option("baseline", "--variant", help="Variante del agente.")
 CARD = typer.Option(None, "--card", help="Tarjeta de situación que se le entregó a la persona.")
+RUNS = typer.Option(None, "--run", help="Corrida a incluir; se repite. Por omisión, todas.")
 
 
 def load_object(path: str) -> Any:
@@ -233,3 +235,16 @@ def report(
         raise _unknown_run(missing) from None
     typer.echo(render_comparison(comparison))
     raise typer.Exit(comparison.exit_code)
+
+
+@app.command()
+def cost(
+    runs: list[str] = RUNS,
+    data: Path = DATA,
+):
+    """Costo y latencia por componente, con la fecha de los precios."""
+    try:
+        components = cost_summary(Store(data), runs or None)
+    except KeyError as missing:
+        raise _unknown_run(missing) from None
+    typer.echo(render_cost(components))
