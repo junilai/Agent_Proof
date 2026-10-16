@@ -65,7 +65,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Matriz de confusión, TPR, FPR y pass^k (§5.5, §5.8), con desglose de falsos positivos, sensibilidad, control negativo, distribución conjunta de fallos y tamaño de efecto. Se calculan solo sin casos pendientes de anotación. Los escenarios sin repeticiones válidas se listan como desvío, y los pares con menos repeticiones válidas que las previstas se marcan (D-001, regla 4). Comando: `python -m experiments.analysis --data . --reference <corrida> --control <corrida> --candidate <corrida> ...`
 - [ ] Registro de costo y latencia por componente (§5.8), en tokens y en USD con la fecha de los precios, conciliado con la facturación de la consola de Anthropic; gasto total del proyecto, incluidos el desarrollo y la depuración, frente al presupuesto de USD 150–300 (§7). Línea base: USD 0.60 según la consola al cierre de F1 (22-sep-2026) *Hecho en la parte D:* el inductor, el usuario simulado, el agente y el evaluador registran tokens y segundos, y `agentproof cost` los reporta con precios verificados el 16-oct-2026. *Falta:* conciliar con la consola al cerrar el piloto.
 - [x] Revisión del prompt del inductor antes del pre-registro (§5.1), hecha el 23-sep-2026 en F2, antes de inducir el corpus: el mensaje inicial revela solo lo que el cliente dijo al abrir la conversación, para que la reejecución conserve los turnos de la semilla (en el hito de F1 adelantó el número de pedido), y los criterios exigen el desenlace, no la justificación del agente, para no inflar los falsos positivos de E3
-- [ ] Pre-registro del protocolo (§5.5). Su huella cubre también las reglas del oráculo (`src/experiments/oracle/`), que se congelan con el resto
+- [ ] Pre-registro del protocolo (§5.5). Su huella cubre también las reglas del oráculo (`src/experiments/oracle/`), que se congelan con el resto. *Borrador hecho:* [`docs/preregistro.md`](preregistro.md) (secciones 1–8 y 10) con [D-008](decisiones.md) y la prueba de huella `tests/test_preregistration.py`. *Falta:* la sección 9 (conjuntos expuestos del corpus) y la huella de los escenarios inducidos.
 - [ ] **Hito:** tag `preregistro-v1` y piloto de 5 escenarios × 2 repeticiones × 2 condiciones (§7c)
 
 ## F4 Portabilidad — objetivo: 26 oct – 8 nov
@@ -108,6 +108,8 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
   - [x] Capítulo de descripción de la propuesta (§5.1, §5.6, §5.7)
   - [x] Réplica de la búsqueda en Scopus, IEEE Xplore y ACM Digital Library (§5, A2). Evidencia: 18 consultas el 22-sep-2026, 709 resultados, 256 revisados por título y resumen; ningún trabajo cubre la combinación completa y tres cubren eslabones aislados, ahora citados en la brecha
 - [ ] T2 Diseño experimental y pre-registro — oct
+  - [x] Borrador del capítulo, con sus seis secciones y las referencias de Benjamini-Hochberg, Fleiss y Hayes-Krippendorff verificadas en Crossref
+  - [ ] Cifras del corpus y conjuntos expuestos, al cerrar el corpus
 - [ ] T3 Desarrollo del prototipo — nov
 - [ ] T4 Resultados y conclusiones; al final, introducción, resumen y abstract — nov – dic
   - [x] Borrador de la introducción, adelantado para el primer entregable del 27 de septiembre
