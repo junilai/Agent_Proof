@@ -6,12 +6,16 @@ repetition the simulated user broke (``simulator_error``) is run again within
 the caps of D-001; the failed attempt is kept. Nothing the agent did is ever
 retried. A run that was interrupted is resumed with ``resume=True``: every
 repetition that already has a valid trace is skipped, and the retries already
-spent still count against the caps.
+spent still count against the caps. While a run executes, a lock file holds the
+id of its process, so the same run is never executed twice at once; a lock left
+by a process that no longer exists is taken over.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+import os
+from collections.abc import Callable, Iterator, Sequence
+from contextlib import contextmanager
 from datetime import datetime
 
 from agentproof import retries
@@ -21,6 +25,36 @@ from agentproof.schema import RunManifest, Scenario, Trace
 from agentproof.session import SessionFactory
 from agentproof.simulator import SimulatedUser
 from agentproof.store import Store
+
+LOCK = "running.lock"
+
+
+class RunInProgress(RuntimeError):
+    """Another process is executing the same run."""
+
+
+def _alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+@contextmanager
+def _exclusive(store: Store, run_id: str) -> Iterator[None]:
+    path = store.runs_dir / run_id / LOCK
+    if path.exists():
+        holder = int(path.read_text() or 0)
+        if holder and holder != os.getpid() and _alive(holder):
+            raise RunInProgress(f"{run_id} is still running in process {holder}")
+    path.write_text(str(os.getpid()))
+    try:
+        yield
+    finally:
+        path.unlink(missing_ok=True)
 
 
 async def run_suite(
@@ -36,6 +70,22 @@ async def run_suite(
     done = store.run_traces(manifest.run_id) if resume else []
     if not resume:
         store.create_run(manifest)
+    with _exclusive(store, manifest.run_id):
+        return await _execute(
+            scenarios, session_factory, manifest, store, user_for, clock, on_trace, done
+        )
+
+
+async def _execute(
+    scenarios: Sequence[Scenario],
+    session_factory: SessionFactory,
+    manifest: RunManifest,
+    store: Store,
+    user_for: Callable[[Scenario], UserDriver],
+    clock: Callable[[], datetime],
+    on_trace: Callable[[Trace], None] | None,
+    done: list[Trace],
+) -> list[Trace]:
     traces: list[Trace] = []
     for scenario in scenarios:
         retried = retries.conversation_retries(done, scenario.scenario_id)

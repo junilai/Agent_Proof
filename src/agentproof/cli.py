@@ -21,7 +21,7 @@ from agentproof.cost import cost_summary, render_cost
 from agentproof.induction import induce_missing, induce_scenario
 from agentproof.judge import judge_run, judge_trace
 from agentproof.report import compare_runs, render_comparison
-from agentproof.runner import run_suite
+from agentproof.runner import RunInProgress, run_suite
 from agentproof.schema import RunManifest, Scenario, Trace, Verdict, run_id_for
 from agentproof.session import SessionFactory
 from agentproof.simulator import SimulatedUser
@@ -197,11 +197,21 @@ def resume(run_id: str = typer.Option(..., "--run", help="Id de la corrida."), d
         raise typer.Exit(1)
     scenarios = [store.scenario(scenario_id) for scenario_id in manifest.scenario_ids]
     factory = session_factory_for(manifest.adapter, manifest.agent, manifest.variant)
-    asyncio.run(
-        run_suite(
-            scenarios, factory, manifest, store, _simulated_user, on_trace=_progress, resume=True
+    try:
+        asyncio.run(
+            run_suite(
+                scenarios,
+                factory,
+                manifest,
+                store,
+                _simulated_user,
+                on_trace=_progress,
+                resume=True,
+            )
         )
-    )
+    except RunInProgress:
+        typer.echo("La corrida sigue en curso en otro proceso: espere a que termine.", err=True)
+        raise typer.Exit(1) from None
     typer.echo(f"Corrida {manifest.run_id} completa.")
 
 

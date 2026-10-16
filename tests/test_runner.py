@@ -1,8 +1,10 @@
 import asyncio
+import os
+import subprocess
 
 import pytest
 
-from agentproof.runner import run_suite
+from agentproof.runner import LOCK, RunInProgress, run_suite
 from agentproof.session import AgentTurn
 from agentproof.simulator import END_TOKEN, SimulatedUser
 from agentproof.store import Store
@@ -198,3 +200,34 @@ def test_traces_record_the_simulated_user_and_the_agent_apart(tmp_path):
     assert (only.simulator_usage.input_tokens, only.simulator_usage.output_tokens) == (70, 2)
     assert only.usage.input_tokens == 10 and only.usage.cost_usd == 0.25
     assert only.simulator_seconds is not None and only.agent_seconds is not None
+
+
+def dead_pid():
+    process = subprocess.Popen(["true"])
+    process.wait()
+    return process.pid
+
+
+def lock_path(store):
+    return store.runs_dir / manifest().run_id / LOCK
+
+
+def test_a_run_still_executing_elsewhere_cannot_be_resumed(tmp_path):
+    """The bug the live check found: resuming a run that had not really stopped."""
+    store = Store(tmp_path)
+    with pytest.raises(Interrupted):
+        suite(store, good_user, on_trace=stop_after(1))
+    assert not lock_path(store).exists()
+    lock_path(store).write_text(str(os.getppid()))
+    with pytest.raises(RunInProgress):
+        suite(store, good_user, resume=True)
+    assert len(store.run_traces(manifest().run_id)) == 1
+
+
+def test_a_lock_left_by_a_process_that_died_is_taken_over(tmp_path):
+    store = Store(tmp_path)
+    with pytest.raises(Interrupted):
+        suite(store, good_user, on_trace=stop_after(1))
+    lock_path(store).write_text(str(dead_pid()))
+    assert len(suite(store, good_user, resume=True)) == 5
+    assert not lock_path(store).exists()
