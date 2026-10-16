@@ -18,7 +18,7 @@ AMBIGUOUS = "Tu reembolso fue aprobado, aunque el reembolso no procede."
 APPROVED = "Tu reembolso de $89.90 fue aprobado."
 
 
-def run_trace(trace_id, condition, text):
+def run_trace(trace_id, condition, text, repetition):
     events = [event(1, "user_message", text="hola"), event(2, "agent_message", text=text)]
     return trace(
         "run",
@@ -28,6 +28,7 @@ def run_trace(trace_id, condition, text):
         variant="baseline" if condition.startswith("baseline") else condition,
         run_id=f"{condition}-20261016-120000",
         scenario_id=scenario_id_for(SEED_ID),
+        repetition=repetition,
     )
 
 
@@ -52,8 +53,8 @@ def populated(tmp_path):
     }
     for condition, traces in runs.items():
         store.create_run(manifest(run_id=f"{condition}-20261016-120000", condition=condition))
-        for trace_id, text in traces:
-            store.save_run_trace(run_trace(trace_id, condition, text))
+        for repetition, (trace_id, text) in enumerate(traces, start=1):
+            store.save_run_trace(run_trace(trace_id, condition, text, repetition))
     return store
 
 

@@ -1,8 +1,10 @@
 from fractions import Fraction
 
+import pytest
+
 from agentproof.schema import scenario_id_for
 from agentproof.store import Store
-from experiments.oracle.annotation import Annotation, save_annotation
+from experiments.oracle.annotation import Annotation, cases, pending, save_annotation
 from experiments.oracle.manifested import manifested, sensitivity
 from tests.factories import T0, event, manifest, trace
 
@@ -75,6 +77,30 @@ def test_sensitivity_with_two_failures_out_of_five(tmp_path):
         Fraction(2, 5): [scenario_id_for(REFUND)],
         Fraction(3, 5): [],
     }
+
+
+def broken(run_trace):
+    """The same repetition after the simulated user failed before the agent decided."""
+    return run_trace.model_copy(
+        update={"termination": "simulator_error", "events": run_trace.events[:1]}
+    )
+
+
+def test_a_repetition_the_simulated_user_broke_is_neither_queued_nor_counted(tmp_path):
+    store = populated(tmp_path, [APPROVED, DENIED, DENIED, APPROVED, APPROVED])
+    first = store.run_traces(CANDIDATE)[0]
+    store.save_run_trace(broken(first))
+    assert pending(store, [CANDIDATE]) == []
+    assert all(case.trace.trace_id != first.trace_id for case in cases(store, [CANDIDATE]))
+    assert manifested(store, REFERENCE, CANDIDATE, "d4").manifested == [scenario_id_for(REFUND)]
+
+
+def test_two_valid_traces_of_one_repetition_are_refused(tmp_path):
+    store = populated(tmp_path, [DENIED] * 5)
+    duplicate = store.run_traces(CANDIDATE)[0].model_copy(update={"trace_id": "tr-00000000d0b1"})
+    store.save_run_trace(duplicate)
+    with pytest.raises(ValueError, match="two valid traces"):
+        cases(store, [CANDIDATE])
 
 
 def test_an_undecided_repetition_leaves_the_scenario_pending_until_annotated(tmp_path):

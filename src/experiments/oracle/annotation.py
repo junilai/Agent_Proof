@@ -84,14 +84,31 @@ class Case:
     card: Card
 
 
+def seed_and_card(seeds: dict[str, Trace], scenario_id: str) -> tuple[Trace, Card]:
+    """The seed a scenario was induced from and its card, reached through identifiers only."""
+    seed = seeds[seed_of(scenario_id)]
+    return seed, CARDS_BY_ID[seed.card_id or ""]
+
+
 def cases(store: Store, run_ids: list[str]) -> list[Case]:
-    """Every run trace with its seed and card, reached through identifiers only."""
+    """Every valid repetition of the runs, with its seed and card.
+
+    A trace that ended in ``simulator_error`` is an invalid repetition (D-001):
+    the judge skips it and so does the oracle. Two valid traces of the same
+    repetition would be counted twice, so they are refused.
+    """
     seeds = {seed.trace_id: seed for seed in store.seeds()}
     found = []
     for run_id in run_ids:
+        seen: set[tuple[str, int | None]] = set()
         for trace in store.run_traces(run_id):
-            seed = seeds[seed_of(trace.scenario_id or "")]
-            found.append(Case(run_id, trace, seed, CARDS_BY_ID[seed.card_id or ""]))
+            if trace.termination == "simulator_error":
+                continue
+            repetition = (trace.scenario_id or "", trace.repetition)
+            if repetition in seen:
+                raise ValueError(f"two valid traces of repetition {repetition} in {run_id}")
+            seen.add(repetition)
+            found.append(Case(run_id, trace, *seed_and_card(seeds, repetition[0])))
     return found
 
 
