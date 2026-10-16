@@ -5,7 +5,7 @@ Decisiones de diseño que no se deducen del código ni de la [planificación](pl
 ## D-001 · Repeticiones inválidas: cuándo se reintenta y cuándo no
 
 - **Fecha:** 23 de septiembre de 2026
-- **Estado:** decidida; se implementa en F3, cuando exista el aparato experimental
+- **Estado:** decidida; se implementa en la parte D de F3
 - **Origen:** retroalimentación del tutor sobre el primer entregable
 
 ### El problema
@@ -31,7 +31,14 @@ Perder repeticiones degrada la detección de forma medible. En el caso extremo (
 
 La regla se pre-registra junto con el resto del protocolo, antes de ejecutar cualquier experimento.
 
-**Precisión (16 de octubre de 2026).** La regla no dice si reintentar tras un juicio fallido significa repetir la conversación o volver a juzgar la misma traza. Lo define la implementación, antes del pre-registro. Si se repite la conversación, la traza anterior tiene que quedar marcada como reemplazada. El oráculo cuenta solo repeticiones válidas: excluye las que terminan en `simulator_error` y rechaza dos trazas válidas de la misma repetición.
+### Cómo se reintenta cada fallo (16 de octubre de 2026)
+
+La regla no decía si reintentar tras un juicio fallido significa repetir la conversación o volver a juzgar la misma traza. Se decide así:
+
+- **Un fallo del usuario simulado repite la conversación.** Esa conversación es inválida: no muestra lo que el agente habría hecho con un cliente que siguiera hablando. El intento fallido se conserva, con su número de intento.
+- **Un juicio fallido se resuelve volviendo a juzgar la misma traza, sin repetir la conversación.** Repetirla descartaría evidencia del comportamiento del agente. Si además el evaluador fallara más con las respuestas inusuales de una versión degradada, se descartarían justo esas conversaciones y la medición quedaría sesgada a favor de la versión degradada.
+- **Los topes de la regla 3 se comparten entre las dos etapas:** dos reintentos por repetición y cinco por par, sumando los del usuario simulado y los del evaluador.
+- **El oráculo cuenta la traza cuyo juicio falló definitivamente.** La verdad de referencia no puede depender de que el detector haya logrado juzgarla. Solo las conversaciones que invalidó el usuario simulado se excluyen de ambos lados, y el reporte marca el par con menos repeticiones juzgadas (regla 4).
 
 ### Por qué así
 
@@ -136,3 +143,17 @@ La §5.5 fija el criterio y las métricas, pero deja sin precisar seis detalles 
 4. **pass^k.** Se usa el estimador insesgado por escenario, C(c, k) / C(n, k), con c repeticiones aprobadas de n válidas, promediado sobre los escenarios, para k de 1 a R.
 5. **Tamaño de efecto.** Es la diferencia entre la tasa media de aprobación de la referencia y la del candidato. Para D3 se calcula sobre la suite completa, porque no tiene conjunto expuesto. Para la familia B se calcula sobre la suite y también sobre su conjunto expuesto. Siempre se acompaña de la distribución por escenario, para que una media no esconda de dónde viene el efecto.
 6. **Escenarios incompletos.** La §5.5 pide que las cuatro celdas de la matriz particionen los veinte escenarios sin exclusiones. Un escenario sin repeticiones válidas en una de las corridas no puede etiquetarse. Si aparece uno, aun con los reintentos de D-001, no se le asigna celda ni se descarta en silencio: se lista como desvío del protocolo junto a la matriz.
+
+## D-007 · Cómo se mide el costo y la latencia de cada componente
+
+- **Fecha:** 16 de octubre de 2026
+- **Estado:** decidida; se implementa en la parte D de F3 y se concilia en el piloto
+- **Origen:** registro de costo y latencia por componente (§5.8, §7)
+
+Hasta F2 solo el agente registraba su consumo: el inductor, el usuario simulado y el evaluador lo descartaban. Desde la parte D de F3:
+
+1. **Qué se registra.** Cada componente guarda los tokens de entrada y de salida que informa la API y los segundos de cada llamada, incluidas las llamadas fallidas, que también se pagan. El inductor lo guarda en el escenario, el usuario simulado y el agente en la traza, y el evaluador en el veredicto.
+2. **Cómo se pasa a dólares.** Con una tabla de precios por millón de tokens copiada de la página oficial de precios, con la fecha en que se verificó. Un modelo que no está en la tabla se reporta como tal, sin estimar su precio.
+3. **El agente es un caso aparte.** Usa caché de prompts, que tiene tarifas propias, así que multiplicar sus tokens por la tabla no da su costo. Se reporta además la estimación que entrega su SDK.
+4. **Las cifras de la herramienta son cálculos propios.** Al cerrar el piloto se concilian con la facturación de la consola de Anthropic, y la diferencia se informa. Así se registró en F1 y F2, cuando la consola marcó menos que la suma de las estimaciones del SDK.
+5. **Los artefactos anteriores a este registro** se cuentan como "sin registro", nunca como costo cero.
