@@ -208,3 +208,29 @@ Es un estudio de estimación: no se declaran umbrales de TPR, FPR ni concordanci
 ## 9. Conjuntos expuestos del corpus
 
 Se completa al cerrar el corpus. Contendrá, para cada operador, la lista de escenarios expuestos que resulta de aplicar las reglas de la [sección 4](#4-verdad-de-referencia) a las 20 trazas semilla, generada por un comando y no escrita a mano, y los cinco escenarios sorteados para el piloto.
+
+## 10. Huella del protocolo
+
+Cada pieza congelada se resume en los primeros 16 caracteres de su sha256. Las piezas son los modelos, los prompts, las herramientas, las mutaciones, la base de conocimiento, las tarjetas, las constantes del criterio y del oráculo, y el código del oráculo.
+
+La prueba `tests/test_preregistration.py` recalcula cada huella y la compara con esta tabla. Si el código cambia sin que el pre-registro se enmiende, la integración continua falla. Para enmendarlo:
+
+1. Declarar el cambio en la [sección 8](#8-desvíos-y-enmiendas).
+2. Reemplazar la tabla por la que imprime `uv run python -m tests.test_preregistration`.
+
+Al cerrar el corpus se agregarán los 20 escenarios inducidos.
+
+| Pieza | Huella |
+|---|---|
+| Modelos de los componentes | `ab5bf458c1a07618` |
+| Instrucciones del inductor | `e40ed8811906d3f9` |
+| Instrucciones del usuario simulado | `b1abd93029edcbc4` |
+| Rúbrica del evaluador | `5b097001dbc4f39a` |
+| Prompt del agente en cada variante | `880db4a48e7e8978` |
+| Herramientas y límite de pasos de la edición Claude Agent SDK | `5bb212bd5fe02e99` |
+| Mutaciones | `066775c0b3e42b0c` |
+| Base de conocimiento | `603bf9873124a1b1` |
+| Tarjetas de situación | `d88008bfe7786bcc` |
+| Criterio de regresión y reintentos | `9aad2d0f4e567eb3` |
+| Umbrales y semilla del oráculo | `e9762d8f9b00c5ea` |
+| Reglas del oráculo (código fuente) | `2e4699d45a9d6478` |
