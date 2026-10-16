@@ -17,7 +17,7 @@ import anthropic
 from pydantic import BaseModel
 
 from agentproof.conversation import utc_now
-from agentproof.llm import structured_call
+from agentproof.llm import Meter, structured_call
 from agentproof.models import INDUCER
 from agentproof.schema import Scenario, Trace, scenario_id_for
 from agentproof.store import Store
@@ -77,14 +77,17 @@ def induce_scenario(
             created_at=clock(),
         )
 
-    return structured_call(
+    meter = Meter()
+    scenario = structured_call(
         client or anthropic.Anthropic(),
         INDUCER,
         system=INDUCTION_SYSTEM,
         prompt=induction_prompt(seed),
         output_type=ScenarioDraft,
         validate=to_scenario,
+        meter=meter,
     )
+    return scenario.model_copy(update={"usage": meter.usage, "seconds": meter.seconds})
 
 
 @dataclass

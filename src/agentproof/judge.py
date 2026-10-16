@@ -20,7 +20,7 @@ from pydantic import BaseModel
 
 from agentproof import retries
 from agentproof.conversation import utc_now
-from agentproof.llm import structured_call
+from agentproof.llm import Meter, structured_call
 from agentproof.models import JUDGE
 from agentproof.schema import CriterionResult, JudgeFailure, Scenario, Trace, Verdict
 from agentproof.store import Store
@@ -88,14 +88,17 @@ def judge_trace(
             created_at=clock(),
         )
 
-    return structured_call(
+    meter = Meter()
+    verdict = structured_call(
         client or anthropic.Anthropic(),
         JUDGE,
         system=JUDGE_RUBRIC,
         prompt=judge_prompt(scenario, trace),
         output_type=JudgeOutput,
         validate=to_verdict,
+        meter=meter,
     )
+    return verdict.model_copy(update={"usage": meter.usage, "seconds": meter.seconds})
 
 
 @dataclass

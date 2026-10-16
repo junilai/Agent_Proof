@@ -4,7 +4,7 @@ from agentproof.induction import INDUCTION_SYSTEM, ScenarioDraft, induce_scenari
 from agentproof.llm import LLMCallError
 from agentproof.models import INDUCER
 from tests.factories import T0, trace
-from tests.fakes import FakeLLM, parsed
+from tests.fakes import FakeLLM, parsed, tokens
 
 DRAFT = ScenarioDraft(
     user_goal="  Obtener el reembolso de unos audífonos dañados del pedido AT-1001  ",
@@ -67,3 +67,10 @@ def test_only_seed_traces_are_induced():
     with pytest.raises(ValueError):
         induce_scenario(trace(kind="run"), client=client)
     assert client.messages.calls == []
+
+
+def test_the_scenario_records_what_inducing_it_consumed():
+    client = FakeLLM(parsed(DRAFT, usage=tokens(1500, 300)))
+    scenario = induce_scenario(trace(), client=client, clock=lambda: T0)
+    assert (scenario.usage.input_tokens, scenario.usage.output_tokens) == (1500, 300)
+    assert scenario.seconds is not None and scenario.seconds >= 0
