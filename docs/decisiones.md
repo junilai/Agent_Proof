@@ -31,6 +31,8 @@ Perder repeticiones degrada la detección de forma medible. En el caso extremo (
 
 La regla se pre-registra junto con el resto del protocolo, antes de ejecutar cualquier experimento.
 
+**Precisión (16 de octubre de 2026).** La regla no dice si reintentar tras un juicio fallido significa repetir la conversación o volver a juzgar la misma traza. Lo define la implementación, antes del pre-registro. Si se repite la conversación, la traza anterior tiene que quedar marcada como reemplazada. El oráculo cuenta solo repeticiones válidas: excluye las que terminan en `simulator_error` y rechaza dos trazas válidas de la misma repetición.
+
 ### Por qué así
 
 Reintentar mantiene el denominador en cinco y con ello la resolución de la prueba, que es la razón por la que se eligió R = 5. El tope evita que un fallo persistente deje una corrida sin terminar. Y la asimetría entre los dos tipos de fallo es lo que protege la validez: si se reintentara también un fallo atribuible al agente, se estaría borrando evidencia en contra de la versión evaluada.

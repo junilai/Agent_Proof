@@ -51,16 +51,16 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F3 Aparato experimental — objetivo: 12–31 oct
 
-- [ ] Condiciones y corridas (§5.5), con la regla de repeticiones inválidas de [D-001](decisiones.md)
+- [ ] Condiciones y corridas (§5.5), con la regla de repeticiones inválidas de [D-001](decisiones.md). Si un reintento repite la conversación, la traza anterior queda marcada como reemplazada, porque el oráculo rechaza dos trazas válidas de la misma repetición
 - [x] Mutaciones D1–D6 en el dominio (§5.4), aplicadas por la edición Claude Agent SDK, con D6 y D4 calibrados ([D-003, D-004](decisiones.md)). Evidencia: 8 pruebas `live` en verde, 14-oct-2026, USD 0.078: D1 no consulta el pedido, D4 enuncia la ventana corrupta de 90 días, D6 trunca solo la conversación de tres llamadas y la línea base resuelve el reembolso como antes
 - [x] Extracción del desenlace por reglas y cola de anotación manual a ciegas (§5.4), con la regla de [D-002](decisiones.md) y calibrada con respuestas reales de agentes degradados ([D-005](decisiones.md)): 28 de 28 respuestas bien clasificadas, ninguna al revés. Cola: `python -m experiments.oracle.annotation --data .`
 - [x] Conjuntos expuestos por operador (§5.4), con una sola regla que comparte el informe de cobertura
 - [x] Predicados de fallo y conjunto manifestado (§5.4), con el análisis de sensibilidad a 0.2, 0.4 y 0.6. El agente sano no dispara ningún predicado en las corridas del hito de F1 ni en el corpus
 - [ ] Criterio de regresión: Fisher + Benjamini-Hochberg + caída ≥ 0.4 (§5.5)
-- [ ] Matriz de confusión, TPR, FPR y pass^k (§5.5, §5.8)
+- [ ] Matriz de confusión, TPR, FPR y pass^k (§5.5, §5.8). Se calculan solo sin casos pendientes de anotación. Los escenarios sin repeticiones válidas y los pares con menos de cinco se reportan aparte (D-001, regla 4)
 - [ ] Registro de costo y latencia por componente (§5.8), en tokens y en USD con la fecha de los precios, conciliado con la facturación de la consola de Anthropic; gasto total del proyecto, incluidos el desarrollo y la depuración, frente al presupuesto de USD 150–300 (§7). Línea base: USD 0.60 según la consola al cierre de F1 (22-sep-2026)
 - [x] Revisión del prompt del inductor antes del pre-registro (§5.1), hecha el 23-sep-2026 en F2, antes de inducir el corpus: el mensaje inicial revela solo lo que el cliente dijo al abrir la conversación, para que la reejecución conserve los turnos de la semilla (en el hito de F1 adelantó el número de pedido), y los criterios exigen el desenlace, no la justificación del agente, para no inflar los falsos positivos de E3
-- [ ] Pre-registro del protocolo (§5.5)
+- [ ] Pre-registro del protocolo (§5.5). Su huella cubre también las reglas del oráculo (`src/experiments/oracle/`), que se congelan con el resto
 - [ ] **Hito:** tag `preregistro-v1` y piloto de 5 escenarios × 2 repeticiones × 2 condiciones (§7c)
 
 ## F4 Portabilidad — objetivo: 26 oct – 8 nov
@@ -68,6 +68,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [ ] Edición LangGraph con el bucle sobre `StateGraph` y su adaptador (§5.7)
 - [ ] Edición CrewAI y su adaptador, con una corrida de punta a punta (§5.7)
 - [ ] Edición smolagents y su adaptador, con una corrida de punta a punta (§5.7)
+- [ ] En cada framework, el adaptador traduce el corte por límite de pasos a `step_limit`; si no, D6 nunca se manifiesta. Se recalibran D6 ([D-003](decisiones.md)) y las reglas del oráculo, con respuestas de los agentes degradados de ese framework, como en [D-005](decisiones.md)
 - [ ] Medición del costo de incorporación por adaptador (§5.7)
 - [ ] Mapeo del esquema a las convenciones GenAI de OpenTelemetry (§5)
 - [ ] *(opcional)* Edición sin framework y su adaptador
