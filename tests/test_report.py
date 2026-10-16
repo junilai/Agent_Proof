@@ -1,8 +1,9 @@
 from fractions import Fraction
 
-from agentproof.report import compare_runs, render_comparison
+from agentproof.report import Retries, compare_runs, render_comparison
+from agentproof.schema import JudgeFailure
 from agentproof.store import Store
-from tests.factories import manifest, trace, verdict
+from tests.factories import T0, manifest, trace, verdict
 
 BASE, CAND = "base-20261001-120000", "cand-20261001-130000"
 
@@ -128,3 +129,38 @@ def test_a_scenario_without_valid_repetitions_is_not_tested(tmp_path):
     comparison = compare_runs(store, BASE, CAND)
     assert comparison.comparisons[0].p_value is None
     assert "sin juicio" in render_comparison(comparison)
+
+
+def test_retries_are_reported_and_a_recovered_repetition_is_not_invalid(tmp_path):
+    """Repetition 1 broke once and was rerun; repetition 2 needed a second judgment;
+    repetition 3 was never judged after three tries."""
+    store = Store(tmp_path)
+    fill(store, BASE, "sc-a", [True] * 3)
+    fill(store, CAND, "sc-a", [True, True, None])
+    broken = trace(
+        kind="run",
+        trace_id="tr-cand-sc-a-1-broken",
+        run_id=CAND,
+        scenario_id="sc-a",
+        repetition=1,
+        termination="simulator_error",
+    )
+    store.save_run_trace(broken)
+    (rerun,) = [t for t in store.run_traces(CAND) if t.trace_id == "tr-cand-sc-a-1"]
+    store.save_run_trace(rerun.model_copy(update={"attempt": 2}))
+    (second,) = [v for v in store.verdicts(CAND) if v.trace_id == "tr-cand-sc-a-2"]
+    store.save_verdict(second.model_copy(update={"attempts": 2}))
+    store.save_judge_failure(
+        JudgeFailure(
+            trace_id="tr-cand-sc-a-3",
+            scenario_id="sc-a",
+            run_id=CAND,
+            attempts=3,
+            reasons=["RuntimeError: x"] * 3,
+            at=T0,
+        )
+    )
+    comparison = compare_runs(store, BASE, CAND)
+    assert comparison.invalid == {BASE: 0, CAND: 1}
+    assert comparison.retries[CAND] == Retries(conversations=1, judgments=3)
+    assert "reintentos (D-001): 1 conversación(es), 3 juicio(s)" in render_comparison(comparison)

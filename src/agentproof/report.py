@@ -6,7 +6,8 @@ scenarios compared, and the pass rate drops by at least 0.4. A drop of 0.4
 without significance is a weak signal: with R = 5 an isolated scenario cannot
 pass the correction, so it is reported but does not fail the build. Rates are
 exact fractions. Repetitions without a verdict (simulator failures or judge
-errors) are invalid: counted and reported, never rated.
+errors) are invalid: counted once per repetition and reported, never rated,
+together with the retries each run needed (D-001).
 """
 
 from __future__ import annotations
@@ -62,6 +63,7 @@ class RunComparison:
     invalid: dict[str, int]
     unmatched: list[str]
     repetitions: dict[str, int]
+    retries: dict[str, Retries]
 
     @property
     def regressions(self) -> list[ScenarioComparison]:
@@ -76,23 +78,39 @@ class RunComparison:
         return 2 if self.regressions else 0
 
 
-def _pass_counts(store: Store, run_id: str) -> tuple[dict[str, PassCount], int]:
+@dataclass(frozen=True)
+class Retries:
+    """What a run needed to keep its repetitions valid (D-001, rule 5)."""
+
+    conversations: int
+    judgments: int
+
+
+def _pass_counts(store: Store, run_id: str) -> tuple[dict[str, PassCount], int, Retries]:
     passed: dict[str, int] = defaultdict(int)
     valid: dict[str, int] = defaultdict(int)
-    for verdict in store.verdicts(run_id):
+    verdicts = store.verdicts(run_id)
+    for verdict in verdicts:
         valid[verdict.scenario_id] += 1
         passed[verdict.scenario_id] += verdict.passed
     traces = store.run_traces(run_id)
     counts = {s: PassCount(passed[s], valid[s]) for s in {t.scenario_id or "" for t in traces}}
-    invalid = len(traces) - sum(valid.values())
-    return counts, invalid
+    repetitions = {(t.scenario_id, t.repetition) for t in traces}
+    invalid = len(repetitions) - len(verdicts)
+    judged = {v.trace_id for v in verdicts}
+    unjudged = [f for f in store.judge_failures(run_id) if f.trace_id not in judged]
+    retries = Retries(
+        conversations=sum(1 for t in traces if (t.attempt or 1) > 1),
+        judgments=sum(r.attempts - 1 for r in [*verdicts, *unjudged]),
+    )
+    return counts, invalid, retries
 
 
 def compare_runs(
     store: Store, baseline_run: str, candidate_run: str, min_drop: Fraction = MIN_DROP
 ) -> RunComparison:
-    base, base_invalid = _pass_counts(store, baseline_run)
-    cand, cand_invalid = _pass_counts(store, candidate_run)
+    base, base_invalid, base_retries = _pass_counts(store, baseline_run)
+    cand, cand_invalid, cand_retries = _pass_counts(store, candidate_run)
     common = sorted(base.keys() & cand.keys())
     p_values = {
         s: fisher_exact(base[s].passed, base[s].valid, cand[s].passed, cand[s].valid)
@@ -117,6 +135,7 @@ def compare_runs(
         repetitions={
             run_id: store.manifest(run_id).repetitions for run_id in (baseline_run, candidate_run)
         },
+        retries={baseline_run: base_retries, candidate_run: cand_retries},
     )
 
 
@@ -155,7 +174,13 @@ def render_comparison(comparison: RunComparison) -> str:
         lines.append("* menos repeticiones válidas que las previstas (D-001, regla 4)")
     for run_id, count in comparison.invalid.items():
         if count:
-            lines.append(f"{run_id}: {count} repetición(es) inválida(s), sin juicio")
+            lines.append(f"{run_id}: {count} repetición(es) sin juicio")
+    for run_id, spent in comparison.retries.items():
+        if spent.conversations or spent.judgments:
+            lines.append(
+                f"{run_id}: reintentos (D-001): {spent.conversations} conversación(es), "
+                f"{spent.judgments} juicio(s)"
+            )
     if comparison.unmatched:
         unmatched = ", ".join(comparison.unmatched)
         lines.append(f"sin comparar (presentes en una sola corrida): {unmatched}")
