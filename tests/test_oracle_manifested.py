@@ -103,6 +103,16 @@ def test_two_valid_traces_of_one_repetition_are_refused(tmp_path):
         cases(store, [CANDIDATE])
 
 
+def test_a_scenario_without_valid_repetitions_is_incomplete_not_pending(tmp_path):
+    """No annotation can settle it, so it must not hold the analysis back as pending."""
+    store = populated(tmp_path, [DENIED] * 5)
+    for run_trace in store.run_traces(REFERENCE):
+        store.save_run_trace(broken(run_trace))
+    result = manifested(store, REFERENCE, CANDIDATE, "d4")
+    assert result.incomplete == [scenario_id_for(REFUND)]
+    assert result.pending == [] and result.manifested == []
+
+
 def test_an_undecided_repetition_leaves_the_scenario_pending_until_annotated(tmp_path):
     store = populated(tmp_path, [AMBIGUOUS, DENIED, DENIED, APPROVED, APPROVED])
     assert manifested(store, REFERENCE, CANDIDATE, "d4").pending == [scenario_id_for(REFUND)]
