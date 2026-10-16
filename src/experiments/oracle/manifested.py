@@ -51,7 +51,7 @@ def failure_rate(
     return Fraction(sum(1 for v in verdicts if v), len(verdicts))
 
 
-def _by_scenario(store: Store, run_id: str) -> dict[str, list[Case]]:
+def by_scenario(store: Store, run_id: str) -> dict[str, list[Case]]:
     grouped: dict[str, list[Case]] = defaultdict(list)
     for case in cases(store, [run_id]):
         grouped[case.trace.scenario_id or ""].append(case)
@@ -63,7 +63,7 @@ def manifested(
 ) -> Manifestation:
     annotations = load_annotations(store)
     seeds = {seed.trace_id: seed for seed in store.seeds()}
-    ours, theirs = _by_scenario(store, candidate), _by_scenario(store, reference)
+    ours, theirs = by_scenario(store, candidate), by_scenario(store, reference)
     compared = {t.scenario_id or "" for r in (reference, candidate) for t in store.run_traces(r)}
     result = Manifestation(operator, threshold)
     for scenario_id in sorted(compared):
