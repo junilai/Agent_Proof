@@ -121,3 +121,18 @@ Costo: USD 0.335 según el SDK. Las 28 respuestas y sus etiquetas quedan en `tes
 2. En los dos cortes de D6 que terminaron con texto, el agente ya había anunciado el escalamiento ("voy a escalar tu caso") antes de que el límite impidiera crear el ticket. Según la §5.4 cuenta la decisión comunicada, así que ahí el predicado no falla: D6 se manifiesta solo cuando el corte llega antes de que el agente enuncie el desenlace.
 
 **Observación para el análisis.** En siete respuestas de D5 el agente no aprobó ningún reembolso que la política negara, y D2 siguió consultando la política. Son mutaciones de propensión: es esperable que su conjunto manifestado sea chico, y eso es un resultado, no un defecto del oráculo.
+
+## D-006 · Lo que el criterio de regresión y las métricas dejan abierto
+
+- **Fecha:** 16 de octubre de 2026
+- **Estado:** decidida; se implementa en la parte C de F3 y se pre-registra
+- **Origen:** construcción del criterio de regresión y de las métricas de F3
+
+La §5.5 fija el criterio y las métricas, pero deja sin precisar seis detalles que cambian las cifras. Se fijan antes de escribir el código, porque se pre-registran con el resto del protocolo.
+
+1. **Qué cuenta como detección.** Solo el estado *regresión*, que cumple las dos condiciones del criterio. La *señal débil* (caída de al menos 0.4 sin significancia) no es detección en la matriz de confusión: se reporta aparte, para que se vea cuántas regresiones quedan por debajo de la resolución que da R = 5.
+2. **Prueba de Fisher de dos colas.** Con los márgenes de la tabla fijos, el valor p es la suma de las probabilidades de todas las tablas tan probables o menos que la observada. Es la definición estándar y reproduce los valores de la §5.5: 0.100, 0.029, 0.0079 y 0.0022 para R = 3, 4, 5 y 6. Se calcula con aritmética exacta, porque los límites de la corrección están muy cerca entre sí: 0.0079 queda entre 0.0075 y 0.01, que son los umbrales de tres y de cuatro escenarios.
+3. **Familia de la corrección.** Benjamini-Hochberg se aplica, en cada comparación, sobre los escenarios comparados, que en el experimento son los veinte. Un escenario sin repeticiones válidas en alguna de las dos corridas no tiene valor p y no entra en la familia.
+4. **pass^k.** Se usa el estimador insesgado por escenario, C(c, k) / C(n, k), con c repeticiones aprobadas de n válidas, promediado sobre los escenarios, para k de 1 a R.
+5. **Tamaño de efecto.** Es la diferencia entre la tasa media de aprobación de la referencia y la del candidato. Para D3 se calcula sobre la suite completa, porque no tiene conjunto expuesto. Para la familia B se calcula sobre la suite y también sobre su conjunto expuesto. Siempre se acompaña de la distribución por escenario, para que una media no esconda de dónde viene el efecto.
+6. **Escenarios incompletos.** La §5.5 pide que las cuatro celdas de la matriz particionen los veinte escenarios sin exclusiones. Un escenario sin repeticiones válidas en una de las corridas no puede etiquetarse. Si aparece uno, aun con los reintentos de D-001, no se le asigna celda ni se descarta en silencio: se lista como desvío del protocolo junto a la matriz.
