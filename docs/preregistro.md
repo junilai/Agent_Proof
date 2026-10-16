@@ -166,3 +166,24 @@ El reporte da a cada escenario uno de tres estados:
 **Costo y latencia.** Se reportan por escenario evaluado y por componente en todos los experimentos (§5.8).
 
 El comando `python -m experiments.analysis` calcula todo lo anterior y no calcula nada mientras haya casos pendientes de anotación.
+
+## 6. Validación del evaluador y de la inducción (E2 y E3)
+
+**E2, concordancia del evaluador** (§5.5, §5.8).
+
+- **Anotadores.** Tres anotadores humanos independientes califican 40 pares (escenario, traza) con la misma rúbrica del evaluador automático.
+- **Muestra.** Es estratificada sobre las ejecuciones de E1 ya juzgadas: 20 pares con veredicto automático aprobado y 20 reprobados, para mitigar la paradoja de κ por prevalencia. La proporción natural de aprobaciones se reporta por separado. Ningún escenario ni ninguna versión del agente aporta más de dos pares. El sorteo usa la semilla `20261018` ([D-008](decisiones.md)).
+- **Contingencia.** Si un estrato no reúne 20 pares, el tope sube a tres dentro de ese estrato. Si aun así no alcanza, ambos estratos se reducen al tamaño del menor y se informa el tamaño final. Nunca se desbalancea la muestra.
+- **Cegamiento.** Los anotadores no ven el veredicto automático ni la versión del agente.
+- **Medidas.** κ de Fleiss entre los tres anotadores, la matriz de κ de Cohen por pares y la concordancia del evaluador con el voto mayoritario.
+
+**E3, fidelidad de la inducción** (§5.8).
+
+- **Calificación.** Los mismos tres anotadores califican cada uno de los 20 escenarios respecto de su conversación semilla, en una escala Likert de cinco puntos con estos anclajes:
+  - 1: el escenario no corresponde a la conversación;
+  - 3: corresponde parcialmente, con omisiones o criterios no verificables;
+  - 5: recoge fielmente el objetivo del usuario y criterios verificables a partir de la conversación.
+- **Métrica principal.** El porcentaje de escenarios con mediana igual o superior a 4.
+- **Concordancia.** Se mide con el α de Krippendorff con ponderación ordinal, junto con las comparaciones por pares y la distribución completa de calificaciones. Con 20 ítems el intervalo de confianza es ancho, y la poca varianza de calificaciones concentradas en valores altos deprime el coeficiente.
+- **Corrección.** Se reporta también el porcentaje de escenarios que requerirían corrección bajo supervisión.
+- **Sesiones separadas.** E3 se hace en una sesión distinta de la de E2, para reducir el anclaje entre tareas.
