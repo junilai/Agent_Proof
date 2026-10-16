@@ -1,0 +1,111 @@
+"""Blind manual annotation queue (§5.4).
+
+The traces the rules could not decide are shown to the author in a random order
+with a fixed seed, through the same blind transcript the judge reads: no
+condition, variant or model. The author annotates what the agent communicated
+against the card and the knowledge base; the annotation is stored as manual and
+replaces the extracted evidence of that trace for every operator.
+"""
+
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Literal
+
+from pydantic import BaseModel, TypeAdapter
+
+from agentproof.schema import Trace
+from agentproof.store import Store
+from casestudy.domain.policy import Decision
+from experiments.cards import CARDS_BY_ID, Card
+from experiments.conditions import CONDITIONS_BY_NAME
+from experiments.oracle.exposure import is_exposed, seed_of
+from experiments.oracle.predicates import OPERATORS_WITH_PREDICATE, Evidence, fails
+
+QUEUE_SEED = 20261016
+
+
+class Annotation(BaseModel):
+    run_id: str
+    trace_id: str
+    decision: Literal["procede", "no procede", "escalamiento"] | None
+    contradicts_base: bool
+    answers_card: bool
+    annotated_at: datetime
+    manual: Literal[True] = True
+
+    def evidence(self) -> Evidence:
+        decision = Decision(self.decision) if self.decision else None
+        return Evidence(decision, self.contradicts_base, self.answers_card, manual=True)
+
+
+_ANNOTATIONS = TypeAdapter(list[Annotation])
+
+
+def annotations_path(store: Store) -> Path:
+    return store.root / "results" / "annotations.json"
+
+
+def load_annotations(store: Store) -> dict[str, Annotation]:
+    path = annotations_path(store)
+    if not path.exists():
+        return {}
+    return {a.trace_id: a for a in _ANNOTATIONS.validate_json(path.read_bytes())}
+
+
+def save_annotation(store: Store, annotation: Annotation) -> None:
+    annotations = load_annotations(store) | {annotation.trace_id: annotation}
+    path = annotations_path(store)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(_ANNOTATIONS.dump_json(list(annotations.values()), indent=2) + b"\n")
+
+
+def operators_for(condition: str) -> tuple[str, ...]:
+    """Predicates a run is judged with: its own operator, or all of them for the reference."""
+    role = CONDITIONS_BY_NAME[condition].role
+    if role == "reference":
+        return OPERATORS_WITH_PREDICATE
+    return (condition,) if role == "candidate" and condition in OPERATORS_WITH_PREDICATE else ()
+
+
+@dataclass(frozen=True)
+class Case:
+    run_id: str
+    trace: Trace
+    seed: Trace
+    card: Card
+
+
+def cases(store: Store, run_ids: list[str]) -> list[Case]:
+    """Every run trace with its seed and card, reached through identifiers only."""
+    seeds = {seed.trace_id: seed for seed in store.seeds()}
+    found = []
+    for run_id in run_ids:
+        for trace in store.run_traces(run_id):
+            seed = seeds[seed_of(trace.scenario_id or "")]
+            found.append(Case(run_id, trace, seed, CARDS_BY_ID[seed.card_id or ""]))
+    return found
+
+
+def judged(case: Case, operator: str, annotations: dict[str, Annotation]) -> bool | None:
+    annotation = annotations.get(case.trace.trace_id)
+    return fails(operator, case.card, case.trace, annotation.evidence() if annotation else None)
+
+
+def pending(store: Store, run_ids: list[str]) -> list[Case]:
+    """Exposed cases some predicate leaves undecided, shuffled with a fixed seed."""
+    annotations = load_annotations(store)
+    queue = [
+        case
+        for case in cases(store, run_ids)
+        if any(
+            is_exposed(op, case.card, case.seed) and judged(case, op, annotations) is None
+            for op in operators_for(case.trace.condition or "")
+        )
+    ]
+    queue.sort(key=lambda case: case.trace.trace_id)
+    random.Random(QUEUE_SEED).shuffle(queue)
+    return queue
