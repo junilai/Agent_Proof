@@ -58,10 +58,16 @@ class Trace(BaseModel):
     repetition: int | None = None
     card_id: str | None = None
     """Situation the conversation was elicited with; opaque to the core (§5.2)."""
+    attempt: int | None = None
+    """Attempt of its repetition; a retry follows a simulated-user failure (D-001)."""
     termination: Termination
     events: list[TraceEvent]
     models: dict[str, Any]
     usage: Usage = Field(default_factory=Usage)
+    """The agent's consumption."""
+    simulator_usage: Usage = Field(default_factory=Usage)
+    agent_seconds: float | None = None
+    simulator_seconds: float | None = None
     started_at: datetime
     ended_at: datetime
 
@@ -97,6 +103,8 @@ class Scenario(BaseModel):
     success_criteria: list[str] = Field(min_length=2, max_length=5)
     induced_by: str
     created_at: datetime
+    usage: Usage = Field(default_factory=Usage)
+    seconds: float | None = None
 
     @model_validator(mode="after")
     def _id_follows_the_seed(self) -> Scenario:
@@ -118,6 +126,10 @@ class Verdict(BaseModel):
     criteria: list[CriterionResult] = Field(min_length=1)
     judged_by: str
     created_at: datetime
+    attempts: int = Field(default=1, ge=1)
+    """How many times the trace had to be judged (D-001)."""
+    usage: Usage = Field(default_factory=Usage)
+    seconds: float | None = None
 
     @computed_field
     @property
@@ -135,6 +147,19 @@ class RunManifest(BaseModel):
     turn_budget: int = Field(ge=1)
     models: dict[str, Any]
     created_at: datetime
+    scenario_ids: list[str] | None = None
+    """Scenarios of the run, so resuming it never picks up seeds added later."""
+
+
+class JudgeFailure(BaseModel):
+    """Judging attempts of a trace that never produced a verdict (D-001)."""
+
+    trace_id: str
+    scenario_id: str
+    run_id: str
+    attempts: int = Field(ge=1)
+    reasons: list[str]
+    at: datetime
 
 
 def scenario_id_for(seed_trace_id: str) -> str:

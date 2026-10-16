@@ -1,19 +1,60 @@
 """Runner (§5.1): replays every scenario ``repetitions`` times against one agent.
 
-Each repetition is one ``converse`` call, so it always yields exactly one trace,
-even when the agent crashes, and a failing scenario never stops the suite.
+Each attempt is one ``converse`` call, so it always yields exactly one trace,
+even when the agent crashes, and a failing scenario never stops the suite. A
+repetition the simulated user broke (``simulator_error``) is run again within
+the caps of D-001; the failed attempt is kept. Nothing the agent did is ever
+retried. A run that was interrupted is resumed with ``resume=True``: every
+repetition that already has a valid trace is skipped, and the retries already
+spent still count against the caps. While a run executes, a lock file holds the
+id of its process, so the same run is never executed twice at once; a lock left
+by a process that no longer exists is taken over.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+import os
+from collections.abc import Callable, Iterator, Sequence
+from contextlib import contextmanager
 from datetime import datetime
 
+from agentproof import retries
 from agentproof.conversation import TraceContext, UserDriver, converse, utc_now
+from agentproof.llm import Meter
 from agentproof.schema import RunManifest, Scenario, Trace
 from agentproof.session import SessionFactory
 from agentproof.simulator import SimulatedUser
 from agentproof.store import Store
+
+LOCK = "running.lock"
+
+
+class RunInProgress(RuntimeError):
+    """Another process is executing the same run."""
+
+
+def _alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+@contextmanager
+def _exclusive(store: Store, run_id: str) -> Iterator[None]:
+    path = store.runs_dir / run_id / LOCK
+    if path.exists():
+        holder = int(path.read_text() or 0)
+        if holder and holder != os.getpid() and _alive(holder):
+            raise RunInProgress(f"{run_id} is still running in process {holder}")
+    path.write_text(str(os.getpid()))
+    try:
+        yield
+    finally:
+        path.unlink(missing_ok=True)
 
 
 async def run_suite(
@@ -24,31 +65,74 @@ async def run_suite(
     user_for: Callable[[Scenario], UserDriver] = SimulatedUser,
     clock: Callable[[], datetime] = utc_now,
     on_trace: Callable[[Trace], None] | None = None,
+    resume: bool = False,
 ) -> list[Trace]:
-    store.create_run(manifest)
+    done = store.run_traces(manifest.run_id) if resume else []
+    if not resume:
+        store.create_run(manifest)
+    with _exclusive(store, manifest.run_id):
+        return await _execute(
+            scenarios, session_factory, manifest, store, user_for, clock, on_trace, done
+        )
+
+
+async def _execute(
+    scenarios: Sequence[Scenario],
+    session_factory: SessionFactory,
+    manifest: RunManifest,
+    store: Store,
+    user_for: Callable[[Scenario], UserDriver],
+    clock: Callable[[], datetime],
+    on_trace: Callable[[Trace], None] | None,
+    done: list[Trace],
+) -> list[Trace]:
     traces: list[Trace] = []
     for scenario in scenarios:
+        retried = retries.conversation_retries(done, scenario.scenario_id)
         for repetition in range(1, manifest.repetitions + 1):
-            context = TraceContext(
-                kind="run",
-                adapter=manifest.adapter,
-                agent=manifest.agent,
-                variant=manifest.variant,
-                condition=manifest.condition,
-                run_id=manifest.run_id,
-                scenario_id=scenario.scenario_id,
-                repetition=repetition,
-            )
-            trace = await converse(
-                session_factory,
-                user_for(scenario),
-                context,
-                turn_budget=manifest.turn_budget,
-                model_config=manifest.models,
-                clock=clock,
-            )
-            store.save_run_trace(trace)
-            traces.append(trace)
-            if on_trace is not None:
-                on_trace(trace)
+            previous = [
+                t
+                for t in done
+                if t.scenario_id == scenario.scenario_id and t.repetition == repetition
+            ]
+            if any(t.termination != "simulator_error" for t in previous):
+                continue
+            attempt = max((t.attempt or 1 for t in previous), default=0) + 1
+            if previous:
+                if attempt > retries.PER_REPETITION + 1 or retried >= retries.PER_SCENARIO:
+                    continue
+                retried += 1
+            while True:
+                context = TraceContext(
+                    kind="run",
+                    adapter=manifest.adapter,
+                    agent=manifest.agent,
+                    variant=manifest.variant,
+                    condition=manifest.condition,
+                    run_id=manifest.run_id,
+                    scenario_id=scenario.scenario_id,
+                    repetition=repetition,
+                    attempt=attempt,
+                )
+                user = user_for(scenario)
+                trace = await converse(
+                    session_factory,
+                    user,
+                    context,
+                    turn_budget=manifest.turn_budget,
+                    model_config=manifest.models,
+                    clock=clock,
+                )
+                meter = getattr(user, "meter", None)
+                if isinstance(meter, Meter):
+                    measured = {"simulator_usage": meter.usage, "simulator_seconds": meter.seconds}
+                    trace = trace.model_copy(update=measured)
+                store.save_run_trace(trace)
+                traces.append(trace)
+                if on_trace is not None:
+                    on_trace(trace)
+                exhausted = attempt > retries.PER_REPETITION or retried >= retries.PER_SCENARIO
+                if trace.termination != "simulator_error" or exhausted:
+                    break
+                attempt, retried = attempt + 1, retried + 1
     return traces

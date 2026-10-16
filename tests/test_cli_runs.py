@@ -2,7 +2,7 @@ from typer.testing import CliRunner
 
 from agentproof import cli
 from agentproof.store import Store
-from tests.factories import scenario, verdict
+from tests.factories import manifest, scenario, verdict
 from tests.fakes import ScriptedUser
 
 runner = CliRunner()
@@ -54,3 +54,36 @@ def test_run_then_judge_then_report(tmp_path, monkeypatch):
 def test_unknown_runs_are_usage_errors(tmp_path):
     assert judge(tmp_path, "x").exit_code == 1
     assert report(tmp_path, "x", "y").exit_code == 1
+
+
+def resume(tmp_path, run_id):
+    return runner.invoke(cli.app, ["resume", "--run", run_id, "--data", str(tmp_path)])
+
+
+def test_a_finished_run_resumes_to_nothing(tmp_path, monkeypatch):
+    Store(tmp_path).save_scenario(scenario())
+    monkeypatch.setattr(cli, "_simulated_user", lambda s: ScriptedUser(s.opening_message))
+    assert run(tmp_path, "baseline-a").exit_code == 0
+    store = Store(tmp_path)
+    (run_id,) = store.runs()
+    assert store.manifest(run_id).scenario_ids == [scenario().scenario_id]
+    result = resume(tmp_path, run_id)
+    assert result.exit_code == 0, result.output
+    assert len(store.run_traces(run_id)) == 5
+
+
+def test_resuming_refuses_when_the_protocol_changed(tmp_path, monkeypatch):
+    Store(tmp_path).save_scenario(scenario())
+    monkeypatch.setattr(cli, "_simulated_user", lambda s: ScriptedUser(s.opening_message))
+    assert run(tmp_path, "baseline-a").exit_code == 0
+    (run_id,) = Store(tmp_path).runs()
+    monkeypatch.setattr(cli.models, "snapshot", lambda: {"judge": "otro"})
+    result = resume(tmp_path, run_id)
+    assert result.exit_code == 1 and "mezclaría dos protocolos" in result.output
+
+
+def test_runs_older_than_the_scenario_list_cannot_resume(tmp_path):
+    Store(tmp_path).create_run(manifest())
+    result = resume(tmp_path, manifest().run_id)
+    assert result.exit_code == 1 and "no registró sus escenarios" in result.output
+    assert resume(tmp_path, "x").exit_code == 1

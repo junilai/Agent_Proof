@@ -1,4 +1,4 @@
-"""AgentProof command line: record | induce | run | judge | report.
+"""AgentProof command line: record | induce | run | resume | judge | report | cost.
 
 The adapter is loaded by name (``claude_sdk`` -> ``agentproof.adapters.claude_sdk``,
 or a full module path) and the agent by ``module:attribute``, so adding a
@@ -17,10 +17,11 @@ import typer
 
 from agentproof import models
 from agentproof.conversation import Exchange, TraceContext, UserDriver, converse, utc_now
+from agentproof.cost import cost_summary, render_cost
 from agentproof.induction import induce_missing, induce_scenario
 from agentproof.judge import judge_run, judge_trace
 from agentproof.report import compare_runs, render_comparison
-from agentproof.runner import run_suite
+from agentproof.runner import RunInProgress, run_suite
 from agentproof.schema import RunManifest, Scenario, Trace, Verdict, run_id_for
 from agentproof.session import SessionFactory
 from agentproof.simulator import SimulatedUser
@@ -34,6 +35,7 @@ ADAPTER = typer.Option(..., "--adapter", help="Adaptador del framework, por ejem
 AGENT = typer.Option(..., "--agent", help="Constructor del agente, como modulo:atributo.")
 VARIANT = typer.Option("baseline", "--variant", help="Variante del agente.")
 CARD = typer.Option(None, "--card", help="Tarjeta de situación que se le entregó a la persona.")
+RUNS = typer.Option(None, "--run", help="Corrida a incluir; se repite. Por omisión, todas.")
 
 
 def load_object(path: str) -> Any:
@@ -163,13 +165,53 @@ def run(
         turn_budget=turn_budget,
         models=models.snapshot(),
         created_at=now,
+        scenario_ids=[s.scenario_id for s in scenarios],
     )
-
-    def progress(trace: Trace) -> None:
-        typer.echo(f"{trace.scenario_id} #{trace.repetition}: {trace.termination}")
-
     factory = session_factory_for(adapter, agent, variant)
-    asyncio.run(run_suite(scenarios, factory, manifest, store, _simulated_user, on_trace=progress))
+    asyncio.run(run_suite(scenarios, factory, manifest, store, _simulated_user, on_trace=_progress))
+    typer.echo(f"Corrida {manifest.run_id} completa.")
+
+
+def _progress(trace: Trace) -> None:
+    retry = f" (intento {trace.attempt})" if (trace.attempt or 1) > 1 else ""
+    typer.echo(f"{trace.scenario_id} #{trace.repetition}{retry}: {trace.termination}")
+
+
+@app.command()
+def resume(run_id: str = typer.Option(..., "--run", help="Id de la corrida."), data: Path = DATA):
+    """Retoma una corrida interrumpida sin repetir lo que ya se ejecutó."""
+    store = Store(data)
+    try:
+        manifest = store.manifest(run_id)
+    except KeyError as missing:
+        raise _unknown_run(missing) from None
+    if manifest.scenario_ids is None:
+        typer.echo("La corrida no registró sus escenarios: no se puede reanudar.", err=True)
+        raise typer.Exit(1)
+    if manifest.models != models.snapshot():
+        typer.echo(
+            "Los modelos fijados cambiaron desde que empezó la corrida: "
+            "reanudarla mezclaría dos protocolos.",
+            err=True,
+        )
+        raise typer.Exit(1)
+    scenarios = [store.scenario(scenario_id) for scenario_id in manifest.scenario_ids]
+    factory = session_factory_for(manifest.adapter, manifest.agent, manifest.variant)
+    try:
+        asyncio.run(
+            run_suite(
+                scenarios,
+                factory,
+                manifest,
+                store,
+                _simulated_user,
+                on_trace=_progress,
+                resume=True,
+            )
+        )
+    except RunInProgress:
+        typer.echo("La corrida sigue en curso en otro proceso: espere a que termine.", err=True)
+        raise typer.Exit(1) from None
     typer.echo(f"Corrida {manifest.run_id} completa.")
 
 
@@ -203,3 +245,16 @@ def report(
         raise _unknown_run(missing) from None
     typer.echo(render_comparison(comparison))
     raise typer.Exit(comparison.exit_code)
+
+
+@app.command()
+def cost(
+    runs: list[str] = RUNS,
+    data: Path = DATA,
+):
+    """Costo y latencia por componente, con la fecha de los precios."""
+    try:
+        components = cost_summary(Store(data), runs or None)
+    except KeyError as missing:
+        raise _unknown_run(missing) from None
+    typer.echo(render_cost(components))

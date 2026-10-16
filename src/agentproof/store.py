@@ -9,6 +9,7 @@ a run trace can never be mistaken for a seed.
     <root>/results/runs/<run_id>/manifest.json
     <root>/results/runs/<run_id>/traces/<trace_id>.json
     <root>/results/runs/<run_id>/verdicts/<trace_id>.json
+    <root>/results/runs/<run_id>/judge_failures/<trace_id>.json
 """
 
 from __future__ import annotations
@@ -18,7 +19,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from agentproof.schema import RunManifest, Scenario, Trace, Verdict
+from agentproof.schema import JudgeFailure, RunManifest, Scenario, Trace, Verdict
 
 
 def _write(path: Path, model: BaseModel) -> None:
@@ -119,3 +120,12 @@ class Store:
 
     def verdicts(self, run_id: str) -> list[Verdict]:
         return _read_all(self._require_run(run_id) / "verdicts", Verdict)
+
+    def save_judge_failure(self, failure: JudgeFailure) -> Path:
+        """The judging attempts of a trace so far; a new attempt replaces the record."""
+        path = self._require_run(failure.run_id) / "judge_failures" / f"{failure.trace_id}.json"
+        _write(path, failure)
+        return path
+
+    def judge_failures(self, run_id: str) -> list[JudgeFailure]:
+        return _read_all(self._require_run(run_id) / "judge_failures", JudgeFailure)

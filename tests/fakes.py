@@ -108,8 +108,12 @@ class FakeLLM:
         self.messages = _FakeParseMessages(list(outcomes))
 
 
-def parsed(value, stop_reason: str = "end_turn") -> SimpleNamespace:
-    return SimpleNamespace(parsed_output=value, stop_reason=stop_reason)
+def tokens(input_tokens: int = 0, output_tokens: int = 0) -> SimpleNamespace:
+    return SimpleNamespace(input_tokens=input_tokens, output_tokens=output_tokens)
+
+
+def parsed(value, stop_reason: str = "end_turn", usage=None) -> SimpleNamespace:
+    return SimpleNamespace(parsed_output=value, stop_reason=stop_reason, usage=usage or tokens())
 
 
 class _Anything(BaseModel):
@@ -141,6 +145,6 @@ class FakeAsyncLLM:
         self.messages = _FakeCreateMessages(list(replies))
 
 
-def reply(text: str, stop_reason: str = "end_turn") -> SimpleNamespace:
+def reply(text: str, stop_reason: str = "end_turn", usage=None) -> SimpleNamespace:
     content = [SimpleNamespace(type="text", text=text)]
-    return SimpleNamespace(content=content, stop_reason=stop_reason)
+    return SimpleNamespace(content=content, stop_reason=stop_reason, usage=usage or tokens())

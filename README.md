@@ -39,12 +39,18 @@ uv run --env-file .env agentproof induce --data datos
 uv run --env-file .env agentproof run --adapter claude_sdk \
   --agent casestudy.editions.claude_sdk:build_options --condition baseline-a --data datos
 
+# retoma una corrida interrumpida sin repetir lo ya ejecutado
+uv run --env-file .env agentproof resume --run <corrida> --data datos
+
 # juzga una corrida y compara dos
 uv run --env-file .env agentproof judge --run <corrida> --data datos
 uv run --env-file .env agentproof report --baseline <corrida-a> --candidate <corrida-b> --data datos
+
+# costo y latencia por componente
+uv run agentproof cost --data datos
 ```
 
-`--data` es la carpeta que guarda `corpus/` y `results/` (por defecto, la actual). `run` repite cada escenario 5 veces con un presupuesto de 10 turnos (`--repetitions`, `--turn-budget`). `report` declara una regresión cuando la tasa de aprobación cae al menos 0.4 y la prueba exacta de Fisher es significativa tras la corrección de Benjamini-Hochberg (α = 0.05) sobre los escenarios comparados. Una caída igual de grande pero sin significancia se reporta como señal débil. Termina con 2 si hay alguna regresión, con 0 si no y con 1 ante un error de uso.
+`--data` es la carpeta que guarda `corpus/` y `results/` (por defecto, la actual). `run` repite cada escenario 5 veces con un presupuesto de 10 turnos (`--repetitions`, `--turn-budget`). Si el usuario simulado falla, la conversación se repite, como máximo dos veces por repetición y cinco por escenario; lo que hace el agente nunca se reintenta. `resume` se niega a continuar si cambiaron los modelos fijados. `report` declara una regresión cuando la tasa de aprobación cae al menos 0.4 y la prueba exacta de Fisher es significativa tras la corrección de Benjamini-Hochberg (α = 0.05) sobre los escenarios comparados. Una caída igual de grande pero sin significancia se reporta como señal débil. Termina con 2 si hay alguna regresión, con 0 si no y con 1 ante un error de uso.
 
 Las pruebas en vivo llaman a la API real y tienen costo; se excluyen por defecto y nunca corren en integración continua:
 

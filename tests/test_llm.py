@@ -1,9 +1,9 @@
 import pytest
 from pydantic import BaseModel
 
-from agentproof.llm import LLMCallError, structured_call
+from agentproof.llm import LLMCallError, Meter, structured_call
 from agentproof.models import JUDGE, SIM_USER
-from tests.fakes import FakeLLM, parsed, validation_error
+from tests.fakes import FakeLLM, parsed, tokens, validation_error
 
 
 class Answer(BaseModel):
@@ -62,3 +62,25 @@ def test_two_bad_answers_raise_with_the_reasons():
     client = FakeLLM(parsed(None, stop_reason="refusal"), validation_error())
     with pytest.raises(LLMCallError, match="refusal"):
         call(client)
+
+
+def test_the_meter_counts_every_call_including_the_failed_ones():
+    client = FakeLLM(
+        validation_error(),
+        parsed(None, stop_reason="refusal", usage=tokens(3, 1)),
+        parsed(Answer(value=4), usage=tokens(5, 2)),
+    )
+    meter = Meter()
+    result = structured_call(
+        client,
+        JUDGE,
+        system="s",
+        prompt="p",
+        output_type=Answer,
+        validate=lambda a: a.value,
+        attempts=3,
+        meter=meter,
+    )
+    assert result == 4
+    assert (meter.usage.input_tokens, meter.usage.output_tokens) == (8, 3)
+    assert meter.seconds >= 0

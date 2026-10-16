@@ -4,7 +4,7 @@ from agentproof.judge import JUDGE_RUBRIC, JudgedCriterion, JudgeOutput, judge_p
 from agentproof.llm import LLMCallError
 from agentproof.models import JUDGE
 from tests.factories import T0, scenario, trace
-from tests.fakes import FakeLLM, parsed
+from tests.fakes import FakeLLM, parsed, tokens
 
 
 def output(*marks):
@@ -61,3 +61,10 @@ def test_only_run_traces_of_the_same_scenario_are_judged():
     for wrong in (trace(), run_trace(scenario_id="sc-otro")):
         with pytest.raises(ValueError):
             judge_trace(scenario(), wrong, client=FakeLLM())
+
+
+def test_the_verdict_records_what_judging_consumed():
+    client = FakeLLM(parsed(output((1, True), (2, True)), usage=tokens(900, 120)))
+    verdict = judge_trace(scenario(), run_trace(), client=client, clock=lambda: T0)
+    assert (verdict.usage.input_tokens, verdict.usage.output_tokens) == (900, 120)
+    assert verdict.seconds is not None and verdict.seconds >= 0
