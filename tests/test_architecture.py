@@ -135,6 +135,17 @@ def test_the_oracle_does_not_depend_on_the_system_it_evaluates():
     assert {k: v for k, v in found.items() if v} == {}
 
 
+DETECTOR = {"agentproof.report", "agentproof.stats", "experiments.analysis"}
+
+
+def test_the_oracle_never_reads_what_the_detector_declared():
+    """Ground truth and detection meet only in experiments.analysis."""
+    for path in ORACLE.rglob("*.py"):
+        source = path.read_text()
+        assert not uses_any(imported_names(source), DETECTOR), path
+        assert ".verdicts(" not in source, path
+
+
 def test_the_oracle_never_reads_induced_scenarios():
     for path in ORACLE.rglob("*.py"):
         source = path.read_text()
