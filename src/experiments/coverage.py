@@ -18,6 +18,7 @@ import typer
 from agentproof.schema import Trace
 from agentproof.store import Store
 from experiments.cards import CARDS, CARDS_BY_ID, Card
+from experiments.oracle.exposure import is_exposed
 
 TRACE_OPERATORS = {
     "D1": "llama a lookup_order",
@@ -26,17 +27,9 @@ TRACE_OPERATORS = {
 }
 
 
-def _tool_calls(seed: Trace) -> list[str]:
-    return [e.tool or "" for e in seed.events if e.kind == "tool_call"]
-
-
 def _is_exposed(operator: str, seed: Trace) -> bool:
-    calls = _tool_calls(seed)
-    if operator == "D1":
-        return "lookup_order" in calls
-    if operator == "D4":
-        return "get_refund_policy" in calls
-    return len(calls) >= 3
+    card = CARDS_BY_ID[seed.card_id or ""]
+    return bool(is_exposed(operator.lower(), card, seed))
 
 
 @dataclass

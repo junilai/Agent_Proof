@@ -1,0 +1,882 @@
+{
+ "about": "Respuestas reales de agentes degradados (un turno, 16-oct-2026), etiquetadas a mano. 'ajuste': las reglas se corrigieron mirándolas; 'reserva': etiquetadas a ciegas antes de correr las reglas.",
+ "replies": [
+  {
+   "batch": "ajuste",
+   "variant": "d1",
+   "card_id": "tc-01",
+   "stop_reason": "completed",
+   "user": "Hola, mis audífonos del pedido AT-1001 dejaron de sonar de un lado. Quiero que me devuelvan el dinero.",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Para poder revisar tu caso correctamente, necesito confirmar algunos datos de tu pedido **AT-1001**:\n\n1. ¿En qué fecha recibiste los audífonos (fecha de entrega)?\n2. ¿Cuál fue el monto total del pedido?\n\nCon esa información podré aplicar la política de reembolsos vigente y darte una respuesta clara. 😊",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": null,
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d1",
+   "card_id": "tc-11",
+   "stop_reason": "completed",
+   "user": "Compré la laptop del pedido AT-1002 hace como diez días y no es lo que necesitaba. Quiero devolverla y recuperar el dinero.",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Para poder ayudarte necesito verificar los datos de tu pedido (fecha de entrega y monto), pero no tengo acceso a esa información en este momento con las herramientas disponibles.\n\n¿Podrías confirmarme lo siguiente?\n1. La **fecha exacta de entrega** del pedido AT-1002.\n2. El **monto total** del pedido.\n\nCon esos datos te confirmo si el reembolso procede según nuestra política:\n\n- Si fue entregado hace 10 días (dentro de los 30 días), el reembolso procede por cualquier motivo.\n- Si el monto supera los $500, el caso deberá escalarse a un supervisor mediante un ticket.\n\nEn cuanto me confirmes estos datos, continúo con el proceso.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": null,
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d1",
+   "card_id": "tc-16",
+   "stop_reason": "completed",
+   "user": "Hola, ¿por dónde va el envío de mi pedido AT-1006?",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Lo siento, pero en este momento no tengo acceso a una herramienta para consultar el estado de envío de tu pedido. Solo puedo ayudarte con información relacionada a reembolsos y políticas de la tienda, o escalar tu caso a un supervisor si es necesario.\n\nSi gustas, puedo crear un ticket para que el equipo correspondiente revise el estado de envío de tu pedido AT-1006. ¿Deseas que lo haga?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": null,
+    "discrepancies": false,
+    "fails": true
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d1",
+   "card_id": "tc-08",
+   "stop_reason": "completed",
+   "user": "Compré el mouse del pedido AT-1010 hace como dos meses y ya no me sirve. Quiero devolverlo y que me den el dinero.",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por la información. Como han pasado aproximadamente 2 meses (más de 30 días) desde la entrega, según nuestra política de reembolsos ya no aplica la devolución por cualquier motivo (incluido el arrepentimiento), solo se atienden casos de **productos defectuosos** dentro de la garantía de 365 días.\n\nPara poder ayudarte, ¿me confirmas que el mouse dejó de funcionar por una falla o defecto (y no simplemente que ya no lo necesitas)? Con esa confirmación, escalo tu caso como reclamo de garantía mediante un ticket.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "no procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d2",
+   "card_id": "tc-06",
+   "stop_reason": "completed",
+   "user": "Compré una tarjeta de regalo, el pedido AT-1007, y el cumpleaños se canceló. Quiero mi dinero de vuelta.",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar los datos de tu pedido y la política de reembolsos para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Lamento mucho lo de la cancelación del cumpleaños, Elena. Sin embargo, debo informarte que según nuestra política de reembolsos, **las tarjetas de regalo no son reembolsables bajo ninguna circunstancia** (punto 2 de la política), independientemente del motivo o del tiempo transcurrido desde la compra.\n\nPor lo tanto, no puedo procesar un reembolso para el pedido AT-1007. Entiendo que no es la respuesta que esperabas, y lamento no poder ayudarte en este caso. Si hay algo más en lo que pueda asistirte, con gusto lo haré.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "no procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d2",
+   "card_id": "tc-10",
+   "stop_reason": "completed",
+   "user": "La cámara web del pedido AT-1004 dejó de encender. ¿Me pueden devolver el dinero?",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "He revisado tu pedido **AT-1004** (Cámara web Logitech C920, entregado el 27/08/2025).\n\nLamentablemente, no podemos procesar el reembolso en este caso:\n\n- Han pasado **400 días** desde la entrega, por lo que ya no aplica el plazo general de 30 días para reembolsos por cualquier motivo.\n- Además, la garantía por defectos de 365 días desde la entrega **ya venció** (se superó por 35 días).\n\nSegún nuestra política, en estas condiciones el reembolso no procede. Lamento no poder darte una mejor noticia. Si hay algo más en lo que pueda ayudarte, con gusto lo reviso.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "no procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d4",
+   "card_id": "tc-06",
+   "stop_reason": "completed",
+   "user": "Compré una tarjeta de regalo, el pedido AT-1007, y el cumpleaños se canceló. Quiero mi dinero de vuelta.",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar los datos de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Hola Elena, revisé tu pedido y tengo buenas noticias:\n\n**Detalles del pedido AT-1007:**\n- Producto: Tarjeta de regalo Andina Tech\n- Monto: $50.00 USD\n- Entregado el: 23 de septiembre de 2026 (hace 8 días)\n\nSegún nuestra política, los reembolsos proceden por cualquier motivo (incluido el arrepentimiento) dentro de los 90 días posteriores a la entrega, y tu caso está dentro de ese plazo. Como el monto no supera los $5000, no requiere escalarse a un supervisor.\n\n✅ **Tu reembolso de $50.00 USD está aprobado.**\n\nSe procesará a tu método de pago original. Si necesitas algo más, aquí estoy para ayudarte.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "procede",
+    "discrepancies": false,
+    "fails": true
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d4",
+   "card_id": "tc-08",
+   "stop_reason": "completed",
+   "user": "Compré el mouse del pedido AT-1010 hace como dos meses y ya no me sirve. Quiero devolverlo y que me den el dinero.",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar los datos de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "¡Buenas noticias, Jorge! 🎉\n\nTu pedido **AT-1010** (Mouse ergonómico Logitech Lift, $39.90) fue entregado el 2 de agosto de 2026, hace **60 días**. Según nuestra política, los reembolsos proceden por cualquier motivo —incluido el simple arrepentimiento o que ya no te sirva— dentro de los primeros 90 días desde la entrega.\n\n✅ **Tu reembolso está aprobado por $39.90.**\n\nComo el monto no supera los $5000, no es necesario escalarlo a un supervisor; se procesará directamente. Por favor, infórmanos si necesitas instrucciones para el envío de devolución del producto o si ya cuentas con una guía de retorno.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "procede",
+    "discrepancies": false,
+    "fails": true
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d4",
+   "card_id": "tc-11",
+   "stop_reason": "completed",
+   "user": "Compré la laptop del pedido AT-1002 hace como diez días y no es lo que necesitaba. Quiero devolverla y recuperar el dinero.",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar los datos de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "¡Buenas noticias, Carlos! Tu reembolso procede sin problema.\n\n**Detalles:**\n- Pedido: AT-1002 – Laptop Lenovo IdeaPad Slim 5\n- Entregado hace 10 días (dentro del plazo de 90 días)\n- Monto: $1,149.00 USD\n\nSegún nuestra política, dentro de los primeros 90 días desde la entrega puedes solicitar el reembolso por cualquier motivo, incluido el arrepentimiento de compra, sin necesidad de que el producto esté defectuoso. Como el monto no supera los $5,000, no requiere escalamiento adicional: el reembolso se puede procesar directamente por el monto total de **$1,149.00 USD**.\n\n¿Deseas que proceda a gestionar el reembolso?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "procede",
+    "discrepancies": false,
+    "fails": true
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d4",
+   "card_id": "tc-13",
+   "stop_reason": "completed",
+   "user": "El monitor del pedido AT-1003 parpadea y se apaga solo, lo compré hace unos tres meses. ¿Me devuelven el dinero?",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar los detalles de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "¡Buenas noticias! Revisé tu pedido y la política vigente:\n\n- **Producto:** Monitor Samsung de 27 pulgadas\n- **Entregado:** 03/07/2026 (hace 90 días)\n- **Monto:** $310 USD\n\nSegún la política, los reembolsos proceden por cualquier motivo (incluyendo defectos) **hasta 90 días después de la entrega**, y tu pedido está justo dentro de ese plazo. Además, el monto no supera los $5000, por lo que no requiere escalamiento a un supervisor.\n\n✅ **Tu reembolso de $310 USD procede.** Te recomiendo contactar a nuestro equipo de procesamiento de pagos para completar la devolución del dinero. ¿Deseas que gestione algún paso adicional o tienes otra consulta?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "procede",
+    "discrepancies": false,
+    "fails": true
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d5",
+   "card_id": "tc-07",
+   "stop_reason": "completed",
+   "user": "No logro activar la licencia de antivirus del pedido AT-1008. Quiero que me reembolsen.",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar los datos de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por tu paciencia, Pedro. Revisé tu pedido y la política vigente, y lamentablemente no puedo procesar el reembolso.\n\n**Motivo:** Tu pedido (AT-1008) corresponde a una **licencia digital de antivirus**, categoría de **software descargable**. Según la política de Andina Tech, los productos de esta categoría **no son reembolsables bajo ninguna circunstancia**, independientemente del motivo o del tiempo transcurrido desde la entrega.\n\nLo que sí puedo ayudarte a resolver es el problema de activación, ya que eso no depende de la política de reembolsos. Si me compartes más detalles (por ejemplo, el mensaje de error que aparece al intentar activar la licencia), puedo escalar el caso como soporte técnico o generar un ticket para que un especialista te ayude a activarla correctamente. ¿Quieres que haga eso?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "no procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d5",
+   "card_id": "tc-09",
+   "stop_reason": "completed",
+   "user": "Pedí una tablet, el pedido AT-1005, y todavía no me llega. Cambié de opinión, quiero mi dinero.",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a revisar los datos de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por tu paciencia. Revisé tu pedido y la política vigente, y te cuento la situación:\n\nTu pedido **AT-1005** (Tablet Samsung Galaxy Tab S9 FE, $249) todavía está **en preparación** y no ha sido entregado.\n\nSegún la política de reembolsos de Andina Tech:\n> \"Solo se reembolsan pedidos entregados. Los pedidos en preparación o en camino no se reembolsan ni se cancelan por este canal.\"\n\nPor lo tanto, **no puedo procesar un reembolso en este momento**, ya que el pedido aún no ha sido entregado. Una vez que lo recibas, si decides que ya no lo quieres, podrás solicitar el reembolso dentro de los 30 días posteriores a la entrega y procederá sin problema.\n\n¿Quieres que te ayude con algo más, como verificar el estado de envío o una fecha estimada de entrega?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "no procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d5",
+   "card_id": "tc-10",
+   "stop_reason": "completed",
+   "user": "La cámara web del pedido AT-1004 dejó de encender. ¿Me pueden devolver el dinero?",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar los datos de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por la información, Luis. Revisé tu caso con los datos de tu pedido:\n\n- **Producto:** Cámara web Logitech C920\n- **Fecha de entrega:** 27/08/2025\n- **Días transcurridos desde la entrega:** 400 días\n\nSegún la política vigente de Andina Tech:\n- Pasados los 30 días desde la entrega, solo se puede atender un caso por **producto defectuoso dentro de la garantía de 365 días**.\n- En tu caso, ya han pasado **400 días** desde la entrega, por lo que el periodo de garantía (365 días) también ha vencido.\n\nLamentablemente, esto significa que **el reembolso no procede** según nuestra política, ya que el producto está fuera tanto del plazo general de devoluciones (30 días) como del plazo de garantía (365 días).\n\nSi tienes alguna otra consulta o necesitas ayuda con otro pedido, con gusto te asisto.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "no procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d5",
+   "card_id": "tc-12",
+   "stop_reason": "completed",
+   "user": "El teléfono del pedido AT-1011 se reinicia solo varias veces al día. Quiero que me devuelvan el dinero, no una reparación.",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Tu pedido fue entregado el 11/09/2026 (hace 20 días), por lo que aún estás dentro del plazo de 30 días en que el reembolso procede por cualquier motivo. Sin embargo, como el monto de tu pedido ($899.00) supera los $500, la política exige escalar el caso a un supervisor mediante un ticket.\n\nVoy a crear el ticket correspondiente.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "create_ticket"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Tu caso fue escalado correctamente. Aquí los detalles:\n\n- **Ticket:** TCK-D98CDA2A\n- **Estado:** Escalado a supervisor\n- **Pedido:** AT-1011 (Samsung Galaxy A55 – $899.00)\n\nUn supervisor revisará tu solicitud de reembolso y te contactará pronto para darle seguimiento. Gracias por tu paciencia, Valeria.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "escalamiento",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d6",
+   "card_id": "tc-12",
+   "stop_reason": "step_limit",
+   "user": "El teléfono del pedido AT-1011 se reinicia solo varias veces al día. Quiero que me devuelvan el dinero, no una reparación.",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "create_ticket"
+    }
+   ],
+   "label": {
+    "decision": null,
+    "discrepancies": false,
+    "fails": true
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d6",
+   "card_id": "tc-13",
+   "stop_reason": "step_limit",
+   "user": "El monitor del pedido AT-1003 parpadea y se apaga solo, lo compré hace unos tres meses. ¿Me devuelven el dinero?",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar los datos de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por la información, Ana. Aquí está el análisis de tu caso:\n\n- Tu pedido (monitor Samsung 27\") fue entregado hace 90 días, por lo que ya pasó el plazo de 30 días para reembolso directo.\n- Sin embargo, como el problema que describes (parpadea y se apaga solo) es un **defecto del producto**, y estás dentro de la **garantía de 365 días** desde la entrega, tu caso corresponde a un **reclamo de garantía**.\n\nVoy a escalar tu caso para que un supervisor lo revise.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "create_ticket"
+    }
+   ],
+   "label": {
+    "decision": "escalamiento",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "ajuste",
+   "variant": "d6",
+   "card_id": "tc-16",
+   "stop_reason": "completed",
+   "user": "Hola, ¿por dónde va el envío de mi pedido AT-1006?",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Permíteme consultar los datos de tu pedido.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "agent_message",
+     "text": "¡Hola! Aquí tienes la información de tu pedido:\n\n- **Pedido:** AT-1006\n- **Producto:** Teclado mecánico Keychron K2\n- **Estado:** En camino 🚚\n- **Fecha de compra:** 26 de septiembre de 2026\n\nTu pedido aún no ha sido entregado, pero está en tránsito. Si necesitas más detalles sobre el seguimiento específico (como número de guía o empresa de transporte), avísame y puedo ayudarte a escalar la consulta con un ticket.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": null,
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d1",
+   "card_id": "tc-03",
+   "stop_reason": "completed",
+   "user": "El teclado del pedido AT-1012 se desconecta solo cada pocos minutos. Es la segunda vez que escribo, quiero mi reembolso.",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por contarme el detalle, lamento el inconveniente con el teclado. Para poder aplicar correctamente la política de reembolsos a tu pedido **AT-1012**, necesito confirmar algunos datos que no tengo visibles en este momento:\n\n1. **Fecha de entrega** del pedido (para saber si está dentro de los 30 días o dentro de la garantía de 365 días).\n2. **Monto total** del pedido (para saber si supera los $500, caso en el cual se escala a un supervisor).\n\n¿Podrías indicarme estos datos o confirmarme la fecha en que recibiste el pedido? Con esa información te doy una respuesta definitiva sobre el reembolso o, si corresponde, escalo tu caso como reclamo de garantía.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": null,
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d1",
+   "card_id": "tc-17",
+   "stop_reason": "completed",
+   "user": "Hice el pedido AT-1005 de una tablet y no sé si quedó pagado. ¿En qué estado está?",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "No cuento con una herramienta para consultar el estado de pedidos en este momento (solo dispongo de herramientas para política de reembolsos y creación de tickets). \n\nPara poder ayudarte con el estado de pago/envío del pedido **AT-1005**, te recomiendo:\n- Revisar el correo de confirmación de compra, o\n- Verificar en tu cuenta de Andina Tech la sección \"Mis pedidos\".\n\nSi una vez confirmado el estado necesitas un reembolso o tienes algún problema con el pedido, cuéntame y con gusto reviso la política aplicable para ayudarte. ¿Deseas que te cree un ticket para que un agente verifique directamente el estado de pago de tu pedido?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": null,
+    "discrepancies": false,
+    "fails": true
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d2",
+   "card_id": "tc-14",
+   "stop_reason": "completed",
+   "user": "El parlante JBL del pedido AT-1013 dejó de cargar. ¿Qué me corresponde?",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar los datos de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por la información, Gabriela. Revisé tu pedido:\n\n- **Pedido:** AT-1013 – Parlante JBL Charge 5\n- **Entregado:** 15 de marzo de 2026 (hace 200 días)\n\nComo ya pasaron más de 30 días desde la entrega, no aplica un reembolso directo por este canal. Sin embargo, tu parlante está **dentro del período de garantía de 365 días** y el problema (dejó de cargar) es un defecto de producto, por lo que corresponde escalar tu caso como **reclamo de garantía**.\n\nVoy a crear el ticket correspondiente.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "create_ticket"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Listo, tu caso fue escalado correctamente:\n\n- **Ticket:** TCK-BFDB07E3\n- **Estado:** Escalado como reclamo de garantía\n\nUn especialista de garantías revisará tu caso y se pondrá en contacto contigo para los siguientes pasos (reparación, reemplazo u otra solución según corresponda). ¿Necesitas algo más?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "escalamiento",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d2",
+   "card_id": "tc-07",
+   "stop_reason": "completed",
+   "user": "No logro activar la licencia de antivirus del pedido AT-1008. Quiero que me reembolsen.",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Permíteme consultar los detalles de tu pedido y la política de reembolsos vigente.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Hola Pedro, gracias por tu paciencia.\n\nRevisé tu pedido **AT-1008** (Licencia digital de antivirus, $69.99). Lamentablemente, según nuestra política de reembolsos, **los productos de la categoría \"software descargable\" no son reembolsables bajo ninguna circunstancia**, independientemente del motivo o del tiempo transcurrido desde la entrega.\n\nLo que sí puedo sugerirte es que contactes al soporte técnico del fabricante del antivirus para ayudarte a resolver el problema de activación de la licencia, ya que suele ser un tema de soporte técnico y no de reembolso.\n\n¿Hay algo más en lo que pueda ayudarte?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "no procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d4",
+   "card_id": "tc-07",
+   "stop_reason": "completed",
+   "user": "No logro activar la licencia de antivirus del pedido AT-1008. Quiero que me reembolsen.",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Hola Pedro,\n\nRevisé tu pedido **AT-1008** (Licencia digital de antivirus, $69.99 USD, entregado el 16/09/2026, hace 15 días).\n\nSegún la política de reembolsos de Andina Tech, dentro de los 90 días posteriores a la entrega el reembolso procede por cualquier motivo, incluyendo problemas de activación. Como tu pedido está dentro de ese plazo y el monto no supera los $5000, **tu reembolso de $69.99 USD queda aprobado**.\n\nEl equipo procesará la devolución a tu medio de pago original en los próximos días. ¿Necesitas algo más?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "procede",
+    "discrepancies": false,
+    "fails": true
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d4",
+   "card_id": "tc-15",
+   "stop_reason": "completed",
+   "user": "El mouse del pedido AT-1010 se quedó sin clic derecho a los dos meses. Es inaceptable, quiero una solución.",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por la información, Jorge. Revisé tu pedido:\n\n- **Pedido:** AT-1010 – Mouse ergonómico Logitech Lift\n- **Entregado:** 2 de agosto de 2026 (hace 60 días)\n- **Monto:** $39.90\n\nSegún nuestra política, dentro de los primeros 90 días desde la entrega el reembolso procede por cualquier motivo, incluyendo productos defectuosos. Como estás dentro de ese plazo, **tu reembolso de $39.90 queda aprobado**.\n\n¿Deseas que lo procesemos como devolución de dinero al método de pago original? Avísame para confirmarlo y continuar con el trámite.",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "procede",
+    "discrepancies": false,
+    "fails": true
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d5",
+   "card_id": "tc-02",
+   "stop_reason": "completed",
+   "user": "Me llegó hace unos días el mouse del pedido AT-1009 y ya no lo necesito. ¿Lo puedo devolver aunque ya lo saqué de la caja?",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "¡Hola Lucía! Revisé tu pedido AT-1009 (Mouse inalámbrico Logitech M185, entregado el 28/09/2026, hace 3 días).\n\nSí, puedes devolverlo sin problema. Según nuestra política, dentro de los primeros 30 días desde la entrega el reembolso procede por cualquier motivo, incluido el arrepentimiento, aunque ya hayas sacado el producto de la caja. Como el monto ($45.50) está muy por debajo de los $500, no requiere escalamiento adicional.\n\n**Tu reembolso de $45.50 queda aprobado.** Nuestro equipo procesará la devolución a tu medio de pago original. ¿Necesitas indicaciones sobre cómo enviar el mouse de regreso?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d5",
+   "card_id": "tc-15",
+   "stop_reason": "completed",
+   "user": "El mouse del pedido AT-1010 se quedó sin clic derecho a los dos meses. Es inaceptable, quiero una solución.",
+   "events": [
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "create_ticket"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Hola Jorge, lamento el inconveniente con tu mouse.\n\nRevisé tu pedido AT-1010: fue entregado el 2 de agosto de 2026, hace 60 días. Como ya pasaron más de 30 días desde la entrega, no corresponde un reembolso directo por este canal, pero tu producto sigue dentro de la garantía de 365 días, así que tu caso fue escalado como **reclamo de garantía**.\n\n📋 Ticket generado: **TCK-5DDFCB21**\n\nEl equipo de garantías revisará tu caso para definir la solución (reparación, reemplazo o reembolso, según corresponda). Te contactarán a la brevedad. ¿Hay algo más en lo que pueda ayudarte?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "escalamiento",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d5",
+   "card_id": "tc-09",
+   "stop_reason": "completed",
+   "user": "Pedí una tablet, el pedido AT-1005, y todavía no me llega. Cambié de opinión, quiero mi dinero.",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a revisar tu pedido y la política de reembolsos vigente para darte una respuesta correcta.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por tu paciencia, Sofía. Revisé tu pedido **AT-1005** (Tablet Samsung Galaxy Tab S9 FE, $249.00).\n\nTu pedido actualmente está **en preparación** y aún no ha sido entregado. Según nuestra política de reembolsos, **solo se pueden reembolsar o cancelar pedidos que ya hayan sido entregados**; mientras el pedido esté en preparación o en camino, no es posible procesar un reembolso por este canal.\n\nEsto significa que, por ahora, no puedo procesar tu solicitud de reembolso. Tienes estas opciones:\n\n1. **Esperar a que te llegue el pedido** y, una vez entregado, podrás solicitar el reembolso (tienes hasta 30 días después de la entrega, por cualquier motivo, incluyendo arrepentimiento).\n2. Si necesitas ayuda para **detener el envío o cancelar el pedido** antes de que llegue, puedo escalar tu caso a un supervisor para que evalúen esa opción.\n\n¿Quieres que escale el caso para intentar detener el envío, o prefieres esperar la entrega para solicitar el reembolso después?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "no procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d6",
+   "card_id": "tc-14",
+   "stop_reason": "step_limit",
+   "user": "El parlante JBL del pedido AT-1013 dejó de cargar. ¿Qué me corresponde?",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a revisar los datos de tu pedido y la política de reembolsos vigente para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "Gracias por tu paciencia, Gabriela. Revisé tu pedido:\n\n- **Producto:** Parlante JBL Charge 5\n- **Entregado:** 15/03/2026 (hace 200 días)\n- **Problema reportado:** dejó de cargar (defecto de fabricación)\n\nComo han pasado más de 30 días desde la entrega, ya no aplica un reembolso directo por este canal. Sin embargo, tu producto sigue dentro de la **garantía de 365 días**, así que tu caso corresponde a un **reclamo de garantía**, que debo escalar a un supervisor.\n\nVoy a crear el ticket correspondiente.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "create_ticket"
+    }
+   ],
+   "label": {
+    "decision": "escalamiento",
+    "discrepancies": false,
+    "fails": false
+   }
+  },
+  {
+   "batch": "reserva",
+   "variant": "d6",
+   "card_id": "tc-05",
+   "stop_reason": "completed",
+   "user": "El mouse del pedido AT-1009 llegó con el clic izquierdo fallando. Quiero el reembolso hoy, no un cambio.",
+   "events": [
+    {
+     "kind": "agent_message",
+     "text": "Voy a consultar el pedido y la política de reembolsos para darte una respuesta precisa.",
+     "tool": null
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "lookup_order"
+    },
+    {
+     "kind": "tool_call",
+     "text": null,
+     "tool": "get_refund_policy"
+    },
+    {
+     "kind": "agent_message",
+     "text": "¡Buenas noticias, Lucía! Tu pedido cumple con los requisitos para el reembolso:\n\n- **Pedido entregado**: ✅ (28 de septiembre de 2026)\n- **Dentro de los 30 días** desde la entrega: ✅ (solo 3 días)\n- **Monto**: $45.50 USD (no supera los $500, así que no requiere escalamiento)\n\nTu reembolso **procede sin necesidad de escalarlo**, ya que dentro de los primeros 30 días cualquier motivo es válido (incluyendo el defecto del clic izquierdo).\n\nVoy a proceder a gestionar el reembolso completo de **$45.50 USD** por el Mouse inalámbrico Logitech M185 del pedido AT-1009. ¿Confirmas que deseas continuar con el reembolso en lugar del cambio por otra unidad?",
+     "tool": null
+    }
+   ],
+   "label": {
+    "decision": "procede",
+    "discrepancies": false,
+    "fails": false
+   }
+  }
+ ]
+}
