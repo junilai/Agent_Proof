@@ -1,4 +1,4 @@
-"""Confusion matrix, TPR and FPR (§5.5).
+"""Confusion matrix, TPR, FPR and the negative control (§5.5).
 
 A scenario is positive when the oracle placed it in the manifested set of the
 operator, and negative otherwise, whether or not it was exposed. It counts as
@@ -15,7 +15,7 @@ from fractions import Fraction
 
 from agentproof.report import compare_runs
 from agentproof.store import Store
-from experiments.oracle.manifested import THRESHOLD, manifested
+from experiments.oracle.manifested import SENSITIVITY, THRESHOLD, manifested
 from experiments.oracle.predicates import OPERATORS_WITH_PREDICATE
 
 
@@ -82,3 +82,29 @@ def detection(
         }[positive, flagged]
         cell.append(scenario_id)
     return result
+
+
+def sensitivity(store: Store, reference: str, candidate: str, operator: str) -> list[Detection]:
+    return [detection(store, reference, candidate, operator, t) for t in SENSITIVITY]
+
+
+@dataclass
+class NegativeControl:
+    """Two runs of the same baseline: every scenario flagged is a false positive."""
+
+    flagged: list[str]
+    weak_signals: list[str]
+    compared: int
+
+    @property
+    def fpr(self) -> Fraction | None:
+        return _rate(len(self.flagged), self.compared)
+
+
+def negative_control(store: Store, reference: str, control: str) -> NegativeControl:
+    report = compare_runs(store, reference, control)
+    return NegativeControl(
+        flagged=[c.scenario_id for c in report.regressions],
+        weak_signals=[c.scenario_id for c in report.weak_signals],
+        compared=sum(1 for c in report.comparisons if c.p_value is not None),
+    )

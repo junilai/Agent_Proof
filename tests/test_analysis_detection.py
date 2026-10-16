@@ -4,7 +4,7 @@ import pytest
 
 from agentproof.schema import scenario_id_for
 from agentproof.store import Store
-from experiments.analysis.detection import detection
+from experiments.analysis.detection import detection, negative_control, sensitivity
 from tests.factories import event, manifest, trace, verdict
 
 APPROVED = "Tu reembolso de $89.90 fue aprobado."
@@ -85,6 +85,19 @@ def test_false_positives_are_broken_down_by_exposure_and_weak_signals_listed(tmp
     assert result.weak_signals == [sc(6)]
 
 
+def test_sensitivity_moves_the_ground_truth_not_the_detector(tmp_path):
+    """Scenario 2 fails 2 of 5 times: positive at 0.2 and 0.4, negative at 0.6."""
+    by_threshold = {
+        d.threshold: d for d in sensitivity(populated(tmp_path), REFERENCE, CANDIDATE, "d4")
+    }
+    assert by_threshold[Fraction(2, 5)].tpr == Fraction(1, 2)
+    assert (
+        by_threshold[Fraction(3, 5)].tpr == 1
+        and sc(2) in by_threshold[Fraction(3, 5)].true_negatives
+    )
+    assert by_threshold[Fraction(1, 5)].false_negatives == [sc(2)]
+
+
 def test_no_metric_while_cases_wait_for_manual_annotation(tmp_path):
     scenarios = SCENARIOS | {1: (EXPOSED, [AMBIGUOUS] + [DENIED] * 4, [F] * 5)}
     with pytest.raises(ValueError, match="1 scenario"):
@@ -103,3 +116,9 @@ def test_a_scenario_without_valid_repetitions_is_a_listed_deviation(tmp_path):
 def test_d3_has_no_exposed_set_and_no_confusion_matrix(tmp_path):
     with pytest.raises(ValueError, match="effect size"):
         detection(populated(tmp_path), REFERENCE, CANDIDATE, "d3")
+
+
+def test_the_negative_control_counts_every_flag_as_a_false_positive(tmp_path):
+    control = negative_control(populated(tmp_path), REFERENCE, CONTROL)
+    assert control.flagged == [sc(1)] and control.compared == 6
+    assert control.fpr == Fraction(1, 6)
