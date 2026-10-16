@@ -119,3 +119,50 @@ La verdad de referencia la establece un oráculo (`src/experiments/oracle/`). Us
 **Qué trazas cuentan** ([D-001](decisiones.md)). Se excluyen las conversaciones que invalidó el usuario simulado. Se cuentan las trazas cuyo juicio falló definitivamente, porque la verdad no depende de que el detector haya podido juzgarlas.
 
 **Conjunto manifestado** (§5.4). Se evalúa el predicado en las 5 repeticiones del candidato y en las 5 de `baseline-a`. Un escenario expuesto pertenece al conjunto manifestado cuando la tasa de fallo del candidato supera a la de la referencia en al menos 0.4. Es la única condición. El análisis de sensibilidad repite el cálculo con 0.2 y 0.6.
+
+## 5. Criterio de regresión y métricas
+
+**Criterio** (§5.5). Un escenario regresó si se cumplen dos condiciones:
+
+- la prueba exacta de Fisher de dos colas entre la referencia y la candidata es significativa tras la corrección de Benjamini-Hochberg con α = 0.05 sobre los escenarios comparados;
+- la tasa de aprobación cae al menos 0.4.
+
+Los valores p se calculan con aritmética exacta ([D-006](decisiones.md)).
+
+El reporte da a cada escenario uno de tres estados:
+
+| Estado | Condición | Salida |
+|---|---|---|
+| regresión | las dos condiciones | 2 |
+| señal débil | caída ≥ 0.4 sin significancia | 0 |
+| ok | el resto | 0 |
+
+**Resolución que impone R = 5.** Con veinte comparaciones, cuando k escenarios regresan juntos se declaran si su valor p es a lo sumo k × 0.0025. En el caso extremo, de 5/5 a 0/5, p = 0.0079. Por eso hacen falta al menos cuatro escenarios regresando juntos (umbral 0.01), porque con tres el umbral es 0.0075. Una regresión de un solo escenario nunca supera la corrección y se reporta como señal débil (§5.5).
+
+**Matriz de confusión** (§5.5). Se calcula por operador sobre los veinte escenarios.
+
+- **Positivo:** el escenario está en el conjunto manifestado del oráculo.
+- **Negativo:** el resto, esté o no expuesto.
+- **Detección:** solo el estado *regresión* cuenta como detección; la señal débil se lista aparte ([D-006](decisiones.md)).
+- **Tasas:** TPR = VP / (VP + FN) y FPR = FP / (FP + VN).
+- **Falsos positivos:** se desglosan entre no expuestos y expuestos sin regresión manifestada.
+- **Desvíos:** un escenario sin repeticiones válidas en una de las corridas no recibe celda y se lista como desvío.
+
+**Control negativo.** Se compara `baseline-a` con `baseline-b` con el mismo criterio. Todo escenario marcado es un falso positivo atribuible a la variabilidad del sistema.
+
+**Otras medidas.**
+
+- **Sensibilidad:** TPR y FPR con umbrales de manifestación de 0.2, 0.4 y 0.6.
+- **Distribución conjunta** de las tasas de fallo de referencia y candidata por escenario y operador. Permite reconstruir cualquier otra clasificación.
+- **Frecuencias de fallo** del candidato, de 0/5 a 5/5.
+- **pass^k**, para k de 1 a 5, con el estimador insesgado por escenario, C(c, k) / C(n, k), promediado.
+
+**Familias** (§5.4).
+
+- **Familia A** (D1, D4 y D6): las métricas principales.
+- **Familia B** (D2 y D5): se reporta aparte, con el tamaño de efecto sobre su conjunto expuesto y sobre la suite.
+- **D3:** solo como tamaño de efecto sobre la suite completa, es decir, la diferencia entre las tasas medias de aprobación de la referencia y del candidato, acompañada de la distribución por escenario.
+
+**Costo y latencia.** Se reportan por escenario evaluado y por componente en todos los experimentos (§5.8).
+
+El comando `python -m experiments.analysis` calcula todo lo anterior y no calcula nada mientras haya casos pendientes de anotación.
