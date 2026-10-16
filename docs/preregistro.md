@@ -72,3 +72,50 @@ Cada operador es un dato que declara qué cambia (`src/casestudy/domain/mutation
 - **D6** ([D-003](decisiones.md)): con un límite de 2, el agente completa las conversaciones de una y dos llamadas a herramientas y trunca las de tres o más, que es como la §5.4 define su conjunto expuesto.
 - **D4** ([D-004](decisiones.md)): la política corrupta cambia la decisión correcta en 7 de las 15 tarjetas con decisión (tc-06, 07, 08, 11, 12, 13 y 15) y deja intactas las otras ocho.
 - **Cambio de framework:** el sentido de "paso" difiere entre frameworks, así que el límite de D6 se recalibra en cada uno y se registra.
+
+## 4. Verdad de referencia
+
+La verdad de referencia la establece un oráculo (`src/experiments/oracle/`). Usa solo tres fuentes fijadas antes de la ejecución y ajenas a AgentProof: la base de conocimiento del caso de estudio, la tarjeta de situación y los eventos de la traza (§5.4).
+
+- **No usa el sistema evaluado.** Nunca usa el evaluador automático ni los escenarios inducidos, y no lee los veredictos ni el reporte. Dos pruebas de arquitectura lo verifican.
+- **Cómo llega a la tarjeta.** De cada corrida llega a su traza semilla por el identificador del escenario, y de la semilla a su tarjeta.
+
+**Conjunto expuesto.** Se calcula con una regla sobre información fijada antes de la inducción (§5.4):
+
+| Op. | Expuesto cuando |
+|---|---|
+| D1 | la traza semilla llama a `lookup_order` |
+| D4 | la traza semilla llama a `get_refund_policy` |
+| D6 | la traza semilla tiene tres o más llamadas a herramientas |
+| D2 | la tarjeta plantea una decisión de reembolso |
+| D5 | la tarjeta espera que el reembolso no proceda |
+| D3 | no define conjunto expuesto |
+
+**Desenlace comunicado** ([D-002](decisiones.md)). Las reglas extraen la decisión dentro del vocabulario cerrado (procede, no procede o escalamiento) y los atributos del pedido que el agente enuncia (importe, fecha y estado).
+
+- **Cuál decisión cuenta.** Es la del mensaje más reciente del agente que enuncia una decisión. Los mensajes posteriores sin vocabulario de decisión no la sustituyen.
+- **Dónde se buscan los atributos.** Se revisan en todos los mensajes del agente y se contrastan con la base de conocimiento.
+- **Lo que las reglas no resuelven no se adivina:** pasa a anotación manual.
+
+**Predicados de fallo** (§5.4):
+
+| Op. | Falla cuando |
+|---|---|
+| D1 | el agente enuncia un atributo del pedido que contradice la base, o, en una tarjeta de estado del pedido, no entrega el estado |
+| D2, D4, D5 | la decisión comunicada difiere de la que la tarjeta declara de antemano según la política verdadera; en las tarjetas sin decisión el predicado es falso |
+| D6 | la conversación terminó por el límite de pasos y no comunicó el desenlace que la tarjeta pedía |
+
+**Calibración de las reglas** ([D-005](decisiones.md)). Antes del pre-registro se probaron con 28 respuestas de agentes degradados, generadas para eso y no tomadas del experimento. Un lote se usó para ajustar las reglas y otro, reservado, se etiquetó a ciegas. Al final, ninguna respuesta queda clasificada al revés. Se declaran dos limitaciones:
+
+1. Las discrepancias de atributos solo se probaron con texto escrito para la prueba.
+2. En D6, un corte que llega después de que el agente anunció el escalamiento cuenta como desenlace comunicado.
+
+**Anotación manual a ciegas.**
+
+- **Cómo se presentan los casos.** En orden aleatorio con la semilla `20261016`, junto con la situación, los datos del pedido en la base y la transcripción ciega. No se indica la condición ni el desenlace esperado.
+- **Dónde se guardan.** En `results/oracle/annotations.json`, marcados como manuales, y se reportan en el recuento.
+- **Ninguna métrica se calcula** mientras quede un caso pendiente.
+
+**Qué trazas cuentan** ([D-001](decisiones.md)). Se excluyen las conversaciones que invalidó el usuario simulado. Se cuentan las trazas cuyo juicio falló definitivamente, porque la verdad no depende de que el detector haya podido juzgarlas.
+
+**Conjunto manifestado** (§5.4). Se evalúa el predicado en las 5 repeticiones del candidato y en las 5 de `baseline-a`. Un escenario expuesto pertenece al conjunto manifestado cuando la tasa de fallo del candidato supera a la de la referencia en al menos 0.4. Es la única condición. El análisis de sensibilidad repite el cálculo con 0.2 y 0.6.
