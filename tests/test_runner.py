@@ -114,3 +114,66 @@ class StepLimitSession(EchoSession):
 def test_what_the_agent_did_is_never_retried(tmp_path, factory, user, turn_budget, termination):
     found = run_with(tmp_path, lambda s: ScriptedUser(*user), 2, factory, turn_budget)
     assert sorted(found) == [(1, 1, termination), (2, 1, termination)]
+
+
+class Interrupted(Exception):
+    pass
+
+
+def stop_after(count):
+    seen = []
+
+    def on_trace(trace):
+        seen.append(trace)
+        if len(seen) == count:
+            raise Interrupted
+
+    return on_trace
+
+
+def suite(store, user_for, on_trace=None, resume=False, repetitions=3):
+    scenarios = [scenario(), scenario(scenario_id="sc-tr-b", seed_trace_id="tr-b")]
+    return asyncio.run(
+        run_suite(
+            scenarios,
+            EchoSession,
+            manifest(repetitions=repetitions, turn_budget=4),
+            store,
+            user_for=user_for,
+            clock=ticking_clock(),
+            on_trace=on_trace,
+            resume=resume,
+        )
+    )
+
+
+def good_user(s):
+    return ScriptedUser(s.opening_message, "gracias")
+
+
+def test_an_interrupted_run_resumes_without_repeating_anything(tmp_path):
+    store = Store(tmp_path)
+    with pytest.raises(Interrupted):
+        suite(store, good_user, on_trace=stop_after(4))
+    assert len(store.run_traces(manifest().run_id)) == 4
+    assert len(suite(store, good_user, resume=True)) == 2
+    pairs = [(t.scenario_id, t.repetition) for t in store.run_traces(manifest().run_id)]
+    assert sorted(pairs) == [(s, r) for s in ("sc-tr-000000000001", "sc-tr-b") for r in (1, 2, 3)]
+    assert suite(store, good_user, resume=True) == []
+
+
+def test_resuming_continues_a_broken_repetition_within_its_caps(tmp_path):
+    store = Store(tmp_path)
+    with pytest.raises(Interrupted):
+        suite(store, failing_first(1), on_trace=stop_after(1), repetitions=1)
+    resumed = suite(store, good_user, resume=True, repetitions=1)
+    assert [(t.scenario_id, t.attempt, t.termination) for t in resumed] == [
+        ("sc-tr-000000000001", 2, "user_ended"),
+        ("sc-tr-b", 1, "user_ended"),
+    ]
+
+
+def test_resuming_never_exceeds_the_retries_already_spent(tmp_path):
+    store = Store(tmp_path)
+    suite(store, failing_first(99), repetitions=1)
+    assert suite(store, good_user, resume=True, repetitions=1) == []

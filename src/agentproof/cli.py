@@ -1,4 +1,4 @@
-"""AgentProof command line: record | induce | run | judge | report.
+"""AgentProof command line: record | induce | run | resume | judge | report.
 
 The adapter is loaded by name (``claude_sdk`` -> ``agentproof.adapters.claude_sdk``,
 or a full module path) and the agent by ``module:attribute``, so adding a
@@ -163,13 +163,43 @@ def run(
         turn_budget=turn_budget,
         models=models.snapshot(),
         created_at=now,
+        scenario_ids=[s.scenario_id for s in scenarios],
     )
-
-    def progress(trace: Trace) -> None:
-        typer.echo(f"{trace.scenario_id} #{trace.repetition}: {trace.termination}")
-
     factory = session_factory_for(adapter, agent, variant)
-    asyncio.run(run_suite(scenarios, factory, manifest, store, _simulated_user, on_trace=progress))
+    asyncio.run(run_suite(scenarios, factory, manifest, store, _simulated_user, on_trace=_progress))
+    typer.echo(f"Corrida {manifest.run_id} completa.")
+
+
+def _progress(trace: Trace) -> None:
+    retry = f" (intento {trace.attempt})" if (trace.attempt or 1) > 1 else ""
+    typer.echo(f"{trace.scenario_id} #{trace.repetition}{retry}: {trace.termination}")
+
+
+@app.command()
+def resume(run_id: str = typer.Option(..., "--run", help="Id de la corrida."), data: Path = DATA):
+    """Retoma una corrida interrumpida sin repetir lo que ya se ejecutó."""
+    store = Store(data)
+    try:
+        manifest = store.manifest(run_id)
+    except KeyError as missing:
+        raise _unknown_run(missing) from None
+    if manifest.scenario_ids is None:
+        typer.echo("La corrida no registró sus escenarios: no se puede reanudar.", err=True)
+        raise typer.Exit(1)
+    if manifest.models != models.snapshot():
+        typer.echo(
+            "Los modelos fijados cambiaron desde que empezó la corrida: "
+            "reanudarla mezclaría dos protocolos.",
+            err=True,
+        )
+        raise typer.Exit(1)
+    scenarios = [store.scenario(scenario_id) for scenario_id in manifest.scenario_ids]
+    factory = session_factory_for(manifest.adapter, manifest.agent, manifest.variant)
+    asyncio.run(
+        run_suite(
+            scenarios, factory, manifest, store, _simulated_user, on_trace=_progress, resume=True
+        )
+    )
     typer.echo(f"Corrida {manifest.run_id} completa.")
 
 

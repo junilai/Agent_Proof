@@ -4,7 +4,9 @@ Each attempt is one ``converse`` call, so it always yields exactly one trace,
 even when the agent crashes, and a failing scenario never stops the suite. A
 repetition the simulated user broke (``simulator_error``) is run again within
 the caps of D-001; the failed attempt is kept. Nothing the agent did is ever
-retried.
+retried. A run that was interrupted is resumed with ``resume=True``: every
+repetition that already has a valid trace is skipped, and the retries already
+spent still count against the caps.
 """
 
 from __future__ import annotations
@@ -28,13 +30,27 @@ async def run_suite(
     user_for: Callable[[Scenario], UserDriver] = SimulatedUser,
     clock: Callable[[], datetime] = utc_now,
     on_trace: Callable[[Trace], None] | None = None,
+    resume: bool = False,
 ) -> list[Trace]:
-    store.create_run(manifest)
+    done = store.run_traces(manifest.run_id) if resume else []
+    if not resume:
+        store.create_run(manifest)
     traces: list[Trace] = []
     for scenario in scenarios:
-        retried = 0
+        retried = retries.conversation_retries(done, scenario.scenario_id)
         for repetition in range(1, manifest.repetitions + 1):
-            attempt = 1
+            previous = [
+                t
+                for t in done
+                if t.scenario_id == scenario.scenario_id and t.repetition == repetition
+            ]
+            if any(t.termination != "simulator_error" for t in previous):
+                continue
+            attempt = max((t.attempt or 1 for t in previous), default=0) + 1
+            if previous:
+                if attempt > retries.PER_REPETITION + 1 or retried >= retries.PER_SCENARIO:
+                    continue
+                retried += 1
             while True:
                 context = TraceContext(
                     kind="run",
