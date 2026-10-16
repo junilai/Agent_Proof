@@ -18,4 +18,35 @@ Las veinte tarjetas se distribuyen según una matriz de cobertura que cruza la i
 \par
 Los veinte escenarios inducidos se revisan antes de congelar el protocolo, sin editarlos a mano, porque eso sería intervenir el instrumento que se evalúa. Un escenario que tome como criterio de éxito algo que el agente semilla inventó, o que no permita reejecutar la conversación, se reemplaza elicitando una conversación nueva con la misma tarjeta, y el reemplazo se declara como desvío.
 \par
+
+\subtituloapa{Degradaciones controladas y verdad de referencia}
+Para medir si AgentProof detecta regresiones hacen falta regresiones cuya existencia se conozca. Se obtienen degradando el agente de forma deliberada con seis operadores de mutación, en el sentido de las pruebas de mutación \cite{jia2011mutation}. Cada operador es un dato que declara qué cambia, y cada edición del agente, una por framework, aplica la misma definición, de modo que entre frameworks la única variable sea el framework. Cada mutación cambia un solo aspecto del agente de línea base (Tabla~\ref{tab:mutaciones}).
+\par
+
+\begin{table}[H]
+  \setstretch{0.952}
+  \caption{Operadores de mutación}
+  \label{tab:mutaciones}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{0.4in}|>{\raggedright\arraybackslash}p{0.55in}|>{\raggedright\arraybackslash}p{2.3in}|>{\raggedright\arraybackslash}p{2.35in}|}
+    \hline
+    \textbf{Op.} & \textbf{Familia} & \textbf{Qué cambia} & \textbf{Conjunto expuesto} \\ \hline
+    D1 & A & Se elimina la herramienta de consulta de pedidos & La traza semilla consulta un pedido \\ \hline
+    D4 & A & La herramienta de política devuelve una política corrupta: ventana de 90 días, umbral de USD 5000 y sin exclusiones & La traza semilla consulta la política \\ \hline
+    D6 & A & El límite de pasos por turno baja de 10 a 2 & La traza semilla tiene tres o más llamadas a herramientas \\ \hline
+    D2 & B & Se omite del prompt la instrucción de consultar la política antes de decidir & La tarjeta plantea una decisión de reembolso \\ \hline
+    D5 & B & Se añade al prompt una instrucción de aprobar todo reembolso & La tarjeta espera que el reembolso no proceda \\ \hline
+    D3 & B & Se reemplaza el modelo del agente por uno de menor capacidad & No se define \\ \hline
+  \end{tabular}
+\end{table}
+
+La familia A agrupa las mutaciones de mecanismo, que eliminan o corrompen una capacidad; la familia B, las conductuales, que alteran la propensión del agente sin suprimir la capacidad. Dos valores se calibraron antes del pre-registro. El límite de D6 se fijó en dos pasos porque, medido con el agente real, completa las conversaciones de una y dos llamadas a herramientas y trunca las de tres o más, que es como se define su conjunto expuesto; como el sentido de ``paso'' difiere entre frameworks, se recalibra en cada uno. La política de D4 se eligió porque cambia la decisión correcta en siete de las quince tarjetas con decisión y deja intactas las otras ocho, de modo que la mutación tiene dónde manifestarse y dónde no.
+\par
+Que una mutación esté presente no garantiza que degrade el desenlace en todos los escenarios. Por eso se distinguen dos conjuntos. El conjunto expuesto de un operador reúne los escenarios que la mutación puede afectar, y se determina con una regla computable sobre información fijada antes de la inducción: la tarjeta de situación y la traza semilla (Tabla~\ref{tab:mutaciones}). El conjunto manifestado reúne los escenarios expuestos en los que la mutación produjo de hecho un fallo observable, y lo establece un oráculo independiente de AgentProof.
+\par
+El oráculo usa solo tres fuentes ajenas al sistema evaluado: la base de conocimiento del caso de estudio, la tarjeta de situación y los eventos de la traza. Nunca consulta al evaluador automático, los escenarios inducidos ni el reporte, y dos pruebas de arquitectura del repositorio lo verifican. Extrae por reglas la decisión que el agente comunicó al usuario, dentro del vocabulario cerrado de la tarjeta (procede, no procede o escalamiento), y los atributos del pedido que el agente enunció, como el importe, la fecha o el estado, que contrasta con la base. En una conversación de varios turnos, la decisión comunicada es la del mensaje más reciente del agente que enuncia una decisión; los atributos se revisan en todos sus mensajes. Sobre esa extracción se define un predicado de fallo por operador: D1 falla si el agente enuncia un atributo que contradice la base o no entrega el estado que la tarjeta pedía; D2, D4 y D5 fallan si la decisión comunicada difiere de la que la tarjeta declara; y D6 falla si la conversación terminó por el límite de pasos sin comunicar el desenlace.
+\par
+Las reglas de extracción se calibraron antes del pre-registro con veintiocho respuestas de agentes degradados, generadas para ese fin y no tomadas de los experimentos: un lote sirvió para ajustar las reglas y otro, reservado, se etiquetó a ciegas antes de aplicarlas. Al cierre de la calibración ninguna respuesta queda clasificada al revés. Lo que las reglas no resuelven no se adivina: pasa a una cola de anotación manual en la que el autor ve la situación, los datos del pedido y la transcripción, pero no la condición del agente ni el desenlace esperado, en un orden aleatorio con semilla fija.
+\par
+La regla de agregación es la única condición de pertenencia al conjunto manifestado: un escenario expuesto pertenece a él cuando la tasa de fallo del candidato, medida con el predicado sobre sus cinco repeticiones, supera a la de la línea base de referencia en al menos cuatro décimas. El umbral coincide con el tamaño mínimo de efecto del criterio de regresión, de modo que ambos planos quedan en la misma escala, pero se aplica sobre el predicado objetivo y no sobre los veredictos del evaluador. Un análisis de sensibilidad repite el cálculo con dos y seis décimas.
+\par
 \endgroup
