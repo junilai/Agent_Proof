@@ -187,3 +187,24 @@ El comando `python -m experiments.analysis` calcula todo lo anterior y no calcul
 - **Concordancia.** Se mide con el α de Krippendorff con ponderación ordinal, junto con las comparaciones por pares y la distribución completa de calificaciones. Con 20 ítems el intervalo de confianza es ancho, y la poca varianza de calificaciones concentradas en valores altos deprime el coeficiente.
 - **Corrección.** Se reporta también el porcentaje de escenarios que requerirían corrección bajo supervisión.
 - **Sesiones separadas.** E3 se hace en una sesión distinta de la de E2, para reducir el anclaje entre tareas.
+
+## 7. Expectativas
+
+Es un estudio de estimación: no se declaran umbrales de TPR, FPR ni concordancia que definan el éxito de la herramienta ([D-008](decisiones.md)). Antes de ver los datos se registran las expectativas que se siguen de la planificación, para contrastar con ellas los resultados:
+
+1. **Solo se detectan regresiones conjuntas.** Con R = 5, una regresión aislada no supera la corrección. Por eso las regresiones que se declaren afectarán a varios escenarios a la vez, y la TPR debe leerse a la luz de ese límite de resolución, no como la calidad intrínseca del evaluador (§5.4, §5.5).
+2. **La familia A se detecta mejor que la B.** Sus mutaciones eliminan o corrompen una capacidad, mientras que las de la familia B alteran la propensión del agente. La calibración de D-005 ya mostró que D2 y D5 apenas cambian el desenlace, así que se esperan conjuntos manifestados chicos para ellas.
+3. **El control negativo marcará pocos escenarios.** Mide el ruido estocástico del sistema; no se fija cuántos.
+4. **E4 reproducirá la detección de la familia A en LangGraph.** Se mantienen constantes el dominio, las herramientas, la base de conocimiento y el modelo, y el límite de D6 se recalibra para ese framework.
+
+## 8. Desvíos y enmiendas
+
+- **Desvíos.** Todo lo que ocurra distinto de lo previsto se declara en la tesis y no se corrige en silencio. Por ejemplo: conversaciones reemplazadas, escenarios incompletos, reintentos que se agotan, casos anotados a mano o el uso de la contingencia de costo.
+- **Enmiendas.** Un cambio del protocolo después del tag `preregistro-v1` se agrega al final de esta sección, con su fecha, su motivo y su efecto esperado. Actualiza la [tabla de huellas](#10-huella-del-protocolo) y lleva un tag nuevo: `preregistro-v2`, y así sucesivamente ([D-008](decisiones.md)).
+- **El piloto no es una enmienda.** Sus datos no se analizan como resultado, y solo puede activar la contingencia de costo ya declarada en la [sección 2](#2-diseño).
+
+*Enmiendas:* ninguna.
+
+## 9. Conjuntos expuestos del corpus
+
+Se completa al cerrar el corpus. Contendrá, para cada operador, la lista de escenarios expuestos que resulta de aplicar las reglas de la [sección 4](#4-verdad-de-referencia) a las 20 trazas semilla, generada por un comando y no escrita a mano, y los cinco escenarios sorteados para el piloto.
