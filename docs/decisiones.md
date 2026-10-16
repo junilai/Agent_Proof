@@ -153,7 +153,7 @@ La §5.5 fija el criterio y las métricas, pero deja sin precisar seis detalles 
 Hasta F2 solo el agente registraba su consumo: el inductor, el usuario simulado y el evaluador lo descartaban. Desde la parte D de F3:
 
 1. **Qué se registra.** Cada componente guarda los tokens de entrada y de salida que informa la API y los segundos de cada llamada, incluidas las llamadas fallidas, que también se pagan. El inductor lo guarda en el escenario, el usuario simulado y el agente en la traza, y el evaluador en el veredicto.
-2. **Cómo se pasa a dólares.** Con una tabla de precios por millón de tokens copiada de la página oficial de precios, con la fecha en que se verificó. Un modelo que no está en la tabla se reporta como tal, sin estimar su precio.
+2. **Cómo se pasa a dólares.** Con una tabla de precios por millón de tokens copiada de la página oficial de precios, con la fecha en que se verificó. Un modelo que no está en la tabla se reporta como tal, sin estimar su precio. Verificada el 16 de octubre de 2026, en USD por millón de tokens de entrada y de salida: Opus 5, 5 y 25; Sonnet 5, 2 y 10; Haiku 4.5, 1 y 5.
 3. **El agente es un caso aparte.** Usa caché de prompts, que tiene tarifas propias, así que multiplicar sus tokens por la tabla no da su costo. Se reporta además la estimación que entrega su SDK.
 4. **Las cifras de la herramienta son cálculos propios.** Al cerrar el piloto se concilian con la facturación de la consola de Anthropic, y la diferencia se informa. Así se registró en F1 y F2, cuando la consola marcó menos que la suma de las estimaciones del SDK.
 5. **Los artefactos anteriores a este registro** se cuentan como "sin registro", nunca como costo cero.
