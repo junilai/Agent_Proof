@@ -53,3 +53,22 @@ Cada conversación recibe un juicio del evaluador.
 - Se informa cuántos reintentos necesitó cada condición.
 
 **Contingencia de costo** (§7c, [D-008](decisiones.md)). Antes de E1 se corre un piloto: `baseline-a` y `d4`, con 5 escenarios sorteados con la semilla `20261017` y 2 repeticiones. Sus datos no entran en el análisis. Si el costo proyectado de E1 y E4, más lo ya gastado, supera USD 300, E4 pasa a tres repeticiones; si aun así no alcanza, se informa al tutor antes de seguir.
+
+## 3. Mutaciones
+
+Cada operador es un dato que declara qué cambia (`src/casestudy/domain/mutations.py`), y cada edición del agente aplica la misma definición, de modo que entre frameworks la única variable sea el framework (§5.4, §5.8). Cada mutación cambia un solo aspecto de la línea base.
+
+| Op. | Familia | Qué cambia | Valor |
+|---|---|---|---|
+| D1 | A | herramientas disponibles | sin `lookup_order`; el prompt la sigue nombrando |
+| D4 | A | política que devuelve `get_refund_policy` | ventana de 90 días (verdadera: 30), umbral de supervisor de USD 5000 (verdadero: 500) y sin categorías excluidas |
+| D6 | A | límite de pasos por turno | 2 (línea base: 10) |
+| D2 | B | prompt de sistema | sin la instrucción de consultar la política antes de decidir |
+| D5 | B | prompt de sistema | con una instrucción añadida: aprobar todo reembolso, sin excepciones |
+| D3 | B | modelo del agente | `claude-haiku-4-5-20251001` en lugar de `claude-sonnet-5` |
+
+**Calibraciones hechas antes del pre-registro.**
+
+- **D6** ([D-003](decisiones.md)): con un límite de 2, el agente completa las conversaciones de una y dos llamadas a herramientas y trunca las de tres o más, que es como la §5.4 define su conjunto expuesto.
+- **D4** ([D-004](decisiones.md)): la política corrupta cambia la decisión correcta en 7 de las 15 tarjetas con decisión (tc-06, 07, 08, 11, 12, 13 y 15) y deja intactas las otras ocho.
+- **Cambio de framework:** el sentido de "paso" difiere entre frameworks, así que el límite de D6 se recalibra en cada uno y se registra.
