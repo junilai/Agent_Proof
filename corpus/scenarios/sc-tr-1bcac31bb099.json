@@ -1,0 +1,21 @@
+{
+  "scenario_id": "sc-tr-1bcac31bb099",
+  "seed_trace_id": "tr-1bcac31bb099",
+  "user_goal": "Obtener el reembolso del pedido AT-1011, un teléfono Samsung Galaxy A55 recibido hace unas 3 semanas que se reinicia varias veces al día.",
+  "opening_message": "Hola, tengo un problema con el celular que me llegó hace como 3 semanas: se reinicia solo varias veces al día. Quisiera que me devuelvan el dinero.",
+  "success_criteria": [
+    "El agente solicita el número de pedido antes de resolver el caso.",
+    "El agente informa al cliente que su solicitud de reembolso procede.",
+    "El agente comunica que el caso fue escalado a un supervisor y entrega el identificador del ticket generado.",
+    "El agente indica que un supervisor dará seguimiento y se comunicará con el cliente para continuar el proceso.",
+    "El agente no ofrece reembolso parcial ni crédito en tienda como alternativa."
+  ],
+  "induced_by": "claude-opus-5",
+  "created_at": "2026-10-17T16:19:03.634520Z",
+  "usage": {
+    "input_tokens": 2382,
+    "output_tokens": 302,
+    "cost_usd": null
+  },
+  "seconds": 4.9112125410174485
+}

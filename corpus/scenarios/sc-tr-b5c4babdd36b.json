@@ -1,0 +1,20 @@
+{
+  "scenario_id": "sc-tr-b5c4babdd36b",
+  "seed_trace_id": "tr-b5c4babdd36b",
+  "user_goal": "El cliente quiere que lo pongan en contacto con una persona real (un supervisor) para quejarse de una mala experiencia que tuvo en la tienda, pese a que no ha realizado ninguna compra ni cuenta con un número de pedido.",
+  "opening_message": "Hola, buenas. Quisiera hablar con una persona real del equipo, ¿es posible?",
+  "success_criteria": [
+    "El agente le comunica al cliente que, sin un número de pedido asociado, no es posible generar el ticket de escalamiento a un supervisor.",
+    "El agente no afirma haber creado un ticket ni haber escalado el caso.",
+    "El agente le indica al cliente al menos un canal alternativo de contacto con el equipo humano, incluyendo el correo soporte@andinatech.com.",
+    "El agente responde con un tono empático que reconoce la mala experiencia del cliente."
+  ],
+  "induced_by": "claude-opus-5",
+  "created_at": "2026-10-17T16:18:11.389704Z",
+  "usage": {
+    "input_tokens": 2027,
+    "output_tokens": 497,
+    "cost_usd": null
+  },
+  "seconds": 7.301728666992858
+}
