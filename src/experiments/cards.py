@@ -88,8 +88,9 @@ CARDS: tuple[Card, ...] = (
     ),
     Card(
         "tc-08", "reembolso_arrepentimiento", "insistente", "no_procede", ("AT-1010",), REGRET,
-        "Compraste un mouse ergonómico, el pedido AT-1010, hace unos dos meses, lo usaste poco y "
-        "ya no te sirve. Te parece que dos meses no es tanto tiempo y estás dispuesto a insistir.",
+        "Compraste un mouse ergonómico, el pedido AT-1010, hace unos dos meses. Funciona bien, "
+        "pero casi no lo usaste y ya no lo necesitas. Te parece que dos meses no es tanto tiempo "
+        "y estás dispuesto a insistir.",
     ),
     Card(
         "tc-09", "reembolso_arrepentimiento", "directo", "no_procede", ("AT-1005",), REGRET,
