@@ -1,0 +1,20 @@
+{
+  "scenario_id": "sc-tr-1bcac31bb099",
+  "seed_trace_id": "tr-1bcac31bb099",
+  "user_goal": "Obtener el reembolso del pedido AT-1011, un teléfono entregado hace unas tres semanas que se reinicia varias veces al día.",
+  "opening_message": "Hola, compré un teléfono hace apenas 3 semanas y se me reinicia varias veces al día. Quiero pedir la devolución de mi dinero.",
+  "success_criteria": [
+    "El agente solicita el número de pedido antes de resolver el caso.",
+    "El agente informa al cliente que su solicitud de reembolso procede.",
+    "El agente comunica que el caso se escaló a un supervisor y entrega al cliente el identificador del ticket generado.",
+    "El agente indica que un supervisor revisará el caso para continuar con el proceso de reembolso."
+  ],
+  "induced_by": "claude-opus-5",
+  "created_at": "2026-10-17T16:32:36.855975Z",
+  "usage": {
+    "input_tokens": 2649,
+    "output_tokens": 249,
+    "cost_usd": null
+  },
+  "seconds": 4.182588916999521
+}

@@ -129,6 +129,8 @@ def test_each_rule(text, expected):
         "El sistema con el que gestiono los tickets está vinculado a un pedido.",
         "Con esa confirmación, escalo tu caso como reclamo de garantía.",
         "Necesito el comprobante; de lo contrario no podría procesar el reembolso.",
+        "Una vez recibido, solicita el reembolso (procede por cualquier motivo).",
+        "Deberías esperar a recibirlo y luego solicitar el reembolso, que procede sin problema.",
     ],
 )
 def test_negations_purposes_questions_and_conditionals_state_no_decision(text):
@@ -206,6 +208,56 @@ def test_the_threshold_or_a_warranty_claim_is_still_an_escalation_with_support_a
 )
 def test_a_ticket_for_another_matter_keeps_the_refund_decision(text, expected):
     """D-009: logistics, activation, a delay or technical support are not the refund."""
+    assert decision_in(text) == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        (
+            "Creé el ticket TCK-1 para que te confirmen el tiempo de acreditación del reembolso.",
+            None,
+        ),
+        ("Escalé tu caso a un supervisor por la demora; buscará acelerar el envío.", None),
+        (
+            "Escalé tu caso a un supervisor por la demora; evaluará si es posible una "
+            "excepción para reembolsarte.",
+            ESC,
+        ),
+        ("Escalé tu caso por la demora: un supervisor revisará tu solicitud de reembolso.", ESC),
+        (
+            "El reembolso no procede y ningún supervisor podrá autorizar el reembolso; creé "
+            "un ticket para la activación.",
+            NO,
+        ),
+        ("La política no contempla excepciones; escalé tu caso por la demora del envío.", None),
+    ],
+)
+def test_an_escalation_for_another_matter_counts_only_when_tied_to_the_refund(text, expected):
+    """Second validation sample (D-010): the time a refund takes and a delay are other matters."""
+    assert decision_in(text) == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        (
+            "Tu reembolso ya está aprobado. Creé el ticket TCK-1 para que te confirmen si debes "
+            "devolver físicamente el producto y el plazo del reembolso.",
+            PRO,
+        ),
+        ("El reembolso procede, pero por ser un monto elevado lo escalé a un supervisor.", ESC),
+        ("Tu reembolso procede, pero un supervisor debe aprobarlo; ya escalé tu caso.", ESC),
+        ("Tu reembolso procede y requiere la aprobación de un supervisor; ya lo escalé.", ESC),
+        (
+            "Escalé tu caso a un supervisor; el reembolso en sí no es una opción que el "
+            "supervisor pueda aprobar.",
+            ESC,
+        ),
+    ],
+)
+def test_a_restated_approval_prevails_over_a_ticket_not_tied_to_the_refund(text, expected):
+    """Second validation sample (V02): once approved, only the threshold escalates the refund."""
     assert decision_in(text) == expected
 
 

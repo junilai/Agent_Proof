@@ -3,7 +3,15 @@
 from pathlib import Path
 
 from agentproof.store import Store
-from experiments.preregistration import VALIDATION, pilot, render, rows, validation
+from experiments.preregistration import (
+    SECOND_VALIDATION,
+    SECOND_VALIDATION_SEED,
+    VALIDATION,
+    pilot,
+    render,
+    rows,
+    validation,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 SECTION = "## 9. Conjuntos expuestos del corpus\n\n"
@@ -36,3 +44,10 @@ def test_the_draws_are_fixed_and_stay_inside_each_pool():
     assert len(drawn["d5"]) == 5 and all(
         len(drawn[c]) == 10 for c in ("baseline", "d1", "d2", "d4")
     )
+
+
+def test_the_second_validation_sample_draws_four_per_condition():
+    table = rows(Store(ROOT))
+    drawn = validation(table, SECOND_VALIDATION_SEED, SECOND_VALIDATION)
+    assert all(len(chosen) == 4 for chosen in drawn.values())
+    assert all(c == "baseline" or all(c in r.exposed for r in rs) for c, rs in drawn.items())

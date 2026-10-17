@@ -116,17 +116,35 @@ La verdad de referencia la establece un oráculo (`src/experiments/oracle/`). Us
 - **Con 28 respuestas de agentes degradados,** generadas para eso y no tomadas del experimento. Un lote se usó para ajustar las reglas y otro, reservado, se etiquetó a ciegas.
 - **Con los 120 mensajes del agente sano** en las 20 conversaciones del corpus, etiquetados a mano.
 
-En ninguno de los dos casos queda una clasificación al revés. Se declaran tres limitaciones:
+En ninguno de los dos casos queda una clasificación al revés. Se declaran cuatro limitaciones:
 
 1. Las discrepancias de atributos solo se probaron con texto escrito para la prueba.
 2. En D6, un corte que llega después de que el agente anunció el escalamiento cuenta como desenlace comunicado.
-3. Las palabras que identifican "otro asunto" salen del corpus. Antes del tag se mide el acierto del oráculo sobre conversaciones nuevas, etiquetadas a ciegas por dos personas y sin ajustar ninguna regla con ellas, y el resultado se registra en D-005.
+3. Las reglas se ajustaron con conversaciones vistas. El acierto se midió en dos muestras de validación nuevas, etiquetadas a ciegas por dos personas ([D-010](decisiones.md)):
+   - **primera muestra** (50 conversaciones): sirvió para corregir cuatro reglas;
+   - **segunda muestra** (20): la medición independiente de esas reglas, con 15 de 17 decisiones exactas, 1 al revés, 1 omitida y ningún falso positivo de atributos;
+   - **corrección final**: la de esa clasificación al revés. Se verificó sin clasificaciones al revés en las 70 conversaciones, pero no tiene medición independiente; la da la auditoría de E1.
+4. El oráculo lee fechas, no "hace N días": un dato inventado con esa forma no se detecta.
+
+**Auditoría del oráculo sobre E1.** Es la medición independiente de las reglas congeladas.
+
+- **Muestra.** 40 trazas válidas de E1, 5 por cada una de las 8 condiciones, sorteadas con la semilla `20261021`. Dentro de cada condición se sortean 3 trazas en las que el agente creó un ticket y 2 en las que no. Si una condición tiene menos de 3 trazas con ticket, se completa con trazas sin ticket. Se sobrerrepresentan los tickets porque son el punto débil conocido de las reglas.
+- **Etiquetado.** Los anotadores externos de F6 etiquetan a ciegas, con la planilla y la guía de D-010 y sin ver la condición ni la salida del oráculo.
+- **Qué se reporta.**
+  - El acierto de la decisión y las clasificaciones al revés.
+  - Los casos sin resolver.
+  - Los falsos positivos y negativos de atributos.
+  - La coincidencia de cada predicado.
+  - La concordancia entre los anotadores.
+
+  Por la sobrerrepresentación de tickets, la tasa de error se reporta por estrato (con y sin ticket) y ponderada por la proporción real de cada estrato en E1.
+- **Si encuentra errores.** No se corrigen en silencio. Una corrección es una enmienda: se vuelve a puntuar E1 sobre las trazas guardadas, sin volver a correr los agentes, y se reportan las dos cifras.
 
 **Lo que se reporta del oráculo.**
 
 - La tasa de casos sin resolver, por operador y por corrida.
-- El acierto medido sobre las conversaciones de validación (limitación 3).
-- La concordancia entre el oráculo y anotadores externos sobre una muestra de trazas del experimento, si se agrega en F6. Su tamaño y su semilla se declaran como enmienda antes de anotar.
+- El acierto en las dos muestras de validación (limitación 3).
+- El resultado de la auditoría sobre E1.
 
 **Anotación manual a ciegas.**
 
@@ -266,6 +284,14 @@ Generada con `python -m experiments.preregistration --data .`. Una prueba exige 
 - d4: tc-01, tc-02, tc-03, tc-05, tc-06, tc-09, tc-11, tc-12, tc-14, tc-19.
 - d5 (dos repeticiones): tc-06, tc-07, tc-08, tc-09, tc-10.
 
+**Segunda muestra de la validación** ([D-010](decisiones.md)): semilla `20261020`, una repetición por escenario.
+
+- baseline: tc-07, tc-11, tc-15, tc-16.
+- d1: tc-02, tc-03, tc-16, tc-17.
+- d2: tc-01, tc-04, tc-06, tc-09.
+- d4: tc-02, tc-03, tc-07, tc-08.
+- d5: tc-06, tc-07, tc-08, tc-10.
+
 ## 10. Huella del protocolo
 
 Cada pieza congelada se resume en los primeros 16 caracteres de su sha256. Las piezas son los modelos, los prompts, las herramientas, las mutaciones, la base de conocimiento, las tarjetas, las constantes del criterio y del oráculo, y el código del oráculo.
@@ -290,4 +316,4 @@ Al cerrar el corpus se agregarán los 20 escenarios inducidos.
 | Tarjetas de situación | `d6a37a38d88afb97` |
 | Criterio de regresión y reintentos | `9aad2d0f4e567eb3` |
 | Umbrales y semilla del oráculo | `e9762d8f9b00c5ea` |
-| Reglas del oráculo (código fuente) | `31f3403c39c69a2f` |
+| Reglas del oráculo (código fuente) | `bf38de6bedb8ee2e` |

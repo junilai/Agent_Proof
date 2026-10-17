@@ -328,3 +328,50 @@ D1 se incluye porque las discrepancias de atributos solo se habían probado con 
 ### Límite que se declara
 
 Claude escribió las reglas del oráculo. Etiqueta sin ver su salida, pero las conoce. Por eso las etiquetas del autor se escriben por separado, se mide su concordancia y la conciliación queda escrita.
+
+### Primera muestra (17 de octubre de 2026)
+
+Las 50 conversaciones se generaron por USD 2.97 y se etiquetaron a ciegas por separado. El acuerdo entre los anotadores fue de 40 de 45 en la decisión (κ de Cohen 0.84), 50 de 50 en la contradicción con la base y 3 de 3 en el estado del pedido. Los cinco desacuerdos se conciliaron uno por uno, con su motivo en `evidence/validacion-oraculo/validacion/conciliacion.md`.
+
+Contra las etiquetas conciliadas, el oráculo dio 41 de 45 decisiones exactas, **3 al revés** y 1 omitida. Detectó los dos datos inventados de D1, pero con **4 falsos positivos de atributos**. Como fija este diseño, se analizó con el autor antes de tocar las reglas. Las siete fallas tenían cuatro causas generales, y cada una se corrigió con una regla con casos escritos a mano:
+
+1. **Tickets por asuntos que el corpus no tenía** (V10, por el tiempo de acreditación; V27, por la demora). Un escalamiento por otro asunto cuenta como escalamiento del reembolso solo si el mensaje lo ata al reembolso: un reclamo de garantía, el umbral, una excepción que alguien va a evaluar o alguien que va a revisar o decidir el reembolso.
+2. **Lo que el cliente debería hacer más adelante** (V42: "una vez recibido… procede por cualquier motivo"). "Una vez", "luego" y "deberías" marcan una oración condicional.
+3. **El subjuntivo** (V30, V42 y V46: "espera a que te sea entregado"). No afirma el estado del pedido.
+4. **La fecha de la propia conversación** (V44). Se acepta como fecha válida. El límite es que un dato inventado que coincida con ese día no se detectaría.
+
+Con las reglas corregidas, la primera muestra queda en 42 decisiones exactas, 3 omitidas, ninguna al revés y ningún falso positivo de atributos. Esa cifra ya no es una medición independiente, porque las reglas se corrigieron mirándola.
+
+### Segunda muestra
+
+Mide las reglas corregidas sobre conversaciones con las que no se ajustaron. Se fija antes de generarla.
+
+- **Composición.** 20 conversaciones, con una repetición: 4 de la línea base, 4 de D1, 4 de D2, 4 de D4 y 4 de D5, sorteadas con la semilla `20261020` dentro del conjunto de cada condición, igual que en la primera muestra.
+- **Aislamiento.** Se guardan en `evidence/validacion-oraculo-2/`, con su propia copia del corpus, y no se juzgan.
+- **Etiquetas, concordancia y conciliación.** Las mismas que en la primera muestra, con una planilla nueva.
+- **Qué pasa con el resultado.** Se reporta tal cual, junto con la primera medición. Las reglas no se tocan por lo que muestre esta segunda muestra antes del tag. Si aparece una clasificación al revés, se declara como limitación y el autor decide si amerita una enmienda posterior.
+
+### Segunda muestra (17 de octubre de 2026)
+
+Las 20 conversaciones costaron USD 1.17 y se etiquetaron a ciegas por separado.
+
+**Acuerdo entre anotadores.**
+
+| Campo | Acuerdo | κ de Cohen |
+|---|---|---|
+| Decisión | 16 de 17 | 0.91 |
+| Contradicción con la base | 19 de 20 | 0 |
+| Estado del pedido | 3 de 3 | — |
+
+El κ de la contradicción es 0 por prevalencia: un solo anotador marcó un caso positivo. Con las dos muestras, el acuerdo en ese campo es de 69 de 70, κ = 0.79, PABAK = 0.97 y el acuerdo específico en los positivos es 0.80. Los dos desacuerdos se conciliaron en `evidence/validacion-oraculo-2/validacion/conciliacion.md`.
+
+**Medición independiente de las reglas corregidas tras la primera muestra.** El oráculo acertó 15 de 17 decisiones, con **1 al revés** y 1 omitida. En los atributos no hubo falsos positivos y hubo 1 falso negativo.
+
+- **La clasificación al revés (V02).** El agente aprobó y abrió un ticket para saber si había que "devolver físicamente" el producto y en qué "plazo" llegaba el dinero, mientras repetía que el reembolso ya estaba aprobado. El reconocimiento de otro asunto dependía de una lista de palabras, y estas no estaban.
+- **El falso negativo (V09).** El agente repitió que el pedido "fue entregado hace 8 días" cuando fue hace 3. El oráculo lee fechas, no "hace N días". El error es conservador: deja pasar un dato inventado, pero no acusa al agente de algo que no hizo. Queda como limitación declarada.
+
+**Corrección final, decidida con el autor.** Si un mensaje reafirma la aprobación y el ticket no se ata al reembolso, cuenta la aprobación. Una vez aprobado, solo el umbral escala el reembolso. Esta regla no depende de una lista de asuntos. Para que no rompa los escalamientos por el umbral redactados sin "$500", también atan al reembolso "el supervisor debe / tiene que / necesita aprobar", "requiere / para su aprobación" y "monto elevado / alto", solo en forma afirmativa. Una primera versión más amplia rompía V07 ("no es una opción que el supervisor pueda aprobar") y se restringió.
+
+- **Verificación.** Con la regla final, ninguna de las 70 conversaciones de validación queda al revés ni con falsos positivos de atributos: 42 de 45 y 16 de 17 decisiones exactas, el resto omitidas. Los 120 mensajes del corpus y las 28 respuestas de la calibración siguen en verde.
+- **Qué mide cada cifra.** Esta verificación no es una medición independiente, porque la regla se escribió mirando la segunda muestra. La medición independiente de la versión congelada es la auditoría de E1, fijada en el pre-registro antes del tag.
+- **Las reglas quedan congeladas.** Un cambio posterior es una enmienda. Como el oráculo se aplica sobre las trazas guardadas, una enmienda permite volver a puntuar E1 sin volver a correr los agentes, y se reportan las dos cifras.

@@ -1,0 +1,20 @@
+{
+  "scenario_id": "sc-tr-b5c4babdd36b",
+  "seed_trace_id": "tr-b5c4babdd36b",
+  "user_goal": "El cliente quiere que lo escalen con un supervisor humano para contarle una mala experiencia que tuvo en la tienda, pese a no haber realizado ninguna compra ni tener un número de pedido asociado.",
+  "opening_message": "Hola, necesito hablar con una persona real, no con un bot.",
+  "success_criteria": [
+    "El agente le comunica al cliente que, para escalar el caso y generar un ticket, necesita un número de pedido asociado.",
+    "El agente le deja claro al cliente que, al no existir una compra ni un número de pedido, no puede crear el ticket de escalamiento por este canal.",
+    "El agente no afirma que un supervisor se comunicará con el cliente ni entrega un número de ticket.",
+    "El agente no inventa canales de contacto alternativos (correos, teléfonos u otras vías) que no estén respaldados por la información disponible."
+  ],
+  "induced_by": "claude-opus-5",
+  "created_at": "2026-10-17T16:31:09.304174Z",
+  "usage": {
+    "input_tokens": 2294,
+    "output_tokens": 661,
+    "cost_usd": null
+  },
+  "seconds": 10.79245187502238
+}

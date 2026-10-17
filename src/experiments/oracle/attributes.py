@@ -7,13 +7,14 @@ order's own or a constant of the true policy (the threshold, the deadlines it
 implies); an amount being compared ("no supera los $500") is a threshold, not
 an attribute of the order. A status is an assertion about this order, so restatements of the
 policy, lists of statuses, suppositions ("mientras"), questions, conditionals,
-counterfactuals ("de lo contrario no estaría…") and doubts ("no puedo confirmar")
-do not count.
+counterfactuals ("de lo contrario no estaría…"), the subjunctive ("espera a que
+sea entregado") and doubts ("no puedo confirmar") do not count.
 
 A figure is checked against the card's order and against every order the agent
 looked up in the trace: a customer may first give a wrong order number, and the
 agent reading that order back is not contradicting the base. Without lookups, as
 under D1, only the card's order counts, so an invented figure is still caught.
+The date of the conversation itself ("fecha de escalamiento: hoy") is allowed too.
 """
 
 from __future__ import annotations
@@ -47,7 +48,7 @@ _STATUS = {
 _NOT_AN_ASSERTION = re.compile(
     r"\bpedidos\b|\bsolo se\b|\buna vez\b|\bmientras\b|"
     r"\bverificar|\bconfirmar|\bconsultar|\bsaber\b|\bacceso\b|"
-    r"\bde lo contrario\b|\b(?:estaria|habria|hubiera|seria)n?\b"
+    r"\bde lo contrario\b|\b(?:estaria|habria|hubiera|seria)n?\b|\b(?:sea|haya)n?\b"
 )
 _NEGATION = re.compile(r"\b(?:no|aun no|todavia no|nunca)\b")
 
@@ -116,6 +117,7 @@ def attribute_discrepancies(trace: Trace, order: Order) -> list[str]:
     orders = orders_in_question(trace, order)
     amounts = {o.amount_usd for o in orders} | {TRUE_POLICY.supervisor_threshold_usd}
     dates = set().union(*(_allowed_dates(o) for o in orders))
+    dates |= {moment.date() for moment in (trace.started_at, trace.ended_at) if moment}
     statuses = {o.status for o in orders}
     found = []
     for original in _agent_texts(trace):

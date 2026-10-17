@@ -1,0 +1,41 @@
+{
+  "run_id": "d1-20261017-170857",
+  "condition": "d1",
+  "variant": "d1",
+  "adapter": "claude_sdk",
+  "agent": "casestudy.editions.claude_sdk:build_options",
+  "repetitions": 1,
+  "turn_budget": 10,
+  "models": {
+    "inducer": {
+      "model": "claude-opus-5",
+      "max_tokens": 16000,
+      "effort": "high"
+    },
+    "judge": {
+      "model": "claude-opus-5",
+      "max_tokens": 16000,
+      "effort": "high"
+    },
+    "sim_user": {
+      "model": "claude-haiku-4-5-20251001",
+      "max_tokens": 1024,
+      "effort": null
+    },
+    "target_baseline": "claude-sonnet-5",
+    "target_downgraded": "claude-haiku-4-5-20251001"
+  },
+  "created_at": "2026-10-17T17:08:57.087052Z",
+  "scenario_ids": [
+    "sc-tr-1bcac31bb099",
+    "sc-tr-1d3d63b4ec80",
+    "sc-tr-3ee71ca0bdcf",
+    "sc-tr-49f9d41b2bc6",
+    "sc-tr-69b396c04669",
+    "sc-tr-6c6ab21b3116",
+    "sc-tr-91931c2b95fa",
+    "sc-tr-a450dfb016b9",
+    "sc-tr-d707df857e02",
+    "sc-tr-f4fbcd9bf2e0"
+  ]
+}

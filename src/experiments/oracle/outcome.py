@@ -2,7 +2,8 @@
 
 The vocabulary is closed: the refund proceeds, it does not proceed, or the case
 is escalated. A sentence counts only when it states a fact: questions and
-conditional sentences are skipped, and a term preceded by a negation or by a
+conditional sentences are skipped (also what the customer should do later: "una
+vez recibido", "luego", "deberías"), and a term preceded by a negation or by a
 purpose ("para escalar", "puedo escalar") is not an escalation. An offer bound
 to a pending condition ("con esa confirmación, escalo tu caso") is conditional
 too. An escalation prevails over the other two, because escalating usually also
@@ -10,12 +11,16 @@ says that the direct refund does not proceed.
 
 D-009: the vocabulary is about the refund. A ticket counts only when the message
 creates or escalates it; a later mention of an existing ticket states nothing
-new. An escalation for another matter (logistics, activation, a delay, technical
-support) is not an escalation of the refund, unless the message also names a
-warranty claim or the amount threshold. Recasting the request as another matter
-("no se trata de un reembolso…, sino…") while escalating leaves the refund open:
-it is unresolved. Approval and denial in the same message, with no escalation,
-is not guessed either. Unresolved messages go to manual annotation.
+new. An escalation for another matter (logistics, activation, a delay, the time a
+refund takes, technical support) is not an escalation of the refund, unless the
+message ties it to the refund: a warranty claim, the amount threshold, an
+exception someone will consider, or someone who will review or decide the refund.
+For the same reason, a message that restates the approval and opens a ticket not
+tied to the refund keeps the approval: once approved, only the threshold escalates.
+Recasting the request as another matter ("no se trata de un reembolso…, sino…")
+while escalating leaves the refund open: it is unresolved. Approval and denial in
+the same message, with no escalation, is not guessed either. Unresolved messages
+go to manual annotation.
 """
 
 from __future__ import annotations
@@ -39,7 +44,7 @@ _SENTENCES = re.compile(r"(?<=[.!?;])\s+|\n+")
 _CLAUSES = re.compile(r"[,:()]|\s(?:y|pero|aunque|sin embargo|asi que|por lo que|porque|ya que)\s")
 _CONDITIONAL = re.compile(
     r"(?<!\w)si(?!\w)|¿|\bcon es[ao]s? (?:confirmación|datos|información)\b|\ben cuanto\b|"
-    r"\buna vez que\b|\bde lo contrario\b"
+    r"\buna vez\b|\bluego\b|\bdeber[ií]as?\b|\bde lo contrario\b"
 )
 _WINDOW = 6
 
@@ -63,7 +68,15 @@ _HYPOTHETICAL = {"para", "puedo", "podemos", "podria", "podre", "necesitaria", "
 _OUT_OF_SCOPE = re.compile(r"parcial|credito")
 _OTHER_MATTER = re.compile(
     r"soporte tecnico|equipo tecnico|equipo de soporte|logistic|devolucion fisica|"
-    r"proceso (?:exacto )?de devolucion|activacion|atraso"
+    r"proceso (?:exacto )?de devolucion|activacion|atraso|demora|retraso|\benvio\b|"
+    r"acreditacion|tiempo de procesamiento"
+)
+_EXCEPTION = re.compile(r"\bexcepcion\b")
+_REVIEWS_REFUND = re.compile(
+    r"\b(?:evalu|revis|decid|decision|aprob|autoriz)\w*\b[^.?!\n]{0,40}\breembols|"
+    r"\bsupervisor\w* (?:debe|debera|tiene que|necesita) (?:aprob|autoriz)|"
+    r"\b(?:requiere|necesita|para su) (?:la )?(?:aprobacion|autorizacion)\b|"
+    r"\bmonto (?:elevado|alto)\b"
 )
 _THRESHOLD = (
     r"(?:(?:us)?\$\s?|usd\s?)500(?:[.,]00)?\b|\b500(?:[.,]00)? (?:usd|dolares)\b|\bumbral\b"
@@ -104,14 +117,20 @@ def _clause_signals(clause: str, has_noun: bool) -> set[Decision]:
     return signals
 
 
+def _affirmed(pattern: re.Pattern[str], text: str) -> bool:
+    """Some match of the pattern that the three words before it do not negate."""
+    negations = _NEGATION | {"ningun", "ninguna"}
+    return any(
+        not set(re.findall(r"\w+", text[: m.start()])[-3:]) & negations
+        for m in pattern.finditer(text)
+    )
+
+
 def _names_refund_escalation(text: str) -> bool:
-    """A warranty claim, or an amount stated to be above the supervisor threshold."""
+    """A warranty claim, an amount above the threshold, or someone who will weigh the refund."""
     if "reclamo de garantia" in text:
         return True
-    return any(
-        not set(re.findall(r"\w+", text[: m.start()])[-2:]) & _NEGATION
-        for m in _ABOVE.finditer(text)
-    )
+    return any(_affirmed(p, text) for p in (_ABOVE, _EXCEPTION, _REVIEWS_REFUND))
 
 
 def is_hypothetical(sentence: str) -> bool:
@@ -133,7 +152,10 @@ def decision_in(text: str) -> Extracted:
             signals |= _clause_signals(clause, has_noun)
     if Decision.ESCALATED in signals and _RECAST.search(whole):
         return UNRESOLVED
-    if _OTHER_MATTER.search(whole) and not _names_refund_escalation(whole):
+    tied = _names_refund_escalation(whole)
+    if _OTHER_MATTER.search(whole) and not tied:
+        signals.discard(Decision.ESCALATED)
+    if Decision.APPROVED in signals and not tied:
         signals.discard(Decision.ESCALATED)
     if Decision.ESCALATED in signals:
         return Decision.ESCALATED
