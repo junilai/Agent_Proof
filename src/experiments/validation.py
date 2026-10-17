@@ -97,6 +97,61 @@ def write_sheet(store: Store, annotators: list[str]) -> list[Path]:
     return [out / "planilla.md", out / "clave.json", *templates]
 
 
+FIELDS = ("decision", "contradicts_base", "answers_card")
+
+
+def load_labels(path: Path, store: Store) -> dict[str, Label]:
+    """An annotator's labels, refused while a field its card asks for is empty."""
+    labels = {label.item: label for label in LABELS.validate_json(path.read_bytes())}
+    chosen = items(store)
+    if set(labels) != set(chosen):
+        raise ValueError(f"{path.name}: los ítems no coinciden con la planilla")
+    empty = [
+        f"{item}.{name}"
+        for item, case in chosen.items()
+        for name in fields_for(case).split(", ")
+        if getattr(labels[item], name) is None
+    ]
+    if empty:
+        raise ValueError(f"{path.name}: faltan {', '.join(empty)}")
+    return labels
+
+
+def cohen_kappa(pairs: list[tuple[object, object]]) -> float | None:
+    """Agreement beyond chance; None when chance alone explains every pair."""
+    if not pairs:
+        return None
+    observed = sum(a == b for a, b in pairs) / len(pairs)
+    categories = {value for pair in pairs for value in pair}
+    chance = sum(
+        (sum(a == c for a, _ in pairs) / len(pairs)) * (sum(b == c for _, b in pairs) / len(pairs))
+        for c in categories
+    )
+    return None if chance == 1 else (observed - chance) / (1 - chance)
+
+
+def agreement(first: dict[str, Label], second: dict[str, Label]) -> str:
+    lines = ["campo | ítems | acuerdo | κ de Cohen", "---|---|---|---"]
+    disagreements = []
+    for name in FIELDS:
+        pairs = [
+            (getattr(first[i], name), getattr(second[i], name))
+            for i in first
+            if getattr(first[i], name) is not None
+        ]
+        agreed = sum(a == b for a, b in pairs)
+        kappa = cohen_kappa(pairs)
+        shown = "—" if kappa is None else f"{kappa:.2f}"
+        lines.append(f"{name} | {len(pairs)} | {agreed}/{len(pairs)} | {shown}")
+        disagreements += [
+            f"- {i}.{name}: {getattr(first[i], name)} / {getattr(second[i], name)}"
+            for i in first
+            if getattr(first[i], name) is not None
+            and getattr(first[i], name) != getattr(second[i], name)
+        ]
+    return "\n".join([*lines, "", "Desacuerdos:", *(disagreements or ["- ninguno"])])
+
+
 app = typer.Typer(help="Validación del oráculo con etiquetas a ciegas (D-010).")
 DATA = typer.Option(..., "--data", help="Carpeta de la validación, con corpus/ y results/.")
 ANNOTATORS = typer.Option(..., "--annotator", help="Nombre de un anotador; se repite.")
@@ -107,6 +162,17 @@ def sheet_command(data: Path = DATA, annotator: list[str] = ANNOTATORS):
     """Escribe la planilla ciega, la clave y una plantilla de etiquetas por anotador."""
     for path in write_sheet(Store(data), annotator):
         typer.echo(f"escrito: {path}")
+
+
+FIRST = typer.Option(..., "--first", help="Etiquetas de un anotador.")
+SECOND = typer.Option(..., "--second", help="Etiquetas del otro anotador.")
+
+
+@app.command("agree")
+def agree_command(data: Path = DATA, first: Path = FIRST, second: Path = SECOND):
+    """Acuerdo entre los dos anotadores por campo, con κ de Cohen, y sus desacuerdos."""
+    store = Store(data)
+    typer.echo(agreement(load_labels(first, store), load_labels(second, store)))
 
 
 if __name__ == "__main__":

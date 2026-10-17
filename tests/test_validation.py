@@ -5,7 +5,16 @@ import pytest
 
 from agentproof.schema import scenario_id_for
 from agentproof.store import Store
-from experiments.validation import LABELS, items, sheet, write_sheet
+from experiments.validation import (
+    LABELS,
+    Label,
+    agreement,
+    cohen_kappa,
+    items,
+    load_labels,
+    sheet,
+    write_sheet,
+)
 from tests.factories import event, manifest, trace
 
 REFUND_SEED, STATUS_SEED = "tr-5eed00000001", "tr-5eed00000002"
@@ -28,8 +37,9 @@ def run_trace(trace_id, condition, seed_id, text):
 def validation_store(tmp_path):
     """A refund card (tc-01) and a status card (tc-16), each run by the baseline and a mutant."""
     store = Store(tmp_path)
-    store.save_seed(trace(trace_id=REFUND_SEED, card_id="tc-01"))
-    store.save_seed(trace(trace_id=STATUS_SEED, card_id="tc-16"))
+    lookup = [event(1, "user_message", text="hola"), event(2, "tool_call", tool="lookup_order")]
+    store.save_seed(trace(trace_id=REFUND_SEED, card_id="tc-01", events=lookup))
+    store.save_seed(trace(trace_id=STATUS_SEED, card_id="tc-16", events=lookup))
     texts = {REFUND_SEED: "Tu reembolso fue aprobado.", STATUS_SEED: "Tu pedido está en camino."}
     for n, condition in enumerate(("baseline-a", "d1"), start=1):
         store.create_run(manifest(run_id=f"{condition}-20261017-120000", condition=condition))
@@ -86,3 +96,45 @@ def test_labels_already_written_are_never_overwritten(tmp_path):
     write_sheet(store, ["autor"])
     with pytest.raises(FileExistsError):
         write_sheet(store, ["autor"])
+
+
+def correct_labels(store):
+    """What a careful annotator writes: the refund was approved, the status was given."""
+    labels = {}
+    for item, case in items(store).items():
+        if case.card.has_decision:
+            labels[item] = Label(item=item, decision="procede", contradicts_base=False)
+        else:
+            labels[item] = Label(item=item, contradicts_base=False, answers_card=True)
+    return labels
+
+
+def save(path, labels):
+    path.write_bytes(LABELS.dump_json(list(labels.values())))
+    return path
+
+
+def test_cohen_kappa_of_known_pairs():
+    assert cohen_kappa([("a", "a"), ("a", "b"), ("b", "b"), ("b", "b")]) == pytest.approx(0.5)
+    assert cohen_kappa([("a", "a"), ("b", "b")]) == pytest.approx(1.0)
+    assert cohen_kappa([("a", "a"), ("a", "a")]) is None
+    assert cohen_kappa([]) is None
+
+
+def test_labels_with_an_empty_field_are_refused(tmp_path):
+    store = validation_store(tmp_path)
+    labels = correct_labels(store)
+    first = next(iter(labels))
+    labels[first] = Label(item=first)
+    with pytest.raises(ValueError, match=f"faltan {first}"):
+        load_labels(save(tmp_path / "x.json", labels), store)
+
+
+def test_agreement_lists_every_disagreement(tmp_path):
+    store = validation_store(tmp_path)
+    first, second = correct_labels(store), correct_labels(store)
+    refund = next(i for i, c in items(store).items() if c.card.has_decision)
+    second[refund] = Label(item=refund, decision="no procede", contradicts_base=False)
+    text = agreement(first, second)
+    assert "decision | 2 | 1/2" in text and f"- {refund}.decision: procede / no procede" in text
+    assert "contradicts_base | 4 | 4/4" in text
