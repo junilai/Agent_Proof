@@ -47,7 +47,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 ## Corpus — objetivo: 12–25 oct
 
 - [x] Sesiones con 4–6 participantes (§5.2). Evidencia: `corpus/seeds/`, 17-oct-2026. Cinco participantes, contando al autor, grabaron 20 conversaciones, una por tarjeta, con la matriz de cobertura completa (D1 17 expuestas y 3 de control, D4 17 y 3, D6 11 y 9). Cuatro grabaciones quedaron apartadas en [`corpus/descartadas/`](../corpus/descartadas/) según [D-008](decisiones.md): tres en que la persona contó una situación distinta de la tarjeta y una que se cortó sin contenido. Para las regrabaciones se aclaró el texto de tc-05, tc-06 y tc-08, sin cambiar su resultado esperado
-- [ ] **Hito:** 20 conversaciones → 20 escenarios inducidos (§5.2)
+- [x] **Hito:** 20 conversaciones → 20 escenarios inducidos (§5.2). Evidencia: `corpus/scenarios/`, 17-oct-2026. Los 20 escenarios se revisaron contra su semilla, su tarjeta y la base de conocimiento antes del tag. La primera inducción tenía criterios que premiaban afirmaciones del agente sin respaldo, como un pago, un correo o un medio de pago, y la siguiente fijaba números de ticket. Se corrigieron las instrucciones del inductor y se volvió a inducir la suite completa ([D-008](decisiones.md)); la última inducción costó USD 0.52
 
 ## F3 Aparato experimental — objetivo: 12–31 oct
 
