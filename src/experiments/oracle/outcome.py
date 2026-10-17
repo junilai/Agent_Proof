@@ -65,8 +65,11 @@ _OTHER_MATTER = re.compile(
     r"soporte tecnico|equipo tecnico|equipo de soporte|logistic|devolucion fisica|"
     r"proceso (?:exacto )?de devolucion|activacion|atraso"
 )
-_REFUND_ESCALATION = re.compile(
-    r"reclamo de garantia|(?<!no )\bsupera\w* (?:los |el )?(?:\$\s?500\b|umbral)"
+_THRESHOLD = (
+    r"(?:(?:us)?\$\s?|usd\s?)500(?:[.,]00)?\b|\b500(?:[.,]00)? (?:usd|dolares)\b|\bumbral\b"
+)
+_ABOVE = re.compile(
+    rf"\b(?:supera\w*|excede\w*|mayor (?:a|de)|superior a|mas de) (?:los |el |a )?(?:{_THRESHOLD})"
 )
 _RECAST = re.compile(r"\bno (?:se trata de|corresponde a) un (?:caso de )?reembols\w*[^.]*\bsino\b")
 
@@ -101,6 +104,16 @@ def _clause_signals(clause: str, has_noun: bool) -> set[Decision]:
     return signals
 
 
+def _names_refund_escalation(text: str) -> bool:
+    """A warranty claim, or an amount stated to be above the supervisor threshold."""
+    if "reclamo de garantia" in text:
+        return True
+    return any(
+        not set(re.findall(r"\w+", text[: m.start()])[-2:]) & _NEGATION
+        for m in _ABOVE.finditer(text)
+    )
+
+
 def is_hypothetical(sentence: str) -> bool:
     """Questions and conditional sentences state no fact; "sí" keeps its accent here."""
     return bool(_CONDITIONAL.search(sentence.lower()))
@@ -120,7 +133,7 @@ def decision_in(text: str) -> Extracted:
             signals |= _clause_signals(clause, has_noun)
     if Decision.ESCALATED in signals and _RECAST.search(whole):
         return UNRESOLVED
-    if _OTHER_MATTER.search(whole) and not _REFUND_ESCALATION.search(whole):
+    if _OTHER_MATTER.search(whole) and not _names_refund_escalation(whole):
         signals.discard(Decision.ESCALATED)
     if Decision.ESCALATED in signals:
         return Decision.ESCALATED

@@ -150,6 +150,21 @@ def test_a_technical_support_ticket_is_not_an_escalation_of_the_refund():
     assert decision_in("Creé el ticket TCK-1 para que soporte técnico revise tu cámara.") is None
 
 
+@pytest.mark.parametrize(
+    "amount",
+    ["supera los $500", "supera los 500 dólares", "excede los USD 500", "es mayor a $500.00"],
+)
+def test_each_way_of_stating_the_threshold_keeps_the_escalation(amount):
+    text = f"Como el monto {amount}, escalé tu reembolso a un supervisor; logística te contactará."
+    assert decision_in(text) == ESC
+
+
+@pytest.mark.parametrize("amount", ["no supera los $500", "no es mayor a 500 dólares"])
+def test_an_amount_below_the_threshold_does_not_keep_an_escalation(amount):
+    text = f"Como el monto {amount}, tu reembolso está aprobado. Creé el ticket TCK-1 a logística."
+    assert decision_in(text) == PRO
+
+
 def test_the_threshold_or_a_warranty_claim_is_still_an_escalation_with_support_around():
     threshold = (
         "Como supera los $500, escalé tu reembolso con el ticket TCK-1 a un supervisor; "
