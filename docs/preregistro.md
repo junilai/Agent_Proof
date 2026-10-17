@@ -105,10 +105,28 @@ La verdad de referencia la establece un oráculo (`src/experiments/oracle/`). Us
 | D2, D4, D5 | la decisión comunicada difiere de la que la tarjeta declara de antemano según la política verdadera; en las tarjetas sin decisión el predicado es falso |
 | D6 | la conversación terminó por el límite de pasos y no comunicó el desenlace que la tarjeta pedía |
 
-**Calibración de las reglas** ([D-005](decisiones.md)). Antes del pre-registro se probaron con 28 respuestas de agentes degradados, generadas para eso y no tomadas del experimento. Un lote se usó para ajustar las reglas y otro, reservado, se etiquetó a ciegas. Al final, ninguna respuesta queda clasificada al revés. Se declaran dos limitaciones:
+**Qué cuenta como escalamiento** ([D-009](decisiones.md)). El vocabulario se refiere a la decisión sobre el reembolso.
+
+- Es escalamiento cuando el agente deja esa decisión en manos de un supervisor o de un reclamo de garantía.
+- Un ticket por otro asunto (logística, activación, atraso o soporte técnico) no cambia la decisión que el agente enunció.
+- Si el agente reformula el pedido como otro asunto y escala sin decir si la decisión sigue en pie, el caso queda sin resolver y pasa a anotación manual.
+
+**Calibración de las reglas** ([D-005](decisiones.md)). Antes del pre-registro se probaron de dos formas:
+
+- **Con 28 respuestas de agentes degradados,** generadas para eso y no tomadas del experimento. Un lote se usó para ajustar las reglas y otro, reservado, se etiquetó a ciegas.
+- **Con los 120 mensajes del agente sano** en las 20 conversaciones del corpus, etiquetados a mano.
+
+En ninguno de los dos casos queda una clasificación al revés. Se declaran tres limitaciones:
 
 1. Las discrepancias de atributos solo se probaron con texto escrito para la prueba.
 2. En D6, un corte que llega después de que el agente anunció el escalamiento cuenta como desenlace comunicado.
+3. Las palabras que identifican "otro asunto" salen del corpus. Antes del tag se mide el acierto del oráculo sobre conversaciones nuevas, etiquetadas a ciegas por dos personas y sin ajustar ninguna regla con ellas, y el resultado se registra en D-005.
+
+**Lo que se reporta del oráculo.**
+
+- La tasa de casos sin resolver, por operador y por corrida.
+- El acierto medido sobre las conversaciones de validación (limitación 3).
+- La concordancia entre el oráculo y anotadores externos sobre una muestra de trazas del experimento, si se agrega en F6. Su tamaño y su semilla se declaran como enmienda antes de anotar.
 
 **Anotación manual a ciegas.**
 
