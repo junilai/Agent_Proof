@@ -20,8 +20,13 @@ import typer
 from pydantic import BaseModel, TypeAdapter
 
 from agentproof.store import Store
-from experiments.oracle.annotation import Case, cases, present
-from experiments.oracle.predicates import asks_for_status
+from casestudy.domain.catalog import ORDERS_BY_ID
+from casestudy.domain.policy import Decision
+from experiments.oracle.annotation import Case, cases, operators_for, present
+from experiments.oracle.attributes import attribute_discrepancies, states_status
+from experiments.oracle.exposure import is_exposed
+from experiments.oracle.outcome import UNRESOLVED, Extracted, communicated_decision
+from experiments.oracle.predicates import Evidence, asks_for_status, fails
 from experiments.preregistration import VALIDATION_SEED
 
 DecisionLabel = Literal["procede", "no procede", "escalamiento", "sin resolver", "ninguna"]
@@ -152,6 +157,76 @@ def agreement(first: dict[str, Label], second: dict[str, Label]) -> str:
     return "\n".join([*lines, "", "Desacuerdos:", *(disagreements or ["- ninguno"])])
 
 
+def _as_label(found: Extracted) -> str:
+    if found is UNRESOLVED:
+        return "sin resolver"
+    return found.value if isinstance(found, Decision) else "ninguna"
+
+
+def _as_extracted(label: DecisionLabel | None) -> Extracted:
+    if label == "sin resolver":
+        return UNRESOLVED
+    return None if label in (None, "ninguna") else Decision(label)
+
+
+def decision_outcome(label: str, found: str) -> str:
+    decisions = {d.value for d in Decision}
+    if label == found:
+        return "exacta"
+    if label in decisions and found in decisions:
+        return "al revés"
+    if found in decisions:
+        return "de más"
+    return "a la cola" if found == "sin resolver" else "omitida"
+
+
+def score(store: Store, labels: dict[str, Label]) -> dict[str, dict[str, int]]:
+    """The oracle against the reconciled labels (D-010)."""
+    table: dict[str, dict[str, int]] = {"decisión": {}, "atributos": {}, "estado": {}}
+    table["predicados"] = {}
+
+    def count(group: str, key: str) -> None:
+        table[group][key] = table[group].get(key, 0) + 1
+
+    for item, case in items(store).items():
+        label, trace, card = labels[item], case.trace, case.card
+        if card.has_decision:
+            found = _as_label(communicated_decision(trace))
+            count("decisión", decision_outcome(label.decision or "ninguna", found))
+        if card.orders:
+            said = bool(attribute_discrepancies(trace, ORDERS_BY_ID[card.orders[0]]))
+            truth = {(True, True): "VP", (True, False): "FP", (False, True): "FN"}
+            count("atributos", truth.get((said, bool(label.contradicts_base)), "VN"))
+            if asks_for_status(card):
+                agrees = states_status(trace, ORDERS_BY_ID[card.orders[0]]) == label.answers_card
+                count("estado", "coincide" if agrees else "difiere")
+        annotated = Evidence(
+            _as_extracted(label.decision),
+            bool(label.contradicts_base),
+            label.answers_card,
+            manual=True,
+        )
+        for op in operators_for(trace.condition or ""):
+            if is_exposed(op, card, case.seed):
+                oracle, truth_value = fails(op, card, trace), fails(op, card, trace, annotated)
+                key = (
+                    "a la cola"
+                    if oracle is None
+                    else "coincide"
+                    if oracle == truth_value
+                    else "difiere"
+                )
+                count("predicados", f"{op} {key}")
+    return table
+
+
+def render_score(table: dict[str, dict[str, int]]) -> str:
+    lines = []
+    for group, counts in table.items():
+        lines.append(f"{group}: " + ", ".join(f"{k} {v}" for k, v in sorted(counts.items())))
+    return "\n".join(lines)
+
+
 app = typer.Typer(help="Validación del oráculo con etiquetas a ciegas (D-010).")
 DATA = typer.Option(..., "--data", help="Carpeta de la validación, con corpus/ y results/.")
 ANNOTATORS = typer.Option(..., "--annotator", help="Nombre de un anotador; se repite.")
@@ -166,6 +241,7 @@ def sheet_command(data: Path = DATA, annotator: list[str] = ANNOTATORS):
 
 FIRST = typer.Option(..., "--first", help="Etiquetas de un anotador.")
 SECOND = typer.Option(..., "--second", help="Etiquetas del otro anotador.")
+LABELLED = typer.Option(..., "--labels", help="Etiquetas conciliadas.")
 
 
 @app.command("agree")
@@ -173,6 +249,13 @@ def agree_command(data: Path = DATA, first: Path = FIRST, second: Path = SECOND)
     """Acuerdo entre los dos anotadores por campo, con κ de Cohen, y sus desacuerdos."""
     store = Store(data)
     typer.echo(agreement(load_labels(first, store), load_labels(second, store)))
+
+
+@app.command("score")
+def score_command(data: Path = DATA, labels: Path = LABELLED):
+    """El oráculo contra las etiquetas conciliadas: decisión, atributos, estado y predicados."""
+    store = Store(data)
+    typer.echo(render_score(score(store, load_labels(labels, store))))
 
 
 if __name__ == "__main__":

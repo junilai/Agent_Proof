@@ -10,8 +10,10 @@ from experiments.validation import (
     Label,
     agreement,
     cohen_kappa,
+    decision_outcome,
     items,
     load_labels,
+    score,
     sheet,
     write_sheet,
 )
@@ -138,3 +140,38 @@ def test_agreement_lists_every_disagreement(tmp_path):
     text = agreement(first, second)
     assert "decision | 2 | 1/2" in text and f"- {refund}.decision: procede / no procede" in text
     assert "contradicts_base | 4 | 4/4" in text
+
+
+def test_the_oracle_agrees_with_correct_labels(tmp_path):
+    store = validation_store(tmp_path)
+    table = score(store, correct_labels(store))
+    assert table["decisión"] == {"exacta": 2}
+    assert table["atributos"] == {"VN": 4}
+    assert table["estado"] == {"coincide": 2}
+    assert all(key.endswith("coincide") for key in table["predicados"])
+    assert table["predicados"]["d1 coincide"] == 4
+
+
+def test_a_decision_read_the_other_way_is_reported(tmp_path):
+    store = validation_store(tmp_path)
+    labels = correct_labels(store)
+    refund = next(i for i, c in items(store).items() if c.card.has_decision)
+    labels[refund] = Label(item=refund, decision="no procede", contradicts_base=True)
+    table = score(store, labels)
+    assert table["decisión"] == {"exacta": 1, "al revés": 1}
+    assert table["atributos"] == {"VN": 3, "FN": 1}
+
+
+@pytest.mark.parametrize(
+    ("label", "found", "outcome"),
+    [
+        ("procede", "procede", "exacta"),
+        ("procede", "no procede", "al revés"),
+        ("ninguna", "escalamiento", "de más"),
+        ("procede", "sin resolver", "a la cola"),
+        ("procede", "ninguna", "omitida"),
+        ("sin resolver", "sin resolver", "exacta"),
+    ],
+)
+def test_each_decision_outcome(label, found, outcome):
+    assert decision_outcome(label, found) == outcome
