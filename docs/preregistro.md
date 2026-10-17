@@ -230,7 +230,7 @@ Al cerrar el corpus se agregarán los 20 escenarios inducidos.
 | Herramientas y límite de pasos de la edición Claude Agent SDK | `5bb212bd5fe02e99` |
 | Mutaciones | `066775c0b3e42b0c` |
 | Base de conocimiento | `603bf9873124a1b1` |
-| Tarjetas de situación | `d88008bfe7786bcc` |
+| Tarjetas de situación | `8de353057bae7406` |
 | Criterio de regresión y reintentos | `9aad2d0f4e567eb3` |
 | Umbrales y semilla del oráculo | `e9762d8f9b00c5ea` |
 | Reglas del oráculo (código fuente) | `be02d11834b86fce` |
