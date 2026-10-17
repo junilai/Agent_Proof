@@ -238,6 +238,29 @@ def test_an_escalation_for_another_matter_counts_only_when_tied_to_the_refund(te
     assert decision_in(text) == expected
 
 
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        (
+            "Tu reembolso ya está aprobado. Creé el ticket TCK-1 para que te confirmen si debes "
+            "devolver físicamente el producto y el plazo del reembolso.",
+            PRO,
+        ),
+        ("El reembolso procede, pero por ser un monto elevado lo escalé a un supervisor.", ESC),
+        ("Tu reembolso procede, pero un supervisor debe aprobarlo; ya escalé tu caso.", ESC),
+        ("Tu reembolso procede y requiere la aprobación de un supervisor; ya lo escalé.", ESC),
+        (
+            "Escalé tu caso a un supervisor; el reembolso en sí no es una opción que el "
+            "supervisor pueda aprobar.",
+            ESC,
+        ),
+    ],
+)
+def test_a_restated_approval_prevails_over_a_ticket_not_tied_to_the_refund(text, expected):
+    """Second validation sample (V02): once approved, only the threshold escalates the refund."""
+    assert decision_in(text) == expected
+
+
 def test_recasting_the_request_while_escalating_leaves_the_refund_open():
     text = (
         "No se trata de un reembolso por arrepentimiento, sino de una posible falla; "

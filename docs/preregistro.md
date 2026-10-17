@@ -298,4 +298,4 @@ Al cerrar el corpus se agregarán los 20 escenarios inducidos.
 | Tarjetas de situación | `d6a37a38d88afb97` |
 | Criterio de regresión y reintentos | `9aad2d0f4e567eb3` |
 | Umbrales y semilla del oráculo | `e9762d8f9b00c5ea` |
-| Reglas del oráculo (código fuente) | `af3ff79cc7a321b8` |
+| Reglas del oráculo (código fuente) | `bf38de6bedb8ee2e` |

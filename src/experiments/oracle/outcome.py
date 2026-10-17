@@ -15,6 +15,8 @@ new. An escalation for another matter (logistics, activation, a delay, the time 
 refund takes, technical support) is not an escalation of the refund, unless the
 message ties it to the refund: a warranty claim, the amount threshold, an
 exception someone will consider, or someone who will review or decide the refund.
+For the same reason, a message that restates the approval and opens a ticket not
+tied to the refund keeps the approval: once approved, only the threshold escalates.
 Recasting the request as another matter ("no se trata de un reembolso…, sino…")
 while escalating leaves the refund open: it is unresolved. Approval and denial in
 the same message, with no escalation, is not guessed either. Unresolved messages
@@ -71,7 +73,10 @@ _OTHER_MATTER = re.compile(
 )
 _EXCEPTION = re.compile(r"\bexcepcion\b")
 _REVIEWS_REFUND = re.compile(
-    r"\b(?:evalu|revis|decid|decision|aprob|autoriz)\w*\b[^.?!\n]{0,40}\breembols"
+    r"\b(?:evalu|revis|decid|decision|aprob|autoriz)\w*\b[^.?!\n]{0,40}\breembols|"
+    r"\bsupervisor\w* (?:debe|debera|tiene que|necesita) (?:aprob|autoriz)|"
+    r"\b(?:requiere|necesita|para su) (?:la )?(?:aprobacion|autorizacion)\b|"
+    r"\bmonto (?:elevado|alto)\b"
 )
 _THRESHOLD = (
     r"(?:(?:us)?\$\s?|usd\s?)500(?:[.,]00)?\b|\b500(?:[.,]00)? (?:usd|dolares)\b|\bumbral\b"
@@ -147,7 +152,10 @@ def decision_in(text: str) -> Extracted:
             signals |= _clause_signals(clause, has_noun)
     if Decision.ESCALATED in signals and _RECAST.search(whole):
         return UNRESOLVED
-    if _OTHER_MATTER.search(whole) and not _names_refund_escalation(whole):
+    tied = _names_refund_escalation(whole)
+    if _OTHER_MATTER.search(whole) and not tied:
+        signals.discard(Decision.ESCALATED)
+    if Decision.APPROVED in signals and not tied:
         signals.discard(Decision.ESCALATED)
     if Decision.ESCALATED in signals:
         return Decision.ESCALATED
