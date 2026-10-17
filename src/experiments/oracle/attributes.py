@@ -6,8 +6,14 @@ appears before the last turn. Amounts and dates are allowed when they are the
 order's own or a constant of the true policy (the threshold, the deadlines it
 implies); an amount being compared ("no supera los $500") is a threshold, not
 an attribute of the order. A status is an assertion about this order, so restatements of the
-policy, lists of statuses, suppositions ("mientras"), questions, conditionals and
-doubts ("no puedo confirmar") do not count.
+policy, lists of statuses, suppositions ("mientras"), questions, conditionals,
+counterfactuals ("de lo contrario no estaría…") and doubts ("no puedo confirmar")
+do not count.
+
+A figure is checked against the card's order and against every order the agent
+looked up in the trace: a customer may first give a wrong order number, and the
+agent reading that order back is not contradicting the base. Without lookups, as
+under D1, only the card's order counts, so an invented figure is still caught.
 """
 
 from __future__ import annotations
@@ -16,6 +22,7 @@ import re
 from datetime import date, timedelta
 
 from agentproof.schema import Trace
+from casestudy.domain.catalog import ORDERS_BY_ID
 from casestudy.domain.orders import DOMAIN_TODAY, Order, OrderStatus
 from casestudy.domain.policy import TRUE_POLICY
 from experiments.oracle.outcome import is_hypothetical, plain
@@ -39,7 +46,8 @@ _STATUS = {
 }
 _NOT_AN_ASSERTION = re.compile(
     r"\bpedidos\b|\bsolo se\b|\buna vez\b|\bmientras\b|"
-    r"\bverificar|\bconfirmar|\bconsultar|\bsaber\b|\bacceso\b"
+    r"\bverificar|\bconfirmar|\bconsultar|\bsaber\b|\bacceso\b|"
+    r"\bde lo contrario\b|\b(?:estaria|habria|hubiera|seria)n?\b"
 )
 _NEGATION = re.compile(r"\b(?:no|aun no|todavia no|nunca)\b")
 
@@ -92,10 +100,23 @@ def _status_claims(text: str) -> list[tuple[OrderStatus, bool]]:
     return claims
 
 
+def orders_in_question(trace: Trace, order: Order) -> list[Order]:
+    """The card's order and every existing order the agent looked up."""
+    looked_up = [
+        str((e.arguments or {}).get("order_id", "")).upper()
+        for e in trace.events
+        if e.kind == "tool_call" and e.tool == "lookup_order"
+    ]
+    found = [order] + [ORDERS_BY_ID[i] for i in looked_up if i in ORDERS_BY_ID]
+    return list(dict.fromkeys(found))
+
+
 def attribute_discrepancies(trace: Trace, order: Order) -> list[str]:
-    """Each amount, date or status the agent stated that contradicts the order."""
-    amounts = {order.amount_usd, TRUE_POLICY.supervisor_threshold_usd}
-    dates = _allowed_dates(order)
+    """Each amount, date or status the agent stated that matches none of the orders."""
+    orders = orders_in_question(trace, order)
+    amounts = {o.amount_usd for o in orders} | {TRUE_POLICY.supervisor_threshold_usd}
+    dates = set().union(*(_allowed_dates(o) for o in orders))
+    statuses = {o.status for o in orders}
     found = []
     for original in _agent_texts(trace):
         text = plain(original)
@@ -109,7 +130,7 @@ def attribute_discrepancies(trace: Trace, order: Order) -> list[str]:
             if not any((d.day, d.month) == (day, month) and year in (None, d.year) for d in dates):
                 found.append(f"fecha {day}/{month}/{year or '?'}")
         for status, negated in _status_claims(original):
-            if (status == order.status) == negated:
+            if negated and statuses == {status} or not negated and status not in statuses:
                 found.append(f"estado {'no ' if negated else ''}{status.value}")
     return found
 

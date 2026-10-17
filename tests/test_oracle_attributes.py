@@ -1,6 +1,7 @@
 import pytest
 
 from casestudy.domain.catalog import ORDERS_BY_ID
+from experiments.cards import CARDS_BY_ID
 from experiments.oracle.attributes import attribute_discrepancies, states_status
 from tests.factories import event, trace
 from tests.test_oracle_outcome import LABELLED, load
@@ -18,10 +19,18 @@ def says(*texts):
     return trace(events=events)
 
 
-def test_recorded_conversations_contradict_nothing():
-    for path in LABELLED:
-        order = ORDERS_BY_ID["AT-1001" if "tr-49f9" in path else "AT-1003"]
-        assert attribute_discrepancies(load(path), order) == [], path
+def card_order(path):
+    """The order of the card of a recorded conversation; the F1 seed is tc-13's (AT-1003)."""
+    card_id = load(path).card_id
+    return CARDS_BY_ID[card_id].orders[0] if card_id else "AT-1003"
+
+
+@pytest.mark.parametrize(
+    "path",
+    [p for p in LABELLED if not load(p).card_id or CARDS_BY_ID[load(p).card_id].orders],
+)
+def test_recorded_conversations_contradict_nothing(path):
+    assert attribute_discrepancies(load(path), ORDERS_BY_ID[card_order(path)]) == []
 
 
 @pytest.mark.parametrize(
@@ -54,6 +63,63 @@ def test_figures_of_the_order_or_of_the_policy_are_not_discrepancies(text):
 )
 def test_each_contradiction_is_reported(text, found):
     assert attribute_discrepancies(says(text), MONITOR) == found
+
+
+def with_lookups(order_ids, *texts):
+    events = [event(1, "user_message", text="hola")]
+    events += [
+        event(i, "tool_call", tool="lookup_order", arguments={"order_id": order_id})
+        for i, order_id in enumerate(order_ids, start=2)
+    ]
+    start = 2 + len(order_ids)
+    events += [event(i, "agent_message", text=t) for i, t in enumerate(texts, start=start)]
+    return trace(events=events)
+
+
+def test_the_order_the_customer_gave_by_mistake_is_not_a_contradiction():
+    """Discarded tc-08 recording: the customer first gave AT-1001 and the agent read it back."""
+    discarded = load("corpus/descartadas/tr-a540dd6d5ce5.json")
+    assert attribute_discrepancies(discarded, ORDERS_BY_ID["AT-1010"]) == []
+    headphones = "Tus audífonos costaron $89.90 y se entregaron el 21 de septiembre."
+    assert attribute_discrepancies(with_lookups(["AT-1001"], headphones), MONITOR) == []
+
+
+def test_without_a_lookup_only_the_card_order_counts():
+    """D1 answers without looking the order up: another order's figures are invented."""
+    headphones = "Tus audífonos costaron $89.90 y se entregaron el 21 de septiembre."
+    assert attribute_discrepancies(says(headphones), MONITOR) == [
+        "importe 89.90",
+        "fecha 21/9/?",
+    ]
+
+
+def test_a_figure_that_matches_none_of_the_orders_looked_up_is_still_reported():
+    talk = with_lookups(["AT-1001", "at-1003", "AT-9999"], "Costó $290 y está en camino.")
+    assert attribute_discrepancies(talk, MONITOR) == ["importe 290", "estado en_camino"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "El pago fue procesado (de lo contrario el pedido no estaría en preparación).",
+        "Si el pago no se hubiera completado, el pedido no habría avanzado a preparación.",
+        "Sin el pago, tu pedido no estaría en preparación.",
+    ],
+)
+def test_a_counterfactual_states_nothing_about_the_order(text):
+    """tc-17: the agent argues from the status; it does not deny it."""
+    assert attribute_discrepancies(says(text), TABLET) == []
+
+
+@pytest.mark.parametrize(
+    ("text", "found"),
+    [
+        ("Tu pedido no está en preparación.", ["estado no en_preparacion"]),
+        ("Tu pedido ya está en camino.", ["estado en_camino"]),
+    ],
+)
+def test_a_direct_statement_about_the_status_still_counts(text, found):
+    assert attribute_discrepancies(says(text), TABLET) == found
 
 
 def test_discrepancies_count_in_any_message_not_only_the_last():
