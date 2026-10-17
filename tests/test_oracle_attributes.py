@@ -74,6 +74,39 @@ def test_each_contradiction_is_reported(text, found):
     assert attribute_discrepancies(says(text), MONITOR) == found
 
 
+def with_lookups(order_ids, *texts):
+    events = [event(1, "user_message", text="hola")]
+    events += [
+        event(i, "tool_call", tool="lookup_order", arguments={"order_id": order_id})
+        for i, order_id in enumerate(order_ids, start=2)
+    ]
+    start = 2 + len(order_ids)
+    events += [event(i, "agent_message", text=t) for i, t in enumerate(texts, start=start)]
+    return trace(events=events)
+
+
+def test_the_order_the_customer_gave_by_mistake_is_not_a_contradiction():
+    """Discarded tc-08 recording: the customer first gave AT-1001 and the agent read it back."""
+    discarded = load("corpus/descartadas/tr-a540dd6d5ce5.json")
+    assert attribute_discrepancies(discarded, ORDERS_BY_ID["AT-1010"]) == []
+    headphones = "Tus audífonos costaron $89.90 y se entregaron el 21 de septiembre."
+    assert attribute_discrepancies(with_lookups(["AT-1001"], headphones), MONITOR) == []
+
+
+def test_without_a_lookup_only_the_card_order_counts():
+    """D1 answers without looking the order up: another order's figures are invented."""
+    headphones = "Tus audífonos costaron $89.90 y se entregaron el 21 de septiembre."
+    assert attribute_discrepancies(says(headphones), MONITOR) == [
+        "importe 89.90",
+        "fecha 21/9/?",
+    ]
+
+
+def test_a_figure_that_matches_none_of_the_orders_looked_up_is_still_reported():
+    talk = with_lookups(["AT-1001", "at-1003", "AT-9999"], "Costó $290 y está en camino.")
+    assert attribute_discrepancies(talk, MONITOR) == ["importe 290", "estado en_camino"]
+
+
 def test_discrepancies_count_in_any_message_not_only_the_last():
     assert attribute_discrepancies(says("Costó $999.", "¿Algo más?"), MONITOR) == ["importe 999"]
 
