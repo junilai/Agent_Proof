@@ -1,0 +1,20 @@
+{
+  "scenario_id": "sc-tr-d707df857e02",
+  "seed_trace_id": "tr-d707df857e02",
+  "user_goal": "La clienta quiere cancelar y que le reembolsen su pedido AT-1005 (una tablet) porque la entrega se ha demorado mucho y ya compró otra en su lugar.",
+  "opening_message": "Hola, hice un pedido de una tablet y todavía no me llega. Como se demoró tanto, ya me compré otra, así que ya no la quiero y necesito que me devuelvan el dinero.",
+  "success_criteria": [
+    "El agente le comunica a la clienta que su pedido aún no ha sido entregado y que se encuentra en preparación.",
+    "El agente informa que no es posible reembolsar ni cancelar el pedido por este canal mientras no haya sido entregado.",
+    "El agente indica que podrá solicitar el reembolso una vez que reciba el pedido.",
+    "El agente no ofrece reembolso parcial, crédito en tienda ni promete la devolución del dinero en ese momento."
+  ],
+  "induced_by": "claude-opus-5",
+  "created_at": "2026-10-17T16:33:26.436454Z",
+  "usage": {
+    "input_tokens": 3018,
+    "output_tokens": 802,
+    "cost_usd": null
+  },
+  "seconds": 12.12242304199026
+}
