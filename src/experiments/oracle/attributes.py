@@ -14,6 +14,7 @@ A figure is checked against the card's order and against every order the agent
 looked up in the trace: a customer may first give a wrong order number, and the
 agent reading that order back is not contradicting the base. Without lookups, as
 under D1, only the card's order counts, so an invented figure is still caught.
+The date of the conversation itself ("fecha de escalamiento: hoy") is allowed too.
 """
 
 from __future__ import annotations
@@ -116,6 +117,7 @@ def attribute_discrepancies(trace: Trace, order: Order) -> list[str]:
     orders = orders_in_question(trace, order)
     amounts = {o.amount_usd for o in orders} | {TRUE_POLICY.supervisor_threshold_usd}
     dates = set().union(*(_allowed_dates(o) for o in orders))
+    dates |= {moment.date() for moment in (trace.started_at, trace.ended_at) if moment}
     statuses = {o.status for o in orders}
     found = []
     for original in _agent_texts(trace):

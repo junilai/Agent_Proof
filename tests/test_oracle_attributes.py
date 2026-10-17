@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 import pytest
 
 from casestudy.domain.catalog import ORDERS_BY_ID
@@ -109,6 +111,14 @@ def test_a_figure_that_matches_none_of_the_orders_looked_up_is_still_reported():
 def test_a_counterfactual_states_nothing_about_the_order(text):
     """tc-17: the agent argues from the status; it does not deny it."""
     assert attribute_discrepancies(says(text), TABLET) == []
+
+
+def test_the_date_of_the_conversation_is_not_a_contradiction():
+    """Validation sample (V44): the agent dated the escalation with the day of the chat."""
+    when = datetime(2026, 10, 17, 17, 0, tzinfo=UTC)
+    talk = says("Fecha de escalamiento: 17 de octubre de 2026.", "Llegó el 18 de octubre de 2026.")
+    talk = talk.model_copy(update={"started_at": when, "ended_at": when})
+    assert attribute_discrepancies(talk, MONITOR) == ["fecha 18/10/2026"]
 
 
 def test_the_subjunctive_states_nothing_about_the_order():
