@@ -237,6 +237,8 @@ La planificación fija el criterio, los conjuntos, los predicados, la regla de a
 
    Cuando el defecto viene del inductor, se corrigen sus instrucciones y se vuelve a inducir la suite completa, nunca un escenario suelto, y los escenarios nuevos se revisan de nuevo. Los escenarios de la primera inducción quedan en el historial del repositorio. Como ocurre antes del tag, no es una enmienda, pero se declara en la tesis.
 
+   Hicieron falta dos correcciones. La primera reinducción fijó en los criterios de tc-13 y tc-14 el número de ticket de la semilla, que es aleatorio en cada conversación, así que se agregó la regla de exigir que el agente entregue el identificador sin fijar su valor y se volvió a inducir. Con la segunda reinducción ningún criterio premia una afirmación sin respaldo ni fija un identificador, y ahí se detuvo el ajuste, para no adaptar el inductor a estos 20 casos.
+
 ## D-009 · Qué cuenta como escalamiento del reembolso
 
 - **Fecha:** 17 de octubre de 2026
