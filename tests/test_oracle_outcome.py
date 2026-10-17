@@ -209,6 +209,33 @@ def test_a_ticket_for_another_matter_keeps_the_refund_decision(text, expected):
     assert decision_in(text) == expected
 
 
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        (
+            "Creé el ticket TCK-1 para que te confirmen el tiempo de acreditación del reembolso.",
+            None,
+        ),
+        ("Escalé tu caso a un supervisor por la demora; buscará acelerar el envío.", None),
+        (
+            "Escalé tu caso a un supervisor por la demora; evaluará si es posible una "
+            "excepción para reembolsarte.",
+            ESC,
+        ),
+        ("Escalé tu caso por la demora: un supervisor revisará tu solicitud de reembolso.", ESC),
+        (
+            "El reembolso no procede y ningún supervisor podrá autorizar el reembolso; creé "
+            "un ticket para la activación.",
+            NO,
+        ),
+        ("La política no contempla excepciones; escalé tu caso por la demora del envío.", None),
+    ],
+)
+def test_an_escalation_for_another_matter_counts_only_when_tied_to_the_refund(text, expected):
+    """Second validation sample (D-010): the time a refund takes and a delay are other matters."""
+    assert decision_in(text) == expected
+
+
 def test_recasting_the_request_while_escalating_leaves_the_refund_open():
     text = (
         "No se trata de un reembolso por arrepentimiento, sino de una posible falla; "

@@ -10,12 +10,14 @@ says that the direct refund does not proceed.
 
 D-009: the vocabulary is about the refund. A ticket counts only when the message
 creates or escalates it; a later mention of an existing ticket states nothing
-new. An escalation for another matter (logistics, activation, a delay, technical
-support) is not an escalation of the refund, unless the message also names a
-warranty claim or the amount threshold. Recasting the request as another matter
-("no se trata de un reembolso…, sino…") while escalating leaves the refund open:
-it is unresolved. Approval and denial in the same message, with no escalation,
-is not guessed either. Unresolved messages go to manual annotation.
+new. An escalation for another matter (logistics, activation, a delay, the time a
+refund takes, technical support) is not an escalation of the refund, unless the
+message ties it to the refund: a warranty claim, the amount threshold, an
+exception someone will consider, or someone who will review or decide the refund.
+Recasting the request as another matter ("no se trata de un reembolso…, sino…")
+while escalating leaves the refund open: it is unresolved. Approval and denial in
+the same message, with no escalation, is not guessed either. Unresolved messages
+go to manual annotation.
 """
 
 from __future__ import annotations
@@ -63,7 +65,12 @@ _HYPOTHETICAL = {"para", "puedo", "podemos", "podria", "podre", "necesitaria", "
 _OUT_OF_SCOPE = re.compile(r"parcial|credito")
 _OTHER_MATTER = re.compile(
     r"soporte tecnico|equipo tecnico|equipo de soporte|logistic|devolucion fisica|"
-    r"proceso (?:exacto )?de devolucion|activacion|atraso"
+    r"proceso (?:exacto )?de devolucion|activacion|atraso|demora|retraso|\benvio\b|"
+    r"acreditacion|tiempo de procesamiento"
+)
+_EXCEPTION = re.compile(r"\bexcepcion\b")
+_REVIEWS_REFUND = re.compile(
+    r"\b(?:evalu|revis|decid|decision|aprob|autoriz)\w*\b[^.?!\n]{0,40}\breembols"
 )
 _THRESHOLD = (
     r"(?:(?:us)?\$\s?|usd\s?)500(?:[.,]00)?\b|\b500(?:[.,]00)? (?:usd|dolares)\b|\bumbral\b"
@@ -104,14 +111,20 @@ def _clause_signals(clause: str, has_noun: bool) -> set[Decision]:
     return signals
 
 
+def _affirmed(pattern: re.Pattern[str], text: str) -> bool:
+    """Some match of the pattern that the three words before it do not negate."""
+    negations = _NEGATION | {"ningun", "ninguna"}
+    return any(
+        not set(re.findall(r"\w+", text[: m.start()])[-3:]) & negations
+        for m in pattern.finditer(text)
+    )
+
+
 def _names_refund_escalation(text: str) -> bool:
-    """A warranty claim, or an amount stated to be above the supervisor threshold."""
+    """A warranty claim, an amount above the threshold, or someone who will weigh the refund."""
     if "reclamo de garantia" in text:
         return True
-    return any(
-        not set(re.findall(r"\w+", text[: m.start()])[-2:]) & _NEGATION
-        for m in _ABOVE.finditer(text)
-    )
+    return any(_affirmed(p, text) for p in (_ABOVE, _EXCEPTION, _REVIEWS_REFUND))
 
 
 def is_hypothetical(sentence: str) -> bool:
