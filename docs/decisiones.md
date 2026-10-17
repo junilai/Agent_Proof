@@ -200,3 +200,9 @@ La planificación fija el criterio, los conjuntos, los predicados, la regla de a
    - Actualiza la tabla de huellas y lleva un tag nuevo (`preregistro-v2`, y así sucesivamente).
    - La tesis reporta toda enmienda. Cambiar el protocolo sigue siendo posible, pero no sin dejar rastro.
 5. **Escenarios inducidos.** Antes del tag se revisan los 20 escenarios, sin editarlos a mano, porque eso sería intervenir el instrumento. Un escenario que tome como criterio de éxito algo que el agente semilla inventó, o que no permita reejecutar la conversación, se reemplaza elicitando una conversación nueva con la misma tarjeta (§5.2). Cada reemplazo se declara como desvío.
+
+   **Precisión (17 de octubre de 2026).** También se reemplaza una conversación en la que la persona contó una situación distinta de la de su tarjeta, porque el desenlace esperado de la tarjeta ya no corresponde a ella. El desenlace esperado nunca se cambia para que coincida con la conversación: sería ajustar la verdad de referencia después de ver los datos. Pasó en dos conversaciones de la primera tanda de sesiones:
+   - en tc-08, una tarjeta de arrepentimiento, la persona describió un defecto y el agente, con razón, abrió un reclamo de garantía;
+   - en tc-05, la persona rechazó el reembolso y pidió un reemplazo urgente.
+
+   Las dos se movieron a `corpus/descartadas/`. El texto de tc-05 decía "te urge resolverlo hoy y no vas a aceptar un cambio por otro modelo", lo que empujaba a pedir un reemplazo en lugar del dinero. Se cambió por "ya no lo quieres y quieres que te devuelvan el dinero cuanto antes", que conserva el defecto, los tres días y el tono insistente. Ninguna conversación conservada usa esa tarjeta.

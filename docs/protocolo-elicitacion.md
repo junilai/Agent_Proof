@@ -64,7 +64,10 @@ Que el agente falle es información válida: de eso trata el trabajo.
 3. Si la conversación terminó por un fallo de la herramienta, o quedó tan corta que no permite inducir un escenario, se repite la tarjeta.
 4. Comparar el desenlace con el resultado esperado de la tarjeta. Si no coinciden, distinguir dos casos:
    - **el agente decidió mal**: la conversación se conserva, porque es justo la evidencia que el trabajo busca capturar;
-   - **un dato que la tarjeta daba por sentado nunca salió en la conversación** (por ejemplo, el motivo en una tarjeta donde el motivo cambia el resultado): se elicita un reemplazo con la misma tarjeta, porque esa conversación no pone a prueba lo que la tarjeta pretendía.
+   - **un dato que la tarjeta daba por sentado nunca salió en la conversación** (por ejemplo, el motivo en una tarjeta donde el motivo cambia el resultado): se elicita un reemplazo con la misma tarjeta, porque esa conversación no pone a prueba lo que la tarjeta pretendía;
+   - **la persona contó una situación distinta de la de su tarjeta** (por ejemplo, un defecto en una tarjeta de arrepentimiento, o rechazó lo que la tarjeta dice que quiere): también se elicita un reemplazo con la misma tarjeta, porque el desenlace esperado de la tarjeta ya no corresponde a la conversación. Nunca se cambia el desenlace esperado para que coincida con la conversación.
+
+   La conversación reemplazada no se borra: se mueve a `corpus/descartadas/`, fuera del corpus, y se declara como desvío en la tesis ([D-008](decisiones.md)).
 5. Si al completar las veinte algún conjunto de control quedara vacío, se elicitan conversaciones adicionales con tarjetas que lo llenen, como prevé la §5.2 para las conversaciones que no sirven.
 
 ## Qué queda registrado

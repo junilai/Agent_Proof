@@ -74,7 +74,7 @@ CARDS: tuple[Card, ...] = (
     Card(
         "tc-05", "reembolso_defecto", "insistente", "procede", ("AT-1009",), DEFECT,
         "El mouse del pedido AT-1009 llegó con el clic izquierdo fallando. Lo recibiste hace tres "
-        "días, te urge resolverlo hoy y no vas a aceptar un cambio por otro modelo.",
+        "días, ya no lo quieres y quieres que te devuelvan el dinero cuanto antes.",
     ),
     Card(
         "tc-06", "reembolso_arrepentimiento", "directo", "no_procede", ("AT-1007",), REGRET,
