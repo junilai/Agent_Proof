@@ -270,5 +270,67 @@ def score_command(data: Path = DATA, labels: Path = LABELLED):
     typer.echo(render_score(score(store, load_labels(labels, store))))
 
 
+_DECISION_KEYS = {
+    "p": "procede",
+    "n": "no procede",
+    "e": "escalamiento",
+    "s": "sin resolver",
+    "x": "ninguna",
+}
+_QUIT = "q"
+
+
+def _ask(question: str, keys: dict[str, object]) -> object:
+    """One key per answer; ``q`` stops and keeps what was already saved."""
+    options = "/".join([*keys, _QUIT])
+    while True:
+        key = typer.prompt(f"{question} [{options}]").strip().lower()
+        if key == _QUIT:
+            raise typer.Exit(0)
+        if key in keys:
+            return keys[key]
+
+
+def label_interactively(store: Store, annotator: str) -> int:
+    """Asks the fields of each unlabelled item and saves after every one; returns how many."""
+    path = folder(store) / f"etiquetas-{annotator}.json"
+    labels = {label.item: label for label in LABELS.validate_json(path.read_bytes())}
+    chosen = items(store)
+    todo = [
+        item
+        for item, case in chosen.items()
+        if any(getattr(labels[item], name) is None for name in fields_for(case).split(", "))
+    ]
+    typer.echo(f"{len(chosen) - len(todo)} de {len(chosen)} ítems ya etiquetados.")
+    yes_no = {"s": True, "n": False}
+    for done, item in enumerate(todo, start=1):
+        case = chosen[item]
+        typer.echo(f"\n{'=' * 72}\n{item} ({done} de {len(todo)} pendientes)")
+        typer.echo(_conversation(case, int(item[1:]), len(chosen)))
+        asked = fields_for(case)
+        label = Label(item=item)
+        if "decision" in asked:
+            choices = ", ".join(f"[{k}] {v}" for k, v in _DECISION_KEYS.items())
+            typer.echo(f"Decisión comunicada: {choices}")
+            label.decision = _ask("decisión", _DECISION_KEYS)  # type: ignore[assignment]
+        label.contradicts_base = _ask(  # type: ignore[assignment]
+            "¿Algún importe, fecha o estado contradice la base? s/n", yes_no
+        )
+        if "answers_card" in asked:
+            label.answers_card = _ask(  # type: ignore[assignment]
+                "¿Le dio al cliente el estado del pedido? s/n", yes_no
+            )
+        labels[item] = label
+        path.write_bytes(LABELS.dump_json(list(labels.values()), indent=2) + b"\n")
+    return len(todo)
+
+
+@app.command("label")
+def label_command(data: Path = DATA, annotator: str = typer.Option(..., "--annotator")):
+    """Etiqueta en la terminal, ítem por ítem; guarda tras cada uno y se puede retomar."""
+    count = label_interactively(Store(data), annotator)
+    typer.echo(f"\nListo: {count} ítems etiquetados en esta sesión.")
+
+
 if __name__ == "__main__":
     app()

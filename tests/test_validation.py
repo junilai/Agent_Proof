@@ -2,6 +2,7 @@ import json
 import re
 
 import pytest
+from typer.testing import CliRunner
 
 from agentproof.schema import scenario_id_for
 from agentproof.store import Store
@@ -9,6 +10,7 @@ from experiments.validation import (
     LABELS,
     Label,
     agreement,
+    app,
     cohen_kappa,
     decision_outcome,
     items,
@@ -188,3 +190,26 @@ def test_a_decision_read_the_other_way_is_reported(tmp_path):
 )
 def test_each_decision_outcome(label, found, outcome):
     assert decision_outcome(label, found) == outcome
+
+
+def label(tmp_path, keys):
+    args = ["label", "--data", str(tmp_path), "--annotator", "autor"]
+    return CliRunner().invoke(app, args, input="\n".join(keys) + "\n")
+
+
+def test_labelling_in_the_terminal_saves_each_item_and_resumes(tmp_path):
+    store = validation_store(tmp_path)
+    write_sheet(store, ["autor"])
+    kinds = ["decision" if c.card.has_decision else "status" for c in items(store).values()]
+    answers = {"decision": ["p", "n"], "status": ["n", "s"]}
+    first = label(tmp_path, [*answers[kinds[0]], "q"])
+    assert first.exit_code == 0 and "[HERRAMIENTA]" not in first.output
+    path = tmp_path / "validacion" / "etiquetas-autor.json"
+    saved = LABELS.validate_json(path.read_bytes())
+    assert saved[0].contradicts_base is False and saved[1].contradicts_base is None
+    rest = [key for kind in kinds[1:] for key in answers[kind]]
+    second = label(tmp_path, ["z", *rest])
+    assert "1 de 4 ítems ya etiquetados" in second.output and second.exit_code == 0
+    labels = load_labels(path, store)
+    assert {lab.decision for lab in labels.values()} == {"procede", None}
+    assert all(lab.answers_card for lab in labels.values() if lab.decision is None)
