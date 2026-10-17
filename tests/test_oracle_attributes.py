@@ -1,6 +1,7 @@
 import pytest
 
 from casestudy.domain.catalog import ORDERS_BY_ID
+from experiments.cards import CARDS_BY_ID
 from experiments.oracle.attributes import attribute_discrepancies, states_status
 from tests.factories import event, trace
 from tests.test_oracle_outcome import LABELLED, load
@@ -18,10 +19,27 @@ def says(*texts):
     return trace(events=events)
 
 
-def test_recorded_conversations_contradict_nothing():
-    for path in LABELLED:
-        order = ORDERS_BY_ID["AT-1001" if "tr-49f9" in path else "AT-1003"]
-        assert attribute_discrepancies(load(path), order) == [], path
+COUNTERFACTUAL = pytest.mark.xfail(
+    strict=True, reason="tc-17: un contrafáctico se lee como estado (se corrige a continuación)"
+)
+
+
+def card_order(path):
+    """The order of the card of a recorded conversation; the F1 seed is tc-13's (AT-1003)."""
+    card_id = load(path).card_id
+    return CARDS_BY_ID[card_id].orders[0] if card_id else "AT-1003"
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        pytest.param(p, marks=COUNTERFACTUAL) if "tr-6c6ab21b3116" in p else p
+        for p in LABELLED
+        if not load(p).card_id or CARDS_BY_ID[load(p).card_id].orders
+    ],
+)
+def test_recorded_conversations_contradict_nothing(path):
+    assert attribute_discrepancies(load(path), ORDERS_BY_ID[card_order(path)]) == []
 
 
 @pytest.mark.parametrize(

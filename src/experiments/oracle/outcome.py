@@ -6,11 +6,16 @@ conditional sentences are skipped, and a term preceded by a negation or by a
 purpose ("para escalar", "puedo escalar") is not an escalation. An offer bound
 to a pending condition ("con esa confirmación, escalo tu caso") is conditional
 too. An escalation prevails over the other two, because escalating usually also
-says that the direct refund does not proceed. A ticket for technical support is
-not an escalation of the refund: it only counts as one when the message sends
-the case to a supervisor or files a warranty claim. Approval and denial in the
-same message, with no escalation, is not guessed: it is unresolved and goes to
-manual annotation.
+says that the direct refund does not proceed.
+
+D-009: the vocabulary is about the refund. A ticket counts only when the message
+creates or escalates it; a later mention of an existing ticket states nothing
+new. An escalation for another matter (logistics, activation, a delay, technical
+support) is not an escalation of the refund, unless the message also names a
+warranty claim or the amount threshold. Recasting the request as another matter
+("no se trata de un reembolso…, sino…") while escalating leaves the refund open:
+it is unresolved. Approval and denial in the same message, with no escalation,
+is not guessed either. Unresolved messages go to manual annotation.
 """
 
 from __future__ import annotations
@@ -40,9 +45,11 @@ _WINDOW = 6
 
 _NOUN = re.compile(r"reembols|devoluci|devolver\w* (?:el|tu|su) dinero")
 _ESCALATION = re.compile(
-    r"\bescal(?:o|e|are|ado|ada|ar|arlo|arla|arlos|ando|amos|aremos)\b|\btck-|"
-    r"\breclamo de garantia\b|\b(?:el|tu|un|su|del) ticket\b"
+    r"\bescal(?:o|e|are|ados?|adas?|ar|arse|arlo|arla|arlos|ando|amos|aremos)\b|"
+    r"\breclamo de garantia\b"
 )
+_TICKET = re.compile(r"\btck-|\b(?:el|tu|un|su|del) ticket\b")
+_TICKET_CREATED = re.compile(r"\b(?:cree|creado|crear|genere|generado|registre|abri)\b")
 _APPROVAL = re.compile(
     r"\b(?:procede|aprobad[oa]|aprobe|apruebo|autorizad[oa]|procesad[oa]|procese)\b"
 )
@@ -54,8 +61,14 @@ _DENIAL = re.compile(
 _NEGATION = {"no", "ni", "sin", "tampoco", "nunca"}
 _HYPOTHETICAL = {"para", "puedo", "podemos", "podria", "podre", "necesitaria", "quieres", "desea"}
 _OUT_OF_SCOPE = re.compile(r"parcial|credito")
-_TECHNICAL_SUPPORT = re.compile(r"soporte tecnico|equipo tecnico|equipo de soporte")
-_REFUND_ESCALATION = re.compile(r"supervisor|reclamo de garantia")
+_OTHER_MATTER = re.compile(
+    r"soporte tecnico|equipo tecnico|equipo de soporte|logistic|devolucion fisica|"
+    r"proceso (?:exacto )?de devolucion|activacion|atraso"
+)
+_REFUND_ESCALATION = re.compile(
+    r"reclamo de garantia|(?<!no )\bsupera\w* (?:los |el )?(?:\$\s?500\b|umbral)"
+)
+_RECAST = re.compile(r"\bno (?:se trata de|corresponde a) un (?:caso de )?reembols\w*[^.]*\bsino\b")
 
 
 def plain(text: str) -> str:
@@ -71,7 +84,10 @@ def _clause_signals(clause: str, has_noun: bool) -> set[Decision]:
     signals: set[Decision] = set()
     if _OUT_OF_SCOPE.search(clause):
         return signals
-    for match in _ESCALATION.finditer(clause):
+    escalations = list(_ESCALATION.finditer(clause))
+    if _TICKET_CREATED.search(clause):
+        escalations += _TICKET.finditer(clause)
+    for match in escalations:
         if not _preceding_words(clause, match.start()) & (_NEGATION | _HYPOTHETICAL):
             signals.add(Decision.ESCALATED)
     if not has_noun:
@@ -93,6 +109,7 @@ def is_hypothetical(sentence: str) -> bool:
 def decision_in(text: str) -> Extracted:
     """The decision a single agent message states, if it states one."""
     signals: set[Decision] = set()
+    text = text.replace("*", "")
     whole = plain(text)
     for sentence in _SENTENCES.split(text):
         if is_hypothetical(sentence):
@@ -101,7 +118,9 @@ def decision_in(text: str) -> Extracted:
         has_noun = bool(_NOUN.search(text_plain))
         for clause in _CLAUSES.split(text_plain):
             signals |= _clause_signals(clause, has_noun)
-    if _TECHNICAL_SUPPORT.search(whole) and not _REFUND_ESCALATION.search(whole):
+    if Decision.ESCALATED in signals and _RECAST.search(whole):
+        return UNRESOLVED
+    if _OTHER_MATTER.search(whole) and not _REFUND_ESCALATION.search(whole):
         signals.discard(Decision.ESCALATED)
     if Decision.ESCALATED in signals:
         return Decision.ESCALATED

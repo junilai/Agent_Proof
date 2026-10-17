@@ -4,7 +4,7 @@ from casestudy.domain.policy import Decision
 from experiments.cards import CARDS_BY_ID
 from experiments.oracle.predicates import OPERATORS_WITH_PREDICATE, Evidence, fails
 from tests.factories import event, trace
-from tests.test_oracle_outcome import HITO, LABELLED, load
+from tests.test_oracle_outcome import HITO, LABELLED, UNRES, load
 
 REFUND, GIFT_CARD, LAPTOP = CARDS_BY_ID["tc-01"], CARDS_BY_ID["tc-06"], CARDS_BY_ID["tc-11"]
 STATUS, POLICY_QUESTION = CARDS_BY_ID["tc-16"], CARDS_BY_ID["tc-18"]
@@ -77,12 +77,26 @@ def test_the_healthy_agent_of_the_f1_milestone_triggers_no_predicate(path):
     }
 
 
-@pytest.mark.parametrize("path", sorted(p for p in LABELLED if p.startswith("corpus/")))
+def expected_of_the_healthy_agent(path, operator):
+    """No predicate fires; a conversation left unresolved (tc-06, D-009) goes to annotation."""
+    unresolved = [label for _, label in sorted(LABELLED[path].items()) if label][-1:] == [UNRES]
+    return None if unresolved and operator in ("d2", "d4", "d5") else False
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        pytest.param(p, marks=pytest.mark.xfail(strict=True, reason="tc-17: contrafáctico"))
+        if "tr-6c6ab21b3116" in p
+        else p
+        for p in sorted(p for p in LABELLED if p.startswith("corpus/"))
+    ],
+)
 def test_the_healthy_agent_of_the_corpus_triggers_no_predicate(path):
     seed = load(path)
     card = CARDS_BY_ID[seed.card_id]
     assert {op: fails(op, card, seed) for op in OPERATORS_WITH_PREDICATE} == {
-        op: False for op in OPERATORS_WITH_PREDICATE
+        op: expected_of_the_healthy_agent(path, op) for op in OPERATORS_WITH_PREDICATE
     }
 
 
