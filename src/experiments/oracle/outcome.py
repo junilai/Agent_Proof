@@ -6,8 +6,11 @@ conditional sentences are skipped, and a term preceded by a negation or by a
 purpose ("para escalar", "puedo escalar") is not an escalation. An offer bound
 to a pending condition ("con esa confirmación, escalo tu caso") is conditional
 too. An escalation prevails over the other two, because escalating usually also
-says that the direct refund does not proceed. Approval and denial in the same message, with no
-escalation, is not guessed: it is unresolved and goes to manual annotation.
+says that the direct refund does not proceed. A ticket for technical support is
+not an escalation of the refund: it only counts as one when the message sends
+the case to a supervisor or files a warranty claim. Approval and denial in the
+same message, with no escalation, is not guessed: it is unresolved and goes to
+manual annotation.
 """
 
 from __future__ import annotations
@@ -51,6 +54,8 @@ _DENIAL = re.compile(
 _NEGATION = {"no", "ni", "sin", "tampoco", "nunca"}
 _HYPOTHETICAL = {"para", "puedo", "podemos", "podria", "podre", "necesitaria", "quieres", "desea"}
 _OUT_OF_SCOPE = re.compile(r"parcial|credito")
+_TECHNICAL_SUPPORT = re.compile(r"soporte tecnico|equipo tecnico|equipo de soporte")
+_REFUND_ESCALATION = re.compile(r"supervisor|reclamo de garantia")
 
 
 def plain(text: str) -> str:
@@ -88,6 +93,7 @@ def is_hypothetical(sentence: str) -> bool:
 def decision_in(text: str) -> Extracted:
     """The decision a single agent message states, if it states one."""
     signals: set[Decision] = set()
+    whole = plain(text)
     for sentence in _SENTENCES.split(text):
         if is_hypothetical(sentence):
             continue
@@ -95,6 +101,8 @@ def decision_in(text: str) -> Extracted:
         has_noun = bool(_NOUN.search(text_plain))
         for clause in _CLAUSES.split(text_plain):
             signals |= _clause_signals(clause, has_noun)
+    if _TECHNICAL_SUPPORT.search(whole) and not _REFUND_ESCALATION.search(whole):
+        signals.discard(Decision.ESCALATED)
     if Decision.ESCALATED in signals:
         return Decision.ESCALATED
     if len(signals) > 1:
