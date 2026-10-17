@@ -36,6 +36,7 @@ def test_instructions_ground_the_criteria_in_the_tools_and_the_policy():
     assert "dedujo o inventó" in INDUCTION_SYSTEM
     assert "Limítate a lo que el cliente pidió" in INDUCTION_SYSTEM
     assert "si el cliente repite un error" in INDUCTION_SYSTEM
+    assert "sin indicar su valor" in INDUCTION_SYSTEM
 
 
 def test_instructions_keep_the_pace_of_the_seed_conversation():

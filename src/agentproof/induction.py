@@ -48,6 +48,8 @@ INDUCTION_SYSTEM = "\n".join(
         "- Limítate a lo que el cliente pidió: no exijas datos que no pidió, cortesías ni "
         "ofrecimientos adicionales. Cada criterio debe valer para cualquier conversación "
         "equivalente, no solo si el cliente repite un error o un desvío de la original.",
+        "- No fijes en un criterio los identificadores que se generan en cada conversación, como "
+        "el número de ticket: exige que el agente lo entregue, sin indicar su valor.",
         "Escribe todo en español.",
     ]
 )

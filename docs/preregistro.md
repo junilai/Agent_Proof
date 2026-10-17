@@ -241,7 +241,7 @@ Al cerrar el corpus se agregarán los 20 escenarios inducidos.
 | Pieza | Huella |
 |---|---|
 | Modelos de los componentes | `ab5bf458c1a07618` |
-| Instrucciones del inductor | `7b00e20039506c99` |
+| Instrucciones del inductor | `85463d9f574df614` |
 | Instrucciones del usuario simulado | `b1abd93029edcbc4` |
 | Rúbrica del evaluador | `5b097001dbc4f39a` |
 | Prompt del agente en cada variante | `880db4a48e7e8978` |
