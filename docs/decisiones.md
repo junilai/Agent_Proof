@@ -227,6 +227,16 @@ La planificación fija el criterio, los conjuntos, los predicados, la regla de a
 
    **Revisión preventiva de tc-06 (17 de octubre de 2026).** El autor la marcó como ambigua antes de grabarla. "Una tarjeta de regalo de la tienda" podía leerse como que a la persona se la regalaron, como en tc-19, y el texto no decía si la había usado o entregado: cualquiera de las dos lecturas llevaría la conversación a otra situación. El texto pasa a decir que la compró, que es de USD 50, como en la base, y que nunca la usó ni se la dio a nadie. Conserva el arrepentimiento, el tono directo y el pedido AT-1007, y no adelanta nada de la política. Aún no hay ninguna conversación grabada con esta tarjeta.
 
+   **Precisión (17 de octubre de 2026): defectos que vienen del inductor.** La revisión de los 20 escenarios inducidos encontró criterios que premiaban afirmaciones del agente semilla que la base de conocimiento no respalda:
+
+   - el pago procesado de tc-17, que el agente dedujo;
+   - el correo de tc-20, que el agente inventó;
+   - el "método de pago original" de tc-02, tc-03 y tc-05, y el plazo de 3 a 10 días hábiles de tc-03.
+
+   También encontró criterios que exigían extras que la tarjeta no pide, como el monto y la fecha cuando el cliente solo preguntó el estado (tc-16), o que dependían de que el cliente repitiera un error de la conversación original (tc-05). La causa no estaba en las conversaciones sino en las instrucciones del inductor, que no le pedían apoyar los criterios solo en los resultados de las herramientas y en la política. Regrabar no lo habría resuelto, porque el agente sano repite esas afirmaciones.
+
+   Cuando el defecto viene del inductor, se corrigen sus instrucciones y se vuelve a inducir la suite completa, nunca un escenario suelto, y los escenarios nuevos se revisan de nuevo. Los escenarios de la primera inducción quedan en el historial del repositorio. Como ocurre antes del tag, no es una enmienda, pero se declara en la tesis.
+
 ## D-009 · Qué cuenta como escalamiento del reembolso
 
 - **Fecha:** 17 de octubre de 2026
