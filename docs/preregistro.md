@@ -230,7 +230,41 @@ Es un estudio de estimación: no se declaran umbrales de TPR, FPR ni concordanci
 
 ## 9. Conjuntos expuestos del corpus
 
-Se completa al cerrar el corpus. Contendrá, para cada operador, la lista de escenarios expuestos que resulta de aplicar las reglas de la [sección 4](#4-verdad-de-referencia) a las 20 trazas semilla, generada por un comando y no escrita a mano, y los cinco escenarios sorteados para el piloto.
+Generada con `python -m experiments.preregistration --data .`. Una prueba exige que esta sección coincida con lo que imprime el comando. D3 no define conjunto expuesto.
+
+| Tarjeta | Escenario | D1 | D2 | D4 | D5 | D6 |
+|---|---|---|---|---|---|---|
+| tc-01 | `sc-tr-49f9d41b2bc6` | ✓ | ✓ | ✓ |  |  |
+| tc-02 | `sc-tr-8e76607664f8` | ✓ | ✓ | ✓ |  |  |
+| tc-03 | `sc-tr-c54fe59dc976` | ✓ | ✓ | ✓ |  |  |
+| tc-04 | `sc-tr-f4615497b746` | ✓ | ✓ | ✓ |  | ✓ |
+| tc-05 | `sc-tr-69b396c04669` | ✓ | ✓ | ✓ |  | ✓ |
+| tc-06 | `sc-tr-1d3d63b4ec80` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| tc-07 | `sc-tr-e326cdcb18af` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| tc-08 | `sc-tr-f4fbcd9bf2e0` | ✓ | ✓ | ✓ | ✓ |  |
+| tc-09 | `sc-tr-d707df857e02` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| tc-10 | `sc-tr-96424db58a33` | ✓ | ✓ | ✓ | ✓ | ✓ |
+| tc-11 | `sc-tr-08b90a7484e8` | ✓ | ✓ | ✓ |  | ✓ |
+| tc-12 | `sc-tr-1bcac31bb099` | ✓ | ✓ | ✓ |  | ✓ |
+| tc-13 | `sc-tr-a450dfb016b9` | ✓ | ✓ | ✓ |  | ✓ |
+| tc-14 | `sc-tr-91931c2b95fa` | ✓ | ✓ | ✓ |  | ✓ |
+| tc-15 | `sc-tr-0b1ba54b3bff` | ✓ | ✓ | ✓ |  | ✓ |
+| tc-16 | `sc-tr-3ee71ca0bdcf` | ✓ |  |  |  |  |
+| tc-17 | `sc-tr-6c6ab21b3116` | ✓ |  |  |  |  |
+| tc-18 | `sc-tr-dcdc60171b83` |  |  | ✓ |  |  |
+| tc-19 | `sc-tr-9a551596a82f` |  |  | ✓ |  |  |
+| tc-20 | `sc-tr-b5c4babdd36b` |  |  |  |  |  |
+| **expuestos** | de 20 | 17 | 15 | 17 | 5 | 11 |
+
+**Piloto** ([D-008](decisiones.md)): semilla `20261017`, 5 escenarios: tc-01, tc-04, tc-06, tc-09, tc-15.
+
+**Validación del oráculo** ([D-010](decisiones.md)): semilla `20261019`, una repetición por escenario.
+
+- baseline: tc-01, tc-04, tc-05, tc-07, tc-09, tc-11, tc-12, tc-14, tc-16, tc-19.
+- d1: tc-01, tc-05, tc-06, tc-08, tc-09, tc-12, tc-13, tc-14, tc-16, tc-17.
+- d2: tc-02, tc-04, tc-05, tc-07, tc-08, tc-09, tc-10, tc-11, tc-14, tc-15.
+- d4: tc-01, tc-02, tc-03, tc-05, tc-06, tc-09, tc-11, tc-12, tc-14, tc-19.
+- d5 (dos repeticiones): tc-06, tc-07, tc-08, tc-09, tc-10.
 
 ## 10. Huella del protocolo
 
