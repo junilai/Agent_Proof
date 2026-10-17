@@ -221,6 +221,11 @@ Es un estudio de estimación: no se declaran umbrales de TPR, FPR ni concordanci
 - **Enmiendas.** Un cambio del protocolo después del tag `preregistro-v1` se agrega al final de esta sección, con su fecha, su motivo y su efecto esperado. Actualiza la [tabla de huellas](#10-huella-del-protocolo) y lleva un tag nuevo: `preregistro-v2`, y así sucesivamente ([D-008](decisiones.md)).
 - **El piloto no es una enmienda.** Sus datos no se analizan como resultado, y solo puede activar la contingencia de costo ya declarada en la [sección 2](#2-diseño).
 
+*Desvíos antes del tag:*
+
+- **Reemplazo de conversaciones del corpus.** Cuatro grabaciones se apartaron en `corpus/descartadas/` y se volvieron a grabar con la misma tarjeta. Tres porque la persona contó una situación distinta de la tarjeta, y una porque se cortó sin contenido. Los textos de tc-05, tc-06 y tc-08 se aclararon sin cambiar su resultado esperado ([D-008](decisiones.md), punto 5).
+- **Reinducción de la suite.** La revisión de los escenarios encontró criterios que premiaban afirmaciones del agente semilla sin respaldo en la base, y criterios que fijaban un número de ticket. Se corrigieron las instrucciones del inductor y se volvieron a inducir los 20 escenarios, dos veces. Las inducciones anteriores quedan en el historial del repositorio ([D-008](decisiones.md), punto 5).
+
 *Enmiendas:* ninguna.
 
 ## 9. Conjuntos expuestos del corpus
