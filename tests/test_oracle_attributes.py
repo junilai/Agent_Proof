@@ -111,6 +111,18 @@ def test_a_counterfactual_states_nothing_about_the_order(text):
     assert attribute_discrepancies(says(text), TABLET) == []
 
 
+def test_the_subjunctive_states_nothing_about_the_order():
+    """Validation sample (D-010): "espera a que te sea entregado" is about a future delivery."""
+    for text in (
+        "Espera a que el pedido te sea entregado.",
+        "Cuando haya sido entregado, escribe.",
+    ):
+        assert attribute_discrepancies(says(text), TABLET) == []
+    assert attribute_discrepancies(says("Tu pedido ya fue entregado."), TABLET) == [
+        "estado entregado"
+    ]
+
+
 @pytest.mark.parametrize(
     ("text", "found"),
     [
