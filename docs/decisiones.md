@@ -206,3 +206,5 @@ La planificación fija el criterio, los conjuntos, los predicados, la regla de a
    - en tc-05, la persona rechazó el reembolso y pidió un reemplazo urgente.
 
    Las dos se movieron a `corpus/descartadas/`. El texto de tc-05 decía "te urge resolverlo hoy y no vas a aceptar un cambio por otro modelo", lo que empujaba a pedir un reemplazo en lugar del dinero. Se cambió por "ya no lo quieres y quieres que te devuelvan el dinero cuanto antes", que conserva el defecto, los tres días y el tono insistente. Ninguna conversación conservada usa esa tarjeta.
+
+   La primera regrabación de tc-08 también se apartó. La persona empezó con arrepentimiento y el agente negó el reembolso, como corresponde. Al insistir, la persona dijo que el mouse "dejó de funcionar", y el agente abrió un reclamo de garantía. Dos personas distintas leyeron "ya no te sirve" como que el producto se dañó, así que el problema era el texto de la tarjeta. Se cambió por "Funciona bien, pero casi no lo usaste y ya no lo necesitas", que conserva el arrepentimiento, los dos meses y el tono insistente. Ninguna otra tarjeta usa esa expresión.
