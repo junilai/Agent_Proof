@@ -41,6 +41,13 @@ INDUCTION_SYSTEM = "\n".join(
         "leyendo solo una transcripción. Describe qué debe saber o recibir el cliente al final, "
         "nunca qué herramienta debe usar el agente ni en qué orden, y no exijas que el agente "
         "justifique su decisión ni repita los plazos o montos que la sustentan.",
+        "- Apoya cada criterio solo en lo que respaldan los resultados de las herramientas y la "
+        "política que aparecen en la transcripción. No conviertas en criterio una afirmación del "
+        "agente que esos resultados no sostienen, como un plazo, un medio de pago, un canal de "
+        "contacto, un procedimiento o un dato que el agente dedujo o inventó.",
+        "- Limítate a lo que el cliente pidió: no exijas datos que no pidió, cortesías ni "
+        "ofrecimientos adicionales. Cada criterio debe valer para cualquier conversación "
+        "equivalente, no solo si el cliente repite un error o un desvío de la original.",
         "Escribe todo en español.",
     ]
 )

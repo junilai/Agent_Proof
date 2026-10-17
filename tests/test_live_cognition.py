@@ -91,6 +91,11 @@ def test_inducer_keeps_the_pace_of_the_seed(scenario):
     assert "AT-1001" in scenario.user_goal
 
 
+def test_inducer_does_not_reward_what_the_tools_do_not_support(scenario):
+    """The seed agent promised "su medio de pago"; neither the order nor the policy say so."""
+    assert not any("medio de pago" in c or "método de pago" in c for c in scenario.success_criteria)
+
+
 def test_simulated_user_answers_with_the_dated_haiku_identifier(scenario):
     user = SimulatedUser(scenario, client=Recorder(anthropic.AsyncAnthropic()))
     history = [Exchange(scenario.opening_message, "Lo siento. ¿Me indica su número de pedido?")]
