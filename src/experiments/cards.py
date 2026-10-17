@@ -78,8 +78,9 @@ CARDS: tuple[Card, ...] = (
     ),
     Card(
         "tc-06", "reembolso_arrepentimiento", "directo", "no_procede", ("AT-1007",), REGRET,
-        "Compraste una tarjeta de regalo de la tienda, el pedido AT-1007, para un cumpleaños que "
-        "se canceló. Quieres que te devuelvan el dinero y vas al grano.",
+        "Compraste en la tienda una tarjeta de regalo de USD 50, el pedido AT-1007, para regalarla "
+        "en un cumpleaños que al final se canceló. Nunca la usaste ni se la diste a nadie. Quieres "
+        "que te devuelvan el dinero y vas al grano.",
     ),
     Card(
         "tc-07", "reembolso_defecto", "confundido", "no_procede", ("AT-1008",), DEFECT,
