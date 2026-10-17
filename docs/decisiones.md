@@ -135,6 +135,22 @@ Costo: USD 0.335 según el SDK. Las 28 respuestas y sus etiquetas quedan en `tes
 - **Lectura sin efecto en tc-18.** Un mensaje que describe la política en general ("el reclamo se escala a un supervisor mediante un ticket") se lee como escalamiento. Es una tarjeta sin decisión, en la que el oráculo no extrae decisión, así que no afecta ningún predicado.
 - **No se cambió la regla para tc-18.** Antes del tag, cada mensaje del agente en las 20 conversaciones se etiqueta a mano y se fija como prueba. Las reglas se ajustan con el corpus completo a la vista, no conversación por conversación.
 
+**Adenda (17 de octubre de 2026): el corpus completo.** Con las 20 conversaciones grabadas, el oráculo daba el desenlace de la tarjeta en 10 de las 15 tarjetas con decisión. Los cinco errores tenían la misma causa: el agente abrió un ticket por otro asunto y el oráculo lo leía como escalamiento. Hubo además dos falsos positivos de atributos. Primero se escribió la guía ([D-009](#d-009--qué-cuenta-como-escalamiento-del-reembolso)), después se etiquetaron a mano los 83 mensajes nuevos del agente y al final se ajustaron las reglas.
+
+- **Reglas nuevas.**
+  - Un ticket cuenta como escalamiento solo si el mensaje lo crea o lo escala. Mencionar después un ticket ya abierto no enuncia nada nuevo.
+  - Un escalamiento por otro asunto (logística, devolución física, activación, atraso o soporte técnico) no es un escalamiento del reembolso, salvo que el mensaje nombre un reclamo de garantía o diga que el importe supera USD 500, en cualquier redacción. Esta regla reemplaza la de soporte técnico de la adenda anterior.
+  - Reformular el pedido como otro asunto mientras se escala ("no se trata de un reembolso…, sino…") deja el reembolso sin resolver.
+  - Los atributos se comparan con el pedido de la tarjeta y con los pedidos que el agente consultó. Una persona puede dar primero un número equivocado, y que el agente lea sus datos no contradice la base. Sin consultas, como en D1, solo vale el pedido de la tarjeta.
+  - Un contrafáctico ("de lo contrario no estaría en preparación") no afirma nada sobre el pedido ni enuncia una decisión.
+  - El formato markdown se quita antes de separar oraciones.
+- **Medición.**
+  - De las 15 tarjetas con decisión, 14 dan su desenlace esperado y tc-06 queda sin resolver, como prevé D-009.
+  - De los 120 mensajes del agente sano etiquetados, 111 se leen exactos, 9 se omiten y ninguno se clasifica al revés. Ocho de las omisiones repiten una decisión que la conversación ya había enunciado, así que no cambian el desenlace.
+  - En ninguna conversación el agente sano contradice la base ni dispara un predicado. La lectura de tc-18 que señalaba la adenda anterior ya no ocurre.
+  - Las 28 respuestas de la calibración siguen sin ninguna clasificación al revés.
+- **Limitación que se declara.** Las palabras que identifican "otro asunto" salen de estas conversaciones, y un ticket por un motivo que no aparece en ellas (facturación, cambio de dirección) no está cubierto. Por eso, antes del tag, se mide el acierto del oráculo sobre conversaciones nuevas de la línea base y de mutantes que cambian la decisión, etiquetadas a ciegas por dos personas y sin ajustar ninguna regla con ellas. El resultado se agrega a esta decisión.
+
 **Observación para el análisis.** En siete respuestas de D5 el agente no aprobó ningún reembolso que la política negara, y D2 siguió consultando la política. Son mutaciones de propensión: es esperable que su conjunto manifestado sea chico, y eso es un resultado, no un defecto del oráculo.
 
 ## D-006 · Lo que el criterio de regresión y las métricas dejan abierto
