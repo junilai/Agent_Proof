@@ -328,3 +328,25 @@ D1 se incluye porque las discrepancias de atributos solo se habían probado con 
 ### Límite que se declara
 
 Claude escribió las reglas del oráculo. Etiqueta sin ver su salida, pero las conoce. Por eso las etiquetas del autor se escriben por separado, se mide su concordancia y la conciliación queda escrita.
+
+### Primera muestra (17 de octubre de 2026)
+
+Las 50 conversaciones se generaron por USD 2.97 y se etiquetaron a ciegas por separado. El acuerdo entre los anotadores fue de 40 de 45 en la decisión (κ de Cohen 0.84), 50 de 50 en la contradicción con la base y 3 de 3 en el estado del pedido. Los cinco desacuerdos se conciliaron uno por uno, con su motivo en `evidence/validacion-oraculo/validacion/conciliacion.md`.
+
+Contra las etiquetas conciliadas, el oráculo dio 41 de 45 decisiones exactas, **3 al revés** y 1 omitida. Detectó los dos datos inventados de D1, pero con **4 falsos positivos de atributos**. Como fija este diseño, se analizó con el autor antes de tocar las reglas. Las siete fallas tenían cuatro causas generales, y cada una se corrigió con una regla con casos escritos a mano:
+
+1. **Tickets por asuntos que el corpus no tenía** (V10, por el tiempo de acreditación; V27, por la demora). Un escalamiento por otro asunto cuenta como escalamiento del reembolso solo si el mensaje lo ata al reembolso: un reclamo de garantía, el umbral, una excepción que alguien va a evaluar o alguien que va a revisar o decidir el reembolso.
+2. **Lo que el cliente debería hacer más adelante** (V42: "una vez recibido… procede por cualquier motivo"). "Una vez", "luego" y "deberías" marcan una oración condicional.
+3. **El subjuntivo** (V30, V42 y V46: "espera a que te sea entregado"). No afirma el estado del pedido.
+4. **La fecha de la propia conversación** (V44). Se acepta como fecha válida. El límite es que un dato inventado que coincida con ese día no se detectaría.
+
+Con las reglas corregidas, la primera muestra queda en 42 decisiones exactas, 3 omitidas, ninguna al revés y ningún falso positivo de atributos. Esa cifra ya no es una medición independiente, porque las reglas se corrigieron mirándola.
+
+### Segunda muestra
+
+Mide las reglas corregidas sobre conversaciones con las que no se ajustaron. Se fija antes de generarla.
+
+- **Composición.** 20 conversaciones, con una repetición: 4 de la línea base, 4 de D1, 4 de D2, 4 de D4 y 4 de D5, sorteadas con la semilla `20261020` dentro del conjunto de cada condición, igual que en la primera muestra.
+- **Aislamiento.** Se guardan en `evidence/validacion-oraculo-2/`, con su propia copia del corpus, y no se juzgan.
+- **Etiquetas, concordancia y conciliación.** Las mismas que en la primera muestra, con una planilla nueva.
+- **Qué pasa con el resultado.** Se reporta tal cual, junto con la primera medición. Las reglas no se tocan por lo que muestre esta segunda muestra antes del tag. Si aparece una clasificación al revés, se declara como limitación y el autor decide si amerita una enmienda posterior.
