@@ -1,122 +1,122 @@
 [
   {
     "item": "V01",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "no procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V02",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V03",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "no procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V04",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "escalamiento",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V05",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "escalamiento",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V06",
     "decision": null,
-    "contradicts_base": null,
-    "answers_card": null
+    "contradicts_base": false,
+    "answers_card": false
   },
   {
     "item": "V07",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "no procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V08",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V09",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V10",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "no procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V11",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V12",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V13",
     "decision": null,
-    "contradicts_base": null,
-    "answers_card": null
+    "contradicts_base": false,
+    "answers_card": true
   },
   {
     "item": "V14",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V15",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "no procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V16",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "escalamiento",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V17",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V18",
     "decision": null,
-    "contradicts_base": null,
-    "answers_card": null
+    "contradicts_base": false,
+    "answers_card": false
   },
   {
     "item": "V19",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "no procede",
+    "contradicts_base": false,
     "answers_card": null
   },
   {
     "item": "V20",
-    "decision": null,
-    "contradicts_base": null,
+    "decision": "no procede",
+    "contradicts_base": false,
     "answers_card": null
   }
 ]
