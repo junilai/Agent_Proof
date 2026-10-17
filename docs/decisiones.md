@@ -127,6 +127,14 @@ Costo: USD 0.335 según el SDK. Las 28 respuestas y sus etiquetas quedan en `tes
 1. Ninguna respuesta degradada enunció un atributo falso: sin la herramienta de pedidos, D1 pidió los datos en lugar de inventarlos. Los casos positivos de discrepancia de atributos están probados solo con texto escrito para la prueba, y la regla de estados no tiene una medición independiente limpia, porque se corrigió con la reserva.
 2. En los dos cortes de D6 que terminaron con texto, el agente ya había anunciado el escalamiento ("voy a escalar tu caso") antes de que el límite impidiera crear el ticket. Según la §5.4 cuenta la decisión comunicada, así que ahí el predicado no falla: D6 se manifiesta solo cuando el corte llega antes de que el agente enuncie el desenlace.
 
+**Adenda (16 de octubre de 2026): revisión con el corpus elicitado.** Se compararon las conversaciones del corpus grabadas hasta la fecha con lo que lee el oráculo.
+
+- **tc-10 tenía una clasificación al revés.** La tarjeta espera que el reembolso no proceda. El agente dijo que no procede y, a pedido del cliente, creó un ticket de soporte técnico. La regla daba precedencia al ticket y leía escalamiento.
+- **Corrección.** Un ticket o un escalamiento cuentan como escalamiento del reembolso solo si el mensaje deriva el caso a un supervisor o registra un reclamo de garantía. Si el mensaje trata de soporte técnico sin nada de eso, no cuentan.
+- **Verificación.** Con la corrección, las siete conversaciones dan el desenlace de su tarjeta. Las 28 respuestas de la calibración y los 37 mensajes del agente sano siguen sin ninguna clasificación al revés.
+- **Lectura sin efecto en tc-18.** Un mensaje que describe la política en general ("el reclamo se escala a un supervisor mediante un ticket") se lee como escalamiento. Es una tarjeta sin decisión, en la que el oráculo no extrae decisión, así que no afecta ningún predicado.
+- **No se cambió la regla para tc-18.** Antes del tag, cada mensaje del agente en las 20 conversaciones se etiqueta a mano y se fija como prueba. Las reglas se ajustan con el corpus completo a la vista, no conversación por conversación.
+
 **Observación para el análisis.** En siete respuestas de D5 el agente no aprobó ningún reembolso que la política negara, y D2 siguió consultando la política. Son mutaciones de propensión: es esperable que su conjunto manifestado sea chico, y eso es un resultado, no un defecto del oráculo.
 
 ## D-006 · Lo que el criterio de regresión y las métricas dejan abierto
