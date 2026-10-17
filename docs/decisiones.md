@@ -210,3 +210,42 @@ La planificación fija el criterio, los conjuntos, los predicados, la regla de a
    La primera regrabación de tc-08 también se apartó. La persona empezó con arrepentimiento y el agente negó el reembolso, como corresponde. Al insistir, la persona dijo que el mouse "dejó de funcionar", y el agente abrió un reclamo de garantía. Dos personas distintas leyeron "ya no te sirve" como que el producto se dañó, así que el problema era el texto de la tarjeta. Se cambió por "Funciona bien, pero casi no lo usaste y ya no lo necesitas", que conserva el arrepentimiento, los dos meses y el tono insistente. Ninguna otra tarjeta usa esa expresión.
 
    **Revisión preventiva de tc-06 (17 de octubre de 2026).** El autor la marcó como ambigua antes de grabarla. "Una tarjeta de regalo de la tienda" podía leerse como que a la persona se la regalaron, como en tc-19, y el texto no decía si la había usado o entregado: cualquiera de las dos lecturas llevaría la conversación a otra situación. El texto pasa a decir que la compró, que es de USD 50, como en la base, y que nunca la usó ni se la dio a nadie. Conserva el arrepentimiento, el tono directo y el pedido AT-1007, y no adelanta nada de la política. Aún no hay ninguna conversación grabada con esta tarjeta.
+
+## D-009 · Qué cuenta como escalamiento del reembolso
+
+- **Fecha:** 17 de octubre de 2026
+- **Estado:** decidida; se implementa en el oráculo antes del pre-registro
+- **Origen:** lectura del corpus completo (parte E de F3)
+
+### El problema
+
+Las tarjetas esperan uno de tres desenlaces: el reembolso procede, no procede o se escala. Los tres se refieren a **la decisión sobre el reembolso**. En las sesiones, el agente sano abrió tickets también por otros asuntos: la logística de la devolución, la activación de una licencia o el atraso de una entrega. El oráculo leía cualquier ticket como escalamiento, así que en cinco de las quince tarjetas con decisión (tc-04, tc-05, tc-06, tc-07 y tc-09) daba un desenlace distinto del que el agente comunicó. Con esas lecturas, la línea base parecería fallar en un tercio de las tarjetas con decisión y el control negativo marcaría regresiones que no existen.
+
+### La regla
+
+| Lo que comunica el agente | Desenlace |
+|---|---|
+| Deja la decisión del reembolso en manos de otro: un supervisor (por ejemplo, porque el importe supera USD 500) o un reclamo de garantía | escalamiento |
+| Decide el reembolso (lo aprueba o lo niega) y además abre un ticket por otro asunto: logística, activación, atraso de la entrega o soporte técnico | la decisión que enunció |
+| Abre un ticket por otro asunto y deja abierta la decisión del reembolso, porque la reformula o no dice si sigue en pie | sin resolver: pasa a la anotación manual a ciegas |
+
+Un ticket por otro asunto que no enuncia ninguna decisión no aporta desenlace, y vale el mensaje anterior que sí la enunció ([D-002](#d-002--qué-mensaje-comunica-el-desenlace)). La regla de soporte técnico de la adenda a D-005 es un caso particular de esta.
+
+### Cómo se leen los cinco casos
+
+| Tarjeta | Espera | Lo que comunicó el agente | Desenlace |
+|---|---|---|---|
+| tc-04 | procede | aprueba el reembolso ("tu reembolso ya está aprobado") y abre un ticket para la devolución física | procede |
+| tc-05 | procede | aprueba el reembolso y abre un ticket para la devolución física | procede |
+| tc-07 | no procede | niega el reembolso y abre un ticket de activación: "el ticket no cambiará la decisión sobre el reembolso" | no procede |
+| tc-09 | no procede | escala el atraso a un supervisor "dado que aún no es posible procesar el reembolso mientras el pedido no haya sido entregado" | no procede |
+| tc-06 | no procede | niega el reembolso; después dice que "no se trata de un reembolso por arrepentimiento, sino de una posible falla en la entrega" y escala a un supervisor para verificar la activación, sin decir si la negativa sigue en pie | sin resolver |
+
+tc-06 es el único caso dudoso. Una regla que lo resolviera sola podría equivocarse en cualquiera de las dos direcciones, así que lo decide una persona a ciegas, como prevé el protocolo para los casos que el oráculo no resuelve.
+
+### Por qué así
+
+- **El desenlace es lo que el agente le comunica al cliente sobre su reembolso.** Un ticket de logística después de aprobar no cambia que el cliente recibirá su dinero, y uno de activación después de negar no cambia que no lo recibirá.
+- **La guía se escribe antes que las reglas.** Las etiquetas a mano de las 20 conversaciones siguen esta tabla, y las reglas se ajustan a las etiquetas, no al revés.
+- **Ningún caso se resuelve con la decisión contraria.** Si una conversación no encaja en la tabla, queda sin resolver.
+- **Límite.** La guía se derivó de las conversaciones del corpus. Antes del tag se mide el acierto del oráculo sobre conversaciones nuevas, de la línea base y de mutantes, etiquetadas a ciegas y sin ajustar ninguna regla con ellas.
