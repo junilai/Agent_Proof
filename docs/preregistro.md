@@ -266,6 +266,14 @@ Generada con `python -m experiments.preregistration --data .`. Una prueba exige 
 - d4: tc-01, tc-02, tc-03, tc-05, tc-06, tc-09, tc-11, tc-12, tc-14, tc-19.
 - d5 (dos repeticiones): tc-06, tc-07, tc-08, tc-09, tc-10.
 
+**Segunda muestra de la validación** ([D-010](decisiones.md)): semilla `20261020`, una repetición por escenario.
+
+- baseline: tc-07, tc-11, tc-15, tc-16.
+- d1: tc-02, tc-03, tc-16, tc-17.
+- d2: tc-01, tc-04, tc-06, tc-09.
+- d4: tc-02, tc-03, tc-07, tc-08.
+- d5: tc-06, tc-07, tc-08, tc-10.
+
 ## 10. Huella del protocolo
 
 Cada pieza congelada se resume en los primeros 16 caracteres de su sha256. Las piezas son los modelos, los prompts, las herramientas, las mutaciones, la base de conocimiento, las tarjetas, las constantes del criterio y del oráculo, y el código del oráculo.

@@ -25,7 +25,10 @@ PILOT_SIZE = 5
 VALIDATION_SEED = 20261019
 OPERATORS = ("d1", "d2", "d4", "d5", "d6")
 VALIDATION = (("baseline", 10), ("d1", 10), ("d2", 10), ("d4", 10), ("d5", 10))
-"""Conversations of each condition in the oracle validation (D-010)."""
+"""Conversations of each condition in the first sample of the oracle validation (D-010)."""
+SECOND_VALIDATION_SEED = 20261020
+SECOND_VALIDATION = (("baseline", 4), ("d1", 4), ("d2", 4), ("d4", 4), ("d5", 4))
+"""The second sample, which measures the rules corrected after the first (D-010)."""
 
 
 @dataclass(frozen=True)
@@ -52,15 +55,17 @@ def pilot(table: list[Row]) -> list[Row]:
     return sorted(drawn, key=lambda row: row.card.card_id)
 
 
-def validation(table: list[Row]) -> dict[str, list[Row]]:
-    """Each condition draws from its own pool, in the order of ``VALIDATION``.
+def validation(
+    table: list[Row], seed: int = VALIDATION_SEED, plan: tuple[tuple[str, int], ...] = VALIDATION
+) -> dict[str, list[Row]]:
+    """Each condition draws from its own pool, in the order of the plan.
 
     A pool smaller than the number of conversations is taken whole and repeated:
     D5 has 5 exposed scenarios and 10 conversations, two repetitions each.
     """
-    rng = random.Random(VALIDATION_SEED)
+    rng = random.Random(seed)
     drawn = {}
-    for condition, size in VALIDATION:
+    for condition, size in plan:
         pool = [r for r in table if condition == "baseline" or condition in r.exposed]
         chosen = rng.sample(pool, size) if len(pool) >= size else pool
         drawn[condition] = sorted(chosen, key=lambda row: row.card.card_id)
@@ -98,6 +103,14 @@ def render(store: Store) -> str:
     for condition, chosen in validation(table).items():
         repeat = " (dos repeticiones)" if condition == "d5" else ""
         lines.append(f"- {condition}{repeat}: {_cards(chosen)}.")
+    lines += [
+        "",
+        f"**Segunda muestra de la validación** ([D-010](decisiones.md)): semilla "
+        f"`{SECOND_VALIDATION_SEED}`, una repetición por escenario.",
+        "",
+    ]
+    second = validation(table, SECOND_VALIDATION_SEED, SECOND_VALIDATION)
+    lines += [f"- {condition}: {_cards(chosen)}." for condition, chosen in second.items()]
     return "\n".join(lines)
 
 
