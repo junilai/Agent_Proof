@@ -9,9 +9,9 @@ runner = CliRunner()
 AGENT = ["--adapter", "tests.fake_adapter", "--agent", "tests.fakes:echo_agent"]
 
 
-def run(tmp_path, condition):
+def run(tmp_path, condition, *extra):
     args = ["run", *AGENT, "--condition", condition, "--repetitions", "5", "--data", str(tmp_path)]
-    return runner.invoke(cli.app, args)
+    return runner.invoke(cli.app, [*args, *extra])
 
 
 def judge(tmp_path, run_id):
@@ -87,3 +87,39 @@ def test_runs_older_than_the_scenario_list_cannot_resume(tmp_path):
     result = resume(tmp_path, manifest().run_id)
     assert result.exit_code == 1 and "no registró sus escenarios" in result.output
     assert resume(tmp_path, "x").exit_code == 1
+
+
+FIRST, SECOND, THIRD = "sc-tr-000000000001", "sc-tr-000000000002", "sc-tr-000000000003"
+
+
+def three_scenarios(tmp_path, monkeypatch):
+    store = Store(tmp_path)
+    for n, scenario_id in enumerate((FIRST, SECOND, THIRD), start=1):
+        store.save_scenario(scenario(scenario_id=scenario_id, seed_trace_id=f"tr-00000000000{n}"))
+    monkeypatch.setattr(cli, "_simulated_user", lambda s: ScriptedUser(s.opening_message))
+    return store
+
+
+def test_a_run_can_be_limited_to_some_scenarios(tmp_path, monkeypatch):
+    store = three_scenarios(tmp_path, monkeypatch)
+    result = run(tmp_path, "baseline-a", "--scenario", THIRD, "--scenario", FIRST)
+    assert result.exit_code == 0, result.output
+    (run_id,) = store.runs()
+    assert store.manifest(run_id).scenario_ids == [FIRST, THIRD]
+    assert {t.scenario_id for t in store.run_traces(run_id)} == {FIRST, THIRD}
+    assert resume(tmp_path, run_id).exit_code == 0
+    assert len(store.run_traces(run_id)) == 10
+
+
+def test_an_unknown_scenario_runs_nothing(tmp_path, monkeypatch):
+    store = three_scenarios(tmp_path, monkeypatch)
+    result = run(tmp_path, "baseline-a", "--scenario", FIRST, "--scenario", "sc-tr-x")
+    assert result.exit_code == 1 and "sc-tr-x" in result.output
+    assert store.runs() == []
+
+
+def test_without_the_option_every_scenario_runs(tmp_path, monkeypatch):
+    store = three_scenarios(tmp_path, monkeypatch)
+    assert run(tmp_path, "baseline-a").exit_code == 0
+    (run_id,) = store.runs()
+    assert len(store.manifest(run_id).scenario_ids) == 3

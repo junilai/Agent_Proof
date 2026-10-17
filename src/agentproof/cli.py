@@ -36,6 +36,9 @@ AGENT = typer.Option(..., "--agent", help="Constructor del agente, como modulo:a
 VARIANT = typer.Option("baseline", "--variant", help="Variante del agente.")
 CARD = typer.Option(None, "--card", help="Tarjeta de situación que se le entregó a la persona.")
 RUNS = typer.Option(None, "--run", help="Corrida a incluir; se repite. Por omisión, todas.")
+SCENARIOS = typer.Option(
+    None, "--scenario", help="Escenario a reejecutar; se repite. Por omisión, todos."
+)
 
 
 def load_object(path: str) -> Any:
@@ -146,6 +149,7 @@ def run(
     variant: str = VARIANT,
     repetitions: int = typer.Option(5, "--repetitions", min=1),
     turn_budget: int = typer.Option(10, "--turn-budget", min=1),
+    scenario: list[str] | None = SCENARIOS,
     data: Path = DATA,
 ):
     """Reejecuta cada escenario con el usuario simulado contra una variante del agente."""
@@ -154,6 +158,12 @@ def run(
     if not scenarios:
         typer.echo("No hay escenarios: ejecute primero 'agentproof induce'.", err=True)
         raise typer.Exit(1)
+    if scenario:
+        unknown = sorted(set(scenario) - {s.scenario_id for s in scenarios})
+        if unknown:
+            typer.echo(f"Escenarios desconocidos: {', '.join(unknown)}.", err=True)
+            raise typer.Exit(1)
+        scenarios = [s for s in scenarios if s.scenario_id in set(scenario)]
     now = utc_now()
     manifest = RunManifest(
         run_id=run_id_for(condition, now),
