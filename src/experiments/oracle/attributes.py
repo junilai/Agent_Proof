@@ -50,7 +50,9 @@ _NOT_AN_ASSERTION = re.compile(
     r"\bverificar|\bconfirmar|\bconsultar|\bsaber\b|\bacceso\b|"
     r"\bde lo contrario\b|\b(?:estaria|habria|hubiera|seria)n?\b|\b(?:sea|haya)n?\b"
 )
-_NEGATION = re.compile(r"\b(?:no|aun no|todavia no|nunca)\b")
+_NEGATION = {"no", "nunca", "ni"}
+_NEGATION_WINDOW = 4
+"""A negation denies a status only when it is this close: "todavía no ha sido entregado"."""
 
 
 def _agent_texts(trace: Trace) -> list[str]:
@@ -97,7 +99,8 @@ def _status_claims(text: str) -> list[tuple[OrderStatus, bool]]:
             if len(named) > 1:  # "en preparación o en camino": a list, not this order
                 continue
             for status, match in named.items():
-                claims.append((status, bool(_NEGATION.search(clause[: match.start()]))))
+                before = set(re.findall(r"\w+", clause[: match.start()])[-_NEGATION_WINDOW:])
+                claims.append((status, bool(before & _NEGATION)))
     return claims
 
 

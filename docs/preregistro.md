@@ -1,7 +1,7 @@
 # Pre-registro del protocolo experimental
 
 - **Autor:** Jarod Tierra Medina
-- **Estado:** congelado con el tag `preregistro-v1` el 17 de octubre de 2026, con el corpus completo y antes de ejecutar cualquier experimento. Los cambios posteriores se declaran como enmiendas ([sección 8](#8-desvíos-y-enmiendas)).
+- **Estado:** congelado con el tag `preregistro-v1` el 17 de octubre de 2026, con el corpus completo y antes de ejecutar cualquier experimento. Versión vigente: `preregistro-v2`, con una enmienda previa a E1 ([sección 8](#8-desvíos-y-enmiendas)).
 - **Fuentes:** la [planificación](planificacion.pdf) ("§"), la [especificación de F3](specs/2026-10-13-f3-aparato-experimental.md) y las [decisiones](decisiones.md) D-001 a D-010.
 
 Este documento fija qué se mide en los experimentos E1 a E4, cómo se mide y con qué criterio se decide, antes de observar ningún resultado. Resume y remite a sus fuentes, sin repetir sus argumentos. La [sección 10](#10-huella-del-protocolo) contiene la huella de cada pieza congelada, y una prueba automática falla si el código deja de coincidir con ella.
@@ -245,7 +245,13 @@ Es un estudio de estimación: no se declaran umbrales de TPR, FPR ni concordanci
 - **Reemplazo de conversaciones del corpus.** Cuatro grabaciones se apartaron en `corpus/descartadas/` y se volvieron a grabar con la misma tarjeta. Tres porque la persona contó una situación distinta de la tarjeta, y una porque se cortó sin contenido. Los textos de tc-05, tc-06 y tc-08 se aclararon sin cambiar su resultado esperado ([D-008](decisiones.md), punto 5).
 - **Reinducción de la suite.** La revisión de los escenarios encontró criterios que premiaban afirmaciones del agente semilla sin respaldo en la base, y criterios que fijaban un número de ticket. Se corrigieron las instrucciones del inductor y se volvieron a inducir los 20 escenarios, dos veces. Las inducciones anteriores quedan en el historial del repositorio ([D-008](decisiones.md), punto 5).
 
-*Enmiendas:* ninguna.
+*Enmiendas:*
+
+1. **Enmienda 1, `preregistro-v2` (17 de octubre de 2026). El alcance de la negación en el estado del pedido.**
+   - **Motivo.** El piloto mostró que el oráculo buscaba la negación en toda la cláusula, no junto al estado. En tc-09 leía "no está en mis manos aprobar la cancelación de un pedido en preparación" como que el pedido no estaba en preparación. Marcaba una contradicción con la base en 3 de las 4 trazas, de la línea base y de D4, sin que el agente se equivocara. Es un error de aplicación de la regla, no una lectura dudosa.
+   - **Cambio.** Una negación niega un estado solo si está entre las cuatro palabras anteriores ("todavía no ha sido entregado", "no se encuentra en preparación"). Cambia solo la pieza "Reglas del oráculo (código fuente)".
+   - **Efecto esperado.** Menos falsos positivos de D1 en las tarjetas de pedidos sin entregar, y ninguno nuevo. Verificado sin cambios en las 70 conversaciones de validación, los 120 mensajes del corpus y las 28 respuestas de la calibración. Las cuatro trazas del piloto ya no contradicen la base.
+   - **Momento.** Antes de E1: ningún dato del experimento se vio antes de esta enmienda.
 
 ## 9. Conjuntos expuestos del corpus
 
@@ -315,6 +321,6 @@ La prueba `tests/test_preregistration.py` recalcula cada huella y la compara con
 | Tarjetas de situación | `d6a37a38d88afb97` |
 | Criterio de regresión y reintentos | `9aad2d0f4e567eb3` |
 | Umbrales y semilla del oráculo | `e9762d8f9b00c5ea` |
-| Reglas del oráculo (código fuente) | `bf38de6bedb8ee2e` |
+| Reglas del oráculo (código fuente) | `56a5a54f87339ae4` |
 | Corpus semilla | `29ac909479b12894` |
 | Escenarios inducidos | `abbff20458290502` |

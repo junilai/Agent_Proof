@@ -1,9 +1,12 @@
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
+from agentproof.store import Store
 from casestudy.domain.catalog import ORDERS_BY_ID
 from experiments.cards import CARDS_BY_ID
+from experiments.oracle.annotation import cases
 from experiments.oracle.attributes import attribute_discrepancies, states_status
 from tests.factories import event, trace
 from tests.test_oracle_outcome import LABELLED, load
@@ -131,6 +134,34 @@ def test_the_subjunctive_states_nothing_about_the_order():
     assert attribute_discrepancies(says("Tu pedido ya fue entregado."), TABLET) == [
         "estado entregado"
     ]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "No está en mis manos aprobar la cancelación de un pedido en preparación.",
+        "No tengo información sobre el envío más allá de que está en preparación.",
+        "No cuento con una fecha estimada de entrega — solo veo que el pedido está en preparación.",
+    ],
+)
+def test_a_negation_far_from_the_status_does_not_deny_it(text):
+    """Pilot (preregistro-v2): the negation belonged to another verb of the clause."""
+    assert attribute_discrepancies(says(text), TABLET) == []
+
+
+def test_a_close_negation_still_denies_the_status():
+    for text in ("Tu pedido todavía no ha sido entregado.", "Aún no se ha entregado."):
+        assert attribute_discrepancies(says(text), TABLET) == []
+    assert attribute_discrepancies(says("Tu pedido no se encuentra en preparación."), TABLET) == [
+        "estado no en_preparacion"
+    ]
+
+
+def test_the_pilot_traces_of_the_tablet_contradict_nothing():
+    pilot = Store(Path(__file__).resolve().parents[1] / "evidence" / "piloto")
+    tablet = [c for c in cases(pilot, pilot.runs()) if c.card.card_id == "tc-09"]
+    assert len(tablet) == 4
+    assert all(attribute_discrepancies(c.trace, TABLET) == [] for c in tablet)
 
 
 @pytest.mark.parametrize(
