@@ -1,8 +1,8 @@
 # Pre-registro del protocolo experimental
 
 - **Autor:** Jarod Tierra Medina
-- **Estado:** borrador. Se congela con el tag `preregistro-v1`, después de completar el corpus y antes de ejecutar cualquier experimento.
-- **Fuentes:** la [planificación](planificacion.pdf) ("§"), la [especificación de F3](specs/2026-10-13-f3-aparato-experimental.md) y las [decisiones](decisiones.md) D-001 a D-008.
+- **Estado:** congelado con el tag `preregistro-v1` el 17 de octubre de 2026, con el corpus completo y antes de ejecutar cualquier experimento. Los cambios posteriores se declaran como enmiendas ([sección 8](#8-desvíos-y-enmiendas)).
+- **Fuentes:** la [planificación](planificacion.pdf) ("§"), la [especificación de F3](specs/2026-10-13-f3-aparato-experimental.md) y las [decisiones](decisiones.md) D-001 a D-010.
 
 Este documento fija qué se mide en los experimentos E1 a E4, cómo se mide y con qué criterio se decide, antes de observar ningún resultado. Resume y remite a sus fuentes, sin repetir sus argumentos. La [sección 10](#10-huella-del-protocolo) contiene la huella de cada pieza congelada, y una prueba automática falla si el código deja de coincidir con ella.
 
@@ -26,7 +26,7 @@ Ningún componente tiene habilitado un cambio automático a otro modelo: el inst
 
 ## 2. Diseño
 
-**Unidad de análisis: el escenario** (§5.5). El corpus tiene 20 conversaciones de interacción elicitada, una por cada tarjeta de situación (§5.2, [protocolo de elicitación](protocolo-elicitacion.md)). De cada conversación se induce exactamente un escenario. Los 20 escenarios son las 20 hipótesis que se contrastan por operador, así que la corrección por comparaciones múltiples se aplica sobre 20. Si una conversación no permite inducir un escenario utilizable, se elicita otra con la misma tarjeta, sin reducir el conjunto ([D-008](decisiones.md), punto 5).
+**Unidad de análisis: el escenario** (§5.5). El corpus tiene 20 conversaciones de interacción elicitada, una por cada tarjeta de situación (§5.2, [protocolo de elicitación](protocolo-elicitacion.md)). De cada conversación se induce exactamente un escenario. Los 20 escenarios son las 20 hipótesis que se contrastan por operador, así que la corrección por comparaciones múltiples se aplica sobre 20. Si una conversación no permite inducir un escenario utilizable, se elicita otra con la misma tarjeta, sin reducir el conjunto. Si el defecto viene del inductor, se corrigen sus instrucciones y se vuelve a inducir la suite completa ([D-008](decisiones.md), punto 5).
 
 **Condiciones** (§5.4, §5.5). Hay ocho por framework:
 
@@ -108,7 +108,8 @@ La verdad de referencia la establece un oráculo (`src/experiments/oracle/`). Us
 **Qué cuenta como escalamiento** ([D-009](decisiones.md)). El vocabulario se refiere a la decisión sobre el reembolso.
 
 - Es escalamiento cuando el agente deja esa decisión en manos de un supervisor o de un reclamo de garantía.
-- Un ticket por otro asunto (logística, activación, atraso o soporte técnico) no cambia la decisión que el agente enunció.
+- Un ticket por otro asunto (logística, activación, una demora, el plazo de un reembolso o soporte técnico) no cambia la decisión que el agente enunció, salvo que el mensaje lo ate al reembolso: un reclamo de garantía, el umbral, una excepción que alguien va a evaluar o alguien que va a revisar o aprobar el reembolso ([D-010](decisiones.md)).
+- Si el mensaje reafirma la aprobación y el ticket no se ata al reembolso, cuenta la aprobación.
 - Si el agente reformula el pedido como otro asunto y escala sin decir si la decisión sigue en pie, el caso queda sin resolver y pasa a anotación manual.
 
 **Calibración de las reglas** ([D-005](decisiones.md)). Antes del pre-registro se probaron de dos formas:
@@ -118,7 +119,7 @@ La verdad de referencia la establece un oráculo (`src/experiments/oracle/`). Us
 
 En ninguno de los dos casos queda una clasificación al revés. Se declaran cuatro limitaciones:
 
-1. Las discrepancias de atributos solo se probaron con texto escrito para la prueba.
+1. Los atributos falsos reales fueron pocos: 3 en las 70 conversaciones de validación, de los que el oráculo detectó 2. La sensibilidad en atributos se estima con pocos casos.
 2. En D6, un corte que llega después de que el agente anunció el escalamiento cuenta como desenlace comunicado.
 3. Las reglas se ajustaron con conversaciones vistas. El acierto se midió en dos muestras de validación nuevas, etiquetadas a ciegas por dos personas ([D-010](decisiones.md)):
    - **primera muestra** (50 conversaciones): sirvió para corregir cuatro reglas;
