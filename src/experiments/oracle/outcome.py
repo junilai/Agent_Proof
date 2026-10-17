@@ -2,7 +2,8 @@
 
 The vocabulary is closed: the refund proceeds, it does not proceed, or the case
 is escalated. A sentence counts only when it states a fact: questions and
-conditional sentences are skipped, and a term preceded by a negation or by a
+conditional sentences are skipped (also what the customer should do later: "una
+vez recibido", "luego", "deberías"), and a term preceded by a negation or by a
 purpose ("para escalar", "puedo escalar") is not an escalation. An offer bound
 to a pending condition ("con esa confirmación, escalo tu caso") is conditional
 too. An escalation prevails over the other two, because escalating usually also
@@ -41,7 +42,7 @@ _SENTENCES = re.compile(r"(?<=[.!?;])\s+|\n+")
 _CLAUSES = re.compile(r"[,:()]|\s(?:y|pero|aunque|sin embargo|asi que|por lo que|porque|ya que)\s")
 _CONDITIONAL = re.compile(
     r"(?<!\w)si(?!\w)|¿|\bcon es[ao]s? (?:confirmación|datos|información)\b|\ben cuanto\b|"
-    r"\buna vez que\b|\bde lo contrario\b"
+    r"\buna vez\b|\bluego\b|\bdeber[ií]as?\b|\bde lo contrario\b"
 )
 _WINDOW = 6
 

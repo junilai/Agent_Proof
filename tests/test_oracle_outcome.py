@@ -129,6 +129,8 @@ def test_each_rule(text, expected):
         "El sistema con el que gestiono los tickets está vinculado a un pedido.",
         "Con esa confirmación, escalo tu caso como reclamo de garantía.",
         "Necesito el comprobante; de lo contrario no podría procesar el reembolso.",
+        "Una vez recibido, solicita el reembolso (procede por cualquier motivo).",
+        "Deberías esperar a recibirlo y luego solicitar el reembolso, que procede sin problema.",
     ],
 )
 def test_negations_purposes_questions_and_conditionals_state_no_decision(text):
