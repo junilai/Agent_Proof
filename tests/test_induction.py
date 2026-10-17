@@ -30,6 +30,15 @@ def test_instructions_ask_for_outcome_criteria_not_a_trajectory():
     assert "no exijas que el agente justifique" in INDUCTION_SYSTEM
 
 
+def test_instructions_ground_the_criteria_in_the_tools_and_the_policy():
+    """D-008: a criterion never rewards what the seed agent deduced or made up."""
+    assert "solo en lo que respaldan los resultados de las herramientas" in INDUCTION_SYSTEM
+    assert "dedujo o inventó" in INDUCTION_SYSTEM
+    assert "Limítate a lo que el cliente pidió" in INDUCTION_SYSTEM
+    assert "si el cliente repite un error" in INDUCTION_SYSTEM
+    assert "sin indicar su valor" in INDUCTION_SYSTEM
+
+
 def test_instructions_keep_the_pace_of_the_seed_conversation():
     assert "solo lo que el cliente reveló en su primer mensaje" in INDUCTION_SYSTEM
     assert "no adelantes" in INDUCTION_SYSTEM
