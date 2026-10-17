@@ -67,6 +67,19 @@ def test_the_sheet_never_shows_the_condition_or_the_trace(tmp_path):
     assert not re.search(r"\bd[1-6]\b", text)
 
 
+def test_the_sheet_hides_the_tools_and_shows_the_true_policy(tmp_path):
+    """A mutated policy in a tool result would reveal D4; the true one is shown instead."""
+    store = validation_store(tmp_path)
+    corrupt = "Hasta 90 días después de la entrega, el reembolso procede."
+    leaky = run_trace("tr-990000000000", "d4", REFUND_SEED, "Tu reembolso fue aprobado.")
+    leaky.events.insert(1, event(2, "tool_call", tool="get_refund_policy", result=corrupt))
+    store.create_run(manifest(run_id="d4-20261017-120000", condition="d4"))
+    store.save_run_trace(leaky)
+    text = sheet(store)
+    assert "[HERRAMIENTA]" not in text and "90 días" not in text
+    assert "> Política de reembolsos de Andina Tech" in text and "Hasta 30 días" in text
+
+
 def test_each_item_asks_only_the_fields_of_its_card(tmp_path):
     text = sheet(validation_store(tmp_path))
     assert text.count("Campos: decision, contradicts_base\n") == 2

@@ -22,6 +22,7 @@ from pydantic import BaseModel, TypeAdapter
 from agentproof.store import Store
 from casestudy.domain.catalog import ORDERS_BY_ID
 from casestudy.domain.policy import Decision
+from casestudy.domain.policy_text import policy_text
 from experiments.oracle.annotation import Case, cases, operators_for, present
 from experiments.oracle.attributes import attribute_discrepancies, states_status
 from experiments.oracle.exposure import is_exposed
@@ -64,6 +65,13 @@ def fields_for(case: Case) -> str:
     return ", ".join(asked)
 
 
+def _conversation(case: Case, position: int, total: int) -> str:
+    """The case without the tool calls: their results would reveal a mutated policy (D4)
+    or the missing lookups of D1. The order in the base and the true policy stand in."""
+    shown = present(case, position, total).splitlines()
+    return "\n".join(line for line in shown if not line.startswith("[HERRAMIENTA]"))
+
+
 def sheet(store: Store) -> str:
     chosen = items(store)
     parts = [
@@ -77,10 +85,14 @@ def sheet(store: Store) -> str:
         "pedido que contradice la base.",
         "- `answers_card`: true si el agente le dio al cliente el estado del pedido.",
         "",
+        "La política verdadera, contra la que se juzga cada conversación:",
+        "",
+        *(f"> {line}" for line in policy_text().splitlines()),
+        "",
     ]
     for item, case in chosen.items():
         parts += [f"## {item}", f"Campos: {fields_for(case)}", ""]
-        parts.append(present(case, int(item[1:]), len(chosen)))
+        parts.append(_conversation(case, int(item[1:]), len(chosen)))
     return "\n".join(parts)
 
 
