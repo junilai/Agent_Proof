@@ -39,6 +39,8 @@ from experiments.oracle.manifested import SENSITIVITY, THRESHOLD
 ROOT = Path(__file__).resolve().parent.parent
 PREREGISTRATION = ROOT / "docs" / "preregistro.md"
 ORACLE = ROOT / "src" / "experiments" / "oracle"
+SEEDS = ROOT / "corpus" / "seeds"
+SCENARIOS = ROOT / "corpus" / "scenarios"
 ROW = re.compile(r"^\| (.+?) \| `([0-9a-f]{16})` \|$")
 
 
@@ -62,6 +64,13 @@ def _plain(value: Any) -> Any:
 def _digest(value: Any) -> str:
     text = value if isinstance(value, str) else json.dumps(_plain(value), sort_keys=True)
     return hashlib.sha256(text.encode()).hexdigest()[:16]
+
+
+def _files(folder: Path, pattern: str) -> str:
+    """The text of every file, in name order, so the digest never depends on how it is read."""
+    return "".join(
+        f"{p.name}\n{p.read_text(encoding='utf-8')}" for p in sorted(folder.glob(pattern))
+    )
 
 
 def protocol() -> dict[str, str]:
@@ -98,6 +107,8 @@ def protocol() -> dict[str, str]:
             {"threshold": THRESHOLD, "sensitivity": SENSITIVITY, "queue_seed": QUEUE_SEED}
         ),
         "Reglas del oráculo (código fuente)": _digest(oracle_source),
+        "Corpus semilla": _digest(_files(SEEDS, "*.json")),
+        "Escenarios inducidos": _digest(_files(SCENARIOS, "*.json")),
     }
 
 
@@ -119,6 +130,13 @@ def test_the_code_matches_the_preregistered_protocol():
         "Declare la enmienda en la sección 8 y actualice la tabla de la sección 10:\n" + table()
     )
     assert set(declared()) == set(protocol()), "la tabla nombra piezas que ya no existen"
+
+
+def test_the_frozen_corpus_has_one_scenario_per_seed():
+    seeds = {p.stem for p in SEEDS.glob("*.json")}
+    scenarios = {p.stem for p in SCENARIOS.glob("*.json")}
+    assert len(seeds) == len(scenarios) == 20
+    assert scenarios == {f"sc-{seed}" for seed in seeds}
 
 
 def test_the_fingerprint_is_stable_and_sensitive():

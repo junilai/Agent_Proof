@@ -294,14 +294,12 @@ Generada con `python -m experiments.preregistration --data .`. Una prueba exige 
 
 ## 10. Huella del protocolo
 
-Cada pieza congelada se resume en los primeros 16 caracteres de su sha256. Las piezas son los modelos, los prompts, las herramientas, las mutaciones, la base de conocimiento, las tarjetas, las constantes del criterio y del oráculo, y el código del oráculo.
+Cada pieza congelada se resume en los primeros 16 caracteres de su sha256. Las piezas son los modelos, los prompts, las herramientas, las mutaciones, la base de conocimiento, las tarjetas, las constantes del criterio y del oráculo, el código del oráculo, el corpus semilla y los escenarios inducidos.
 
 La prueba `tests/test_preregistration.py` recalcula cada huella y la compara con esta tabla. Si el código cambia sin que el pre-registro se enmiende, la integración continua falla. Para enmendarlo:
 
 1. Declarar el cambio en la [sección 8](#8-desvíos-y-enmiendas).
 2. Reemplazar la tabla por la que imprime `uv run python -m tests.test_preregistration`.
-
-Al cerrar el corpus se agregarán los 20 escenarios inducidos.
 
 | Pieza | Huella |
 |---|---|
@@ -317,3 +315,5 @@ Al cerrar el corpus se agregarán los 20 escenarios inducidos.
 | Criterio de regresión y reintentos | `9aad2d0f4e567eb3` |
 | Umbrales y semilla del oráculo | `e9762d8f9b00c5ea` |
 | Reglas del oráculo (código fuente) | `bf38de6bedb8ee2e` |
+| Corpus semilla | `29ac909479b12894` |
+| Escenarios inducidos | `abbff20458290502` |
