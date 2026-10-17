@@ -85,12 +85,7 @@ def expected_of_the_healthy_agent(path, operator):
 
 @pytest.mark.parametrize(
     "path",
-    [
-        pytest.param(p, marks=pytest.mark.xfail(strict=True, reason="tc-17: contrafáctico"))
-        if "tr-6c6ab21b3116" in p
-        else p
-        for p in sorted(p for p in LABELLED if p.startswith("corpus/"))
-    ],
+    [p for p in sorted(p for p in LABELLED if p.startswith("corpus/"))],
 )
 def test_the_healthy_agent_of_the_corpus_triggers_no_predicate(path):
     seed = load(path)

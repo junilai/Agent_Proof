@@ -39,7 +39,7 @@ _SENTENCES = re.compile(r"(?<=[.!?;])\s+|\n+")
 _CLAUSES = re.compile(r"[,:()]|\s(?:y|pero|aunque|sin embargo|asi que|por lo que|porque|ya que)\s")
 _CONDITIONAL = re.compile(
     r"(?<!\w)si(?!\w)|¿|\bcon es[ao]s? (?:confirmación|datos|información)\b|\ben cuanto\b|"
-    r"\buna vez que\b"
+    r"\buna vez que\b|\bde lo contrario\b"
 )
 _WINDOW = 6
 

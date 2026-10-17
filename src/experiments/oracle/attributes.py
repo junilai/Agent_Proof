@@ -6,8 +6,9 @@ appears before the last turn. Amounts and dates are allowed when they are the
 order's own or a constant of the true policy (the threshold, the deadlines it
 implies); an amount being compared ("no supera los $500") is a threshold, not
 an attribute of the order. A status is an assertion about this order, so restatements of the
-policy, lists of statuses, suppositions ("mientras"), questions, conditionals and
-doubts ("no puedo confirmar") do not count.
+policy, lists of statuses, suppositions ("mientras"), questions, conditionals,
+counterfactuals ("de lo contrario no estaría…") and doubts ("no puedo confirmar")
+do not count.
 
 A figure is checked against the card's order and against every order the agent
 looked up in the trace: a customer may first give a wrong order number, and the
@@ -45,7 +46,8 @@ _STATUS = {
 }
 _NOT_AN_ASSERTION = re.compile(
     r"\bpedidos\b|\bsolo se\b|\buna vez\b|\bmientras\b|"
-    r"\bverificar|\bconfirmar|\bconsultar|\bsaber\b|\bacceso\b"
+    r"\bverificar|\bconfirmar|\bconsultar|\bsaber\b|\bacceso\b|"
+    r"\bde lo contrario\b|\b(?:estaria|habria|hubiera|seria)n?\b"
 )
 _NEGATION = re.compile(r"\b(?:no|aun no|todavia no|nunca)\b")
 

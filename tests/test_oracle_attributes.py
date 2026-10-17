@@ -19,11 +19,6 @@ def says(*texts):
     return trace(events=events)
 
 
-COUNTERFACTUAL = pytest.mark.xfail(
-    strict=True, reason="tc-17: un contrafáctico se lee como estado (se corrige a continuación)"
-)
-
-
 def card_order(path):
     """The order of the card of a recorded conversation; the F1 seed is tc-13's (AT-1003)."""
     card_id = load(path).card_id
@@ -32,11 +27,7 @@ def card_order(path):
 
 @pytest.mark.parametrize(
     "path",
-    [
-        pytest.param(p, marks=COUNTERFACTUAL) if "tr-6c6ab21b3116" in p else p
-        for p in LABELLED
-        if not load(p).card_id or CARDS_BY_ID[load(p).card_id].orders
-    ],
+    [p for p in LABELLED if not load(p).card_id or CARDS_BY_ID[load(p).card_id].orders],
 )
 def test_recorded_conversations_contradict_nothing(path):
     assert attribute_discrepancies(load(path), ORDERS_BY_ID[card_order(path)]) == []
@@ -105,6 +96,30 @@ def test_without_a_lookup_only_the_card_order_counts():
 def test_a_figure_that_matches_none_of_the_orders_looked_up_is_still_reported():
     talk = with_lookups(["AT-1001", "at-1003", "AT-9999"], "Costó $290 y está en camino.")
     assert attribute_discrepancies(talk, MONITOR) == ["importe 290", "estado en_camino"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "El pago fue procesado (de lo contrario el pedido no estaría en preparación).",
+        "Si el pago no se hubiera completado, el pedido no habría avanzado a preparación.",
+        "Sin el pago, tu pedido no estaría en preparación.",
+    ],
+)
+def test_a_counterfactual_states_nothing_about_the_order(text):
+    """tc-17: the agent argues from the status; it does not deny it."""
+    assert attribute_discrepancies(says(text), TABLET) == []
+
+
+@pytest.mark.parametrize(
+    ("text", "found"),
+    [
+        ("Tu pedido no está en preparación.", ["estado no en_preparacion"]),
+        ("Tu pedido ya está en camino.", ["estado en_camino"]),
+    ],
+)
+def test_a_direct_statement_about_the_status_still_counts(text, found):
+    assert attribute_discrepancies(says(text), TABLET) == found
 
 
 def test_discrepancies_count_in_any_message_not_only_the_last():
