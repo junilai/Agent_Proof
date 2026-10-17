@@ -265,3 +265,54 @@ tc-06 es el único caso dudoso. Una regla que lo resolviera sola podría equivoc
 - **La guía se escribe antes que las reglas.** Las etiquetas a mano de las 20 conversaciones siguen esta tabla, y las reglas se ajustan a las etiquetas, no al revés.
 - **Ningún caso se resuelve con la decisión contraria.** Si una conversación no encaja en la tabla, queda sin resolver.
 - **Límite.** La guía se derivó de las conversaciones del corpus. Antes del tag se mide el acierto del oráculo sobre conversaciones nuevas, de la línea base y de mutantes, etiquetadas a ciegas y sin ajustar ninguna regla con ellas.
+
+## D-010 · Conjunto de validación del oráculo
+
+- **Fecha:** 17 de octubre de 2026
+- **Estado:** decidida; se ejecuta antes del tag del pre-registro
+- **Origen:** ajuste del oráculo con el corpus completo ([D-005](#d-005--calibración-del-oráculo-con-respuestas-de-agentes-degradados), [D-009](#d-009--qué-cuenta-como-escalamiento-del-reembolso))
+
+### El problema
+
+Las reglas del oráculo se ajustaron mirando las 20 conversaciones del corpus y las 28 respuestas de la calibración. Medir el acierto sobre esos mismos datos no dice cuánto acierta con conversaciones nuevas, y E1 lee sobre todo conversaciones de agentes degradados. El diseño de la validación se fija aquí, antes de generar ninguna conversación.
+
+### El diseño
+
+**Composición.** Una repetición por conversación. Los escenarios se sortean con la semilla `20261019`, dentro del conjunto de cada condición:
+
+| Condición | Conversaciones | De dónde |
+|---|---|---|
+| línea base | 10 | sorteo entre los 20 escenarios |
+| D1 | 10 | sorteo entre sus 17 escenarios expuestos |
+| D2 | 10 | sorteo entre sus 15 escenarios expuestos |
+| D4 | 10 | sorteo entre sus 17 escenarios expuestos |
+| D5 | 10 | sus 5 escenarios expuestos, con 2 repeticiones |
+
+D1 se incluye porque las discrepancias de atributos solo se habían probado con texto escrito para la prueba (limitación 1 de D-005).
+
+**Aislamiento.** Las corridas se guardan en `evidence/validacion-oraculo/`, con su propia copia del corpus, y no se juzgan. No entran en el análisis de E1.
+
+**Etiquetas.** Por cada conversación se registra:
+
+- la decisión comunicada según D-009: procede, no procede, escalamiento, sin resolver o ninguna (solo en las tarjetas con decisión);
+- si el agente enunció un dato del pedido que contradice la base;
+- en las tarjetas de estado del pedido, si le dio el estado al cliente.
+
+**Quién etiqueta.** El autor y Claude, por separado y a ciegas. La planilla presenta las conversaciones en orden aleatorio, con un identificador opaco y la transcripción ciega, sin la condición ni la salida del oráculo. Ninguno ve las etiquetas del otro hasta que los dos terminan. Se mide la concordancia por campo, con el porcentaje de acuerdo y el κ de Cohen. Los desacuerdos se concilian uno por uno y queda escrito el motivo de cada cambio. El oráculo se mide contra las etiquetas conciliadas.
+
+**Qué se reporta.**
+
+- El acierto de la decisión y, en particular, las clasificaciones al revés.
+- Los casos sin resolver.
+- La matriz de los atributos: verdaderos y falsos positivos y negativos.
+- La concordancia de cada predicado con el que se sigue de las etiquetas conciliadas.
+
+### Qué pasa con el resultado
+
+- **Las reglas no se tocan durante la validación.**
+- **Una clasificación al revés o un falso positivo de atributos** se analiza con el autor antes del tag. Si se corrige, la regla nueva lleva casos escritos a mano y se valida con otra muestra de 20 conversaciones, sorteada con la semilla `20261020`. Las dos mediciones se reportan.
+- **Las omisiones y los casos sin resolver no obligan a corregir.** En el experimento van a la anotación manual, y su tasa se reporta (§4 del pre-registro).
+
+### Límite que se declara
+
+Claude escribió las reglas del oráculo. Etiqueta sin ver su salida, pero las conoce. Por eso las etiquetas del autor se escriben por separado, se mide su concordancia y la conciliación queda escrita.
