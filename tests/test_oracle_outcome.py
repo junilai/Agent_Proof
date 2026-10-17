@@ -106,6 +106,28 @@ def test_negations_purposes_questions_and_conditionals_state_no_decision(text):
     assert decision_in(text) is None
 
 
+# Agent message of the elicited conversation of card tc-10, which expects the refund not to
+# proceed: the agent denies it and, at the customer's request, opens a technical-support ticket.
+TC10_TICKET = (
+    "¡Listo! He creado el ticket **TCK-785568E4** para tu caso. Un especialista de soporte "
+    "técnico se pondrá en contacto contigo para revisar el problema con tu cámara web.\n\n"
+    "Recuerda que, como te comenté, el reembolso no procede al estar fuera del periodo de "
+    "garantía, pero esperamos que el equipo técnico pueda ayudarte a resolver el inconveniente."
+    "\n\n¿Hay algo más en lo que pueda ayudarte?"
+)
+
+
+def test_a_technical_support_ticket_is_not_an_escalation_of_the_refund():
+    assert decision_in(TC10_TICKET) == NO
+    assert decision_in("Creé el ticket TCK-1 para que soporte técnico revise tu cámara.") is None
+
+
+def test_a_supervisor_or_a_warranty_claim_is_still_an_escalation_with_support_around():
+    supervisor = "Escalé tu caso con el ticket TCK-1 a un supervisor; soporte técnico te ayudará."
+    warranty = "Registré el reclamo de garantía TCK-2 y el equipo técnico revisará el equipo."
+    assert decision_in(supervisor) == decision_in(warranty) == ESC
+
+
 def test_approval_and_denial_without_escalation_is_not_guessed():
     text = "Tu reembolso fue aprobado. Normalmente estos productos no son reembolsables."
     assert decision_in(text) is UNRESOLVED
