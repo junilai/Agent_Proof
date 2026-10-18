@@ -53,17 +53,19 @@ Se leyeron, criterio por criterio, los 20 veredictos contra su transcripción.
 
 ## Conciliación con la consola de Anthropic
 
-Se compara el gasto del 17 de octubre de 2026 (UTC), el día en que corrieron las tres inducciones, las dos muestras de validación del oráculo, el piloto y dos pruebas en vivo, con la consola leída a las 23:07 UTC.
+*Corregida el 18 de octubre de 2026.* La primera versión de esta sección comparaba con la consola leída el 17 de octubre a las 23:07 UTC y concluía que solo faltaba el evaluador del piloto. En realidad faltaba **todo el piloto**: la consola tarda más de una hora en reflejar el gasto. Se rehízo con la lectura del 18 de octubre a las 04:45 UTC, cuando la fila del 17 ya no cambiaba.
+
+Se compara el gasto del 17 de octubre de 2026 (UTC), el día en que corrieron las tres inducciones, las dos muestras de validación del oráculo, el piloto y dos pruebas en vivo.
 
 | Modelo | Uso | Registro de AgentProof (USD) | Consola (USD) |
 |---|---|---|---|
-| Claude Haiku 4.5 | usuario simulado | ~0.30 | 0.31 |
-| Claude Opus 5 | inductor ×3, evaluador del piloto y pruebas en vivo | ~1.98 | 1.50 |
-| Claude Sonnet 5 | agente | 5.05 (estimación de su SDK) | 1.93 |
-| **Total** | | **~7.3** | **3.74** |
+| Claude Haiku 4.5 | usuario simulado | 0.29 | 0.41 |
+| Claude Opus 5 | inductor ×3, evaluador del piloto y pruebas en vivo | ~1.98 | 2.04 |
+| Claude Sonnet 5 | agente | 5.05 (estimación de su SDK) | 2.37 |
+| **Total** | | **~7.3** | **4.82** |
 
-- **Haiku coincide.** Es el único componente cuyo costo se calcula entero desde tokens sin caché.
-- **Opus coincide si se descuenta el evaluador del piloto (USD 0.54).** Los juicios corrieron entre las 22:51 y las 22:56 UTC, y la consola aún no los reflejaba: una lectura cuatro minutos antes ya mostraba la misma cifra de Opus, mientras Sonnet y Haiku seguían subiendo. Sin el piloto, el registro da 1.44, frente a 1.50.
-- **El costo del agente está sobreestimado.** La consola marca un 38 % de la estimación del SDK y un 61 % de los tokens valorados a precio de lista (USD 3.18). La causa más probable es la caché de prompts: el Agent SDK reutiliza el prompt de sistema y las herramientas en cada turno, y esa parte se cobra a una fracción del precio. Es la misma discrepancia observada desde F1 (consola USD 0.67 frente a 0.86 al 25 de septiembre).
+- **Opus coincide.** Es el inductor y el evaluador, cuyo costo se calcula desde los tokens que devuelve la API.
+- **El costo del agente está sobreestimado.** La consola marca un 47 % de la estimación del SDK. La causa más probable es la caché de prompts: el Agent SDK reutiliza el prompt de sistema y las herramientas en cada turno, y esa parte se cobra a una fracción del precio.
+- **Haiku tiene un gasto que no se registra**, de unos USD 0.12 en las 90 conversaciones con el agente de ese día. La primera tanda de E1 lo confirma: 0.11 de más en 100 conversaciones. Es un monto fijo por conversación del agente, lo que apunta a llamadas internas del Agent SDK con Haiku, ajenas al usuario simulado.
 
-**Consecuencia para la proyección.** La proyección de E1 basada en la estimación del SDK (unos USD 70) es un techo. Con el costo del agente según la consola, E1 costaría unos USD 42 (agente 17, evaluador 22, usuario simulado 3) y E4 unos USD 21. El costo del agente que reporte la tesis se tomará de la consola, y el registro se usa para el desglose por componente y por escenario.
+**Consecuencia para la proyección.** La proyección de E1 basada en la estimación del SDK (unos USD 70) es un techo. La primera tanda de E1 (`baseline-a`, 100 conversaciones con su juicio) costó USD 4.57 según la consola, así que E1 costaría unos USD 37 y E4 unos USD 18. El costo del agente que reporte la tesis se tomará de la consola, y el registro se usa para el desglose por componente y por escenario.
