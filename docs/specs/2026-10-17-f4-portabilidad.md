@@ -35,7 +35,7 @@ F4 demuestra que AgentProof se incorpora a otros frameworks sin tocar su núcleo
 - `reply`: el texto que ve el cliente;
 - `events`: los mensajes del agente y una `tool_call` por llamada, con el nombre del dominio (`lookup_order`, `get_refund_policy`, `create_ticket`), sus argumentos (`order_id`, `summary`), su resultado y `is_error`. Las herramientas internas del framework, como `final_answer` de smolagents, no se registran como llamadas;
 - `stop_reason`: `step_limit` cuando se alcanza el límite de pasos, `error` ante un error del modelo o del framework, y `completed` en otro caso. Alcanzar el límite nunca es un error (§5.4);
-- `usage`: los tokens del turno. Como estos frameworks no reportan costo, el adaptador lo calcula con la tabla de precios fechada (`agentproof.pricing`) y deja `None` si el modelo no tiene precio.
+- `usage`: los tokens del turno. Como estos frameworks no reportan costo, el adaptador lo calcula con la tabla de precios fechada (`agentproof.pricing`). Usa el modelo que la edición pide en la llamada, que es el de la variante, y no el identificador que devuelve la respuesta, que puede traer fecha o snapshot. Una prueba exige que el modelo de cada variante, incluido el degradado de D3, tenga precio en la tabla.
 
 **Aislamiento.** Cada conversación empieza con memoria vacía. El adaptador no abre la sesión si `LANGSMITH_TRACING` o `LANGCHAIN_TRACING_V2` están activos, ni si la telemetría de CrewAI no está desactivada. El mensaje de error dice qué variable cambiar.
 
@@ -43,7 +43,7 @@ F4 demuestra que AgentProof se incorpora a otros frameworks sin tocar su núcleo
 
 ## 4. Pruebas que cada edición debe pasar
 
-Se escriben antes que cada edición. Corren sin la API, con un modelo falso del propio framework (`GenericFakeChatModel` de LangChain, un `Model` falso de smolagents, un `LLM` falso de CrewAI). Cada prueba nombra la regla que verifica:
+Se escriben antes que cada edición. Corren sin la API, con un modelo falso del propio framework (uno propio sobre `BaseChatModel` de LangChain, que además registra las herramientas pasadas a `bind_tools`; un `Model` falso de smolagents, un `LLM` falso de CrewAI). Cada prueba nombra la regla que verifica:
 
 1. **Herramientas.** Con la línea base, el agente tiene exactamente `lookup_order`, `get_refund_policy` y `create_ticket`, con las descripciones del dominio. Una llamada de `lookup_order` llega a la traza con `tool="lookup_order"`, `arguments={"order_id": ...}` y el resultado del dominio.
 2. **Las seis mutaciones, con la misma definición.** D1 no tiene `lookup_order`. D2 y D5 reciben `system_prompt(mutation)`. D3 usa `TARGET_DOWNGRADED_MODEL`. D4 devuelve `policy_text(CORRUPT_POLICY)`. D6 usa el límite calibrado. La línea base usa 10 pasos. `tests/test_editions_mutations.py` pasa a recorrer las cuatro ediciones.
