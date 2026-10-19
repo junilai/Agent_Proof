@@ -81,7 +81,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F5 E1 y E4 — objetivo: noviembre
 
-- [ ] E1: ~800 conversaciones en el framework principal (§5.8)
+- [x] E1: ~800 conversaciones en el framework principal (§5.8). Evidencia: [`docs/e1.md`](e1.md) y `results/`, 18-oct-2026. Las 800 conversaciones y sus juicios, sin un solo reintento ni error del agente; 13 casos anotados a mano. USD 37.89 según la consola
 - [ ] E4: ~400 conversaciones en LangGraph (§5.8)
 - [ ] **Hito:** datos crudos en `results/`
 
