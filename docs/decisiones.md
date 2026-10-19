@@ -375,3 +375,26 @@ El κ de la contradicción es 0 por prevalencia: un solo anotador marcó un caso
 - **Verificación.** Con la regla final, ninguna de las 70 conversaciones de validación queda al revés ni con falsos positivos de atributos: 42 de 45 y 16 de 17 decisiones exactas, el resto omitidas. Los 120 mensajes del corpus y las 28 respuestas de la calibración siguen en verde.
 - **Qué mide cada cifra.** Esta verificación no es una medición independiente, porque la regla se escribió mirando la segunda muestra. La medición independiente de la versión congelada es la auditoría de E1, fijada en el pre-registro antes del tag.
 - **Las reglas quedan congeladas.** Un cambio posterior es una enmienda. Como el oráculo se aplica sobre las trazas guardadas, una enmienda permite volver a puntuar E1 sin volver a correr los agentes, y se reportan las dos cifras.
+
+## D-011 · Cómo se aplican los topes de la muestra de E2
+
+- **Fecha:** 19 de octubre de 2026
+- **Estado:** decidida con el autor antes de sortear la muestra; se implementa en `src/experiments/samples.py`
+- **Origen:** escritura del sorteo de E2, después de E1
+
+### El problema
+
+La planificación (§5.5) y el pre-registro (§6) dicen que, dentro de cada estrato, "ningún escenario ni ninguna versión del agente aporta más de dos pares". La frase admite dos lecturas: dos topes separados, uno por escenario y otro por versión, o un tope por cada combinación de escenario y versión. Con la primera lectura, las versiones de E1 no alcanzan para llenar un estrato de 20 con el tope de dos.
+
+### La regla
+
+- **Dos topes separados, como dice el texto.** En cada estrato, ningún escenario aporta más de dos pares y ninguna versión del agente aporta más de dos.
+- **Versión del agente es la variante.** `baseline-a` y `baseline-b` son el mismo agente, así que E1 tiene siete versiones: la línea base y las seis mutaciones.
+- **Se activa la contingencia ya pre-registrada.** Siete versiones con dos pares cada una suman 14, menos de 20. Por eso, en el estrato que no se llena, los dos topes suben a tres, que alcanza para 21 pares. Si aun así no se llena, ambos estratos se reducen al tamaño del menor.
+- **Cómo se sortea.** Los pares juzgados de cada estrato se barajan con la semilla `20261018`, se recorren en ese orden y se toma cada par que no supere ningún tope, hasta llegar a 20. Se excluyen las repeticiones inválidas y las trazas sin juicio.
+
+### Por qué así
+
+- **Es la lectura literal**, y la contingencia que resuelve el déficit ya estaba pre-registrada; no se agrega una regla nueva.
+- **Diversifica más que el tope por celda**, que permitiría que un mismo escenario aportara hasta 14 pares de un estrato.
+- **Se reporta.** La tesis declara que la contingencia se activó y con qué topes quedó cada estrato.
