@@ -71,4 +71,14 @@ Los atributos se extraen con patrones de importes, fechas y estados del pedido, 
 \par
 La cola de anotación manual es un comando de terminal que presenta los casos pendientes en un orden aleatorio con semilla fija. Para cada uno muestra la situación, los datos del pedido y la transcripción, pero no la condición del agente, el desenlace esperado ni la salida de las reglas, y guarda cada anotación en un archivo del repositorio que el análisis lee junto con las trazas.
 \par
+
+\subtituloapa{Pruebas automatizadas}
+El prototipo tiene 562 pruebas automatizadas en 61 archivos, con unas cinco mil líneas, que corren sin acceso a la API en unos cinco segundos. Para eso, las pruebas usan dobles de cada pieza externa: un usuario que sigue un guion, una sesión de agente que devuelve turnos fijados, un reloj que avanza de forma controlada y un cliente de la API que devuelve respuestas fijadas, incluidas respuestas inválidas y errores. Con ellos se ejecuta el pipeline completo, desde la grabación hasta el reporte, y se fijan los casos difíciles, como una conversación que falla a la mitad, un juicio incompleto o una corrida interrumpida. Las pruebas del criterio estadístico fijan los valores p de la planificación y el número mínimo de escenarios que deben regresar juntos para que la corrección por comparaciones múltiples declare una regresión. Las del oráculo incluyen los 120 mensajes del corpus etiquetados a mano y las respuestas de la calibración, de modo que un cambio en las reglas que clasifique alguno al revés hace fallar la integración continua.
+\par
+Otras 18 pruebas en vivo llaman a la API y se ejecutan a mano, porque cuestan dinero. Verifican lo que un doble no puede: que el inductor produce criterios válidos, que el evaluador califica cada criterio, que el agente está aislado y que cada mutación se comporta como se declara. Cada ejecución en vivo registra su costo.
+\par
+El protocolo experimental también está protegido por pruebas. Una prueba calcula una huella criptográfica de cada pieza del protocolo, como los prompts, los modelos fijados, las mutaciones, las reglas del oráculo, el corpus semilla y los escenarios inducidos, y la compara con la tabla publicada en el documento de pre-registro. Si una pieza cambia sin que se declare como enmienda, la integración continua falla. Los sorteos de las muestras se generan con un comando a partir de semillas fijadas antes de ver los datos, y otra prueba verifica que lo publicado en el pre-registro coincide con lo que el comando genera.
+\par
+La integración continua ejecuta las pruebas, el análisis de estilo y la compilación de este documento ante cada cambio. Además, cada commit se verificó en un clon limpio del repositorio antes de integrarlo, para que ninguno dependa de archivos que solo existen en el equipo del autor.
+\par
 \endgroup
