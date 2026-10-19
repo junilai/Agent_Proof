@@ -6,5 +6,14 @@
 \tituloapa[Desarrollo del prototipo]{DESARROLLO DEL PROTOTIPO}
 \begingroup\dobleesp
 \vspace{6pt}
+Este capítulo describe cómo se implementaron AgentProof y el aparato experimental con que se evalúa, tal como quedaron al congelar el protocolo y ejecutar el primer experimento. El capítulo de la propuesta explica el diseño; aquí se explica cómo se materializó, qué decisiones de implementación exigió y cómo se verifica que el código hace lo que el diseño dice. La portabilidad a LangGraph, CrewAI y smolagents se describirá al completar esa fase.
+\par
+
+\subtituloapa{Organización del código}
+El código vive en un repositorio público con licencia MIT. Está escrito en Python 3.12, con las dependencias fijadas en un archivo de bloqueo para que cualquier persona reproduzca el mismo entorno, y se organiza en tres paquetes con dependencias en una sola dirección. El paquete \texttt{agentproof} es la herramienta, con unas 1850 líneas en su núcleo y un adaptador por framework. El paquete \texttt{casestudy} contiene el agente del caso de estudio: un dominio sin dependencias de ningún framework, de unas 390 líneas, y una edición por framework. El paquete \texttt{experiments}, de unas 2100 líneas, reúne lo que solo sirve para la tesis: las tarjetas de situación, el informe de cobertura, las condiciones experimentales, el oráculo, el análisis estadístico, el pre-registro y los sorteos.
+\par
+La dirección de las dependencias es la que hace creíble la evaluación. El paquete de experimentos puede usar los otros dos; el caso de estudio solo toma de la herramienta el módulo que fija los modelos; y el núcleo no importa ninguno de los dos ni ningún framework de agentes. Así, la herramienta no puede saber qué degradación tiene el agente que evalúa, ni el oráculo, que define la verdad de referencia, puede reutilizar la lógica del detector que se mide con él. Una prueba automática recorre el árbol sintáctico de cada módulo, incluidas las importaciones dentro de funciones, y falla si alguna de estas reglas se rompe. Los frameworks se declaran como dependencias opcionales, de modo que instalar la herramienta no instala ninguno.
+\par
+Todos los datos se guardan como documentos JSON dentro del repositorio: las trazas semilla y los escenarios inducidos del corpus, y para cada corrida su manifiesto, sus trazas y sus juicios. Las cifras de la tesis se calculan a partir de esos archivos con un comando, sin volver a llamar a ningún modelo, así que cualquier lector puede regenerarlas.
 \par
 \endgroup
