@@ -1,0 +1,101 @@
+operator,scenario_id,reference,candidate,exposed,manifested,status
+d1,sc-tr-08b90a7484e8,0.0000,1.0000,True,True,ok
+d1,sc-tr-0b1ba54b3bff,0.0000,0.2000,True,False,señal débil
+d1,sc-tr-1bcac31bb099,0.0000,0.8000,True,True,ok
+d1,sc-tr-1d3d63b4ec80,0.0000,0.0000,True,False,ok
+d1,sc-tr-3ee71ca0bdcf,0.0000,1.0000,True,True,señal débil
+d1,sc-tr-49f9d41b2bc6,0.0000,1.0000,True,True,ok
+d1,sc-tr-69b396c04669,0.0000,0.8000,True,True,señal débil
+d1,sc-tr-6c6ab21b3116,0.2000,1.0000,True,True,ok
+d1,sc-tr-8e76607664f8,0.0000,0.6000,True,True,ok
+d1,sc-tr-91931c2b95fa,0.0000,0.0000,True,False,ok
+d1,sc-tr-96424db58a33,0.0000,0.8000,True,True,ok
+d1,sc-tr-9a551596a82f,0.0000,0.0000,False,False,ok
+d1,sc-tr-a450dfb016b9,0.0000,0.0000,True,False,señal débil
+d1,sc-tr-b5c4babdd36b,0.0000,0.0000,False,False,ok
+d1,sc-tr-c54fe59dc976,0.0000,0.4000,True,True,ok
+d1,sc-tr-d707df857e02,0.0000,0.4000,True,True,señal débil
+d1,sc-tr-dcdc60171b83,0.0000,0.0000,False,False,ok
+d1,sc-tr-e326cdcb18af,0.0000,0.0000,True,False,ok
+d1,sc-tr-f4615497b746,0.0000,1.0000,True,True,ok
+d1,sc-tr-f4fbcd9bf2e0,0.0000,0.0000,True,False,señal débil
+d2,sc-tr-08b90a7484e8,0.0000,0.0000,True,False,ok
+d2,sc-tr-0b1ba54b3bff,0.0000,0.0000,True,False,ok
+d2,sc-tr-1bcac31bb099,0.0000,0.0000,True,False,ok
+d2,sc-tr-1d3d63b4ec80,0.0000,0.0000,True,False,ok
+d2,sc-tr-3ee71ca0bdcf,0.0000,0.0000,False,False,ok
+d2,sc-tr-49f9d41b2bc6,0.0000,0.2000,True,False,ok
+d2,sc-tr-69b396c04669,0.0000,0.4000,True,True,ok
+d2,sc-tr-6c6ab21b3116,0.0000,0.0000,False,False,ok
+d2,sc-tr-8e76607664f8,0.0000,0.0000,True,False,ok
+d2,sc-tr-91931c2b95fa,0.0000,0.0000,True,False,ok
+d2,sc-tr-96424db58a33,0.2000,0.0000,True,False,señal débil
+d2,sc-tr-9a551596a82f,0.0000,0.0000,False,False,ok
+d2,sc-tr-a450dfb016b9,0.0000,0.0000,True,False,ok
+d2,sc-tr-b5c4babdd36b,0.0000,0.0000,False,False,ok
+d2,sc-tr-c54fe59dc976,0.4000,0.0000,True,False,ok
+d2,sc-tr-d707df857e02,0.4000,0.6000,True,False,ok
+d2,sc-tr-dcdc60171b83,0.0000,0.0000,False,False,ok
+d2,sc-tr-e326cdcb18af,0.8000,0.8000,True,False,ok
+d2,sc-tr-f4615497b746,0.2000,0.2000,True,False,ok
+d2,sc-tr-f4fbcd9bf2e0,0.0000,0.0000,True,False,ok
+d4,sc-tr-08b90a7484e8,0.0000,1.0000,True,True,regresión
+d4,sc-tr-0b1ba54b3bff,0.0000,0.8000,True,True,regresión
+d4,sc-tr-1bcac31bb099,0.0000,1.0000,True,True,regresión
+d4,sc-tr-1d3d63b4ec80,0.0000,1.0000,True,True,regresión
+d4,sc-tr-3ee71ca0bdcf,0.0000,0.0000,False,False,ok
+d4,sc-tr-49f9d41b2bc6,0.0000,0.0000,True,False,ok
+d4,sc-tr-69b396c04669,0.0000,0.0000,True,False,señal débil
+d4,sc-tr-6c6ab21b3116,0.0000,0.0000,False,False,ok
+d4,sc-tr-8e76607664f8,0.0000,0.0000,True,False,ok
+d4,sc-tr-91931c2b95fa,0.0000,0.0000,True,False,ok
+d4,sc-tr-96424db58a33,0.2000,0.0000,True,False,señal débil
+d4,sc-tr-9a551596a82f,0.0000,0.0000,True,False,señal débil
+d4,sc-tr-a450dfb016b9,0.0000,0.8000,True,True,regresión
+d4,sc-tr-b5c4babdd36b,0.0000,0.0000,False,False,ok
+d4,sc-tr-c54fe59dc976,0.4000,0.2000,True,False,ok
+d4,sc-tr-d707df857e02,0.4000,0.2000,True,False,ok
+d4,sc-tr-dcdc60171b83,0.0000,0.0000,True,False,señal débil
+d4,sc-tr-e326cdcb18af,0.8000,1.0000,True,False,regresión
+d4,sc-tr-f4615497b746,0.2000,0.0000,True,False,ok
+d4,sc-tr-f4fbcd9bf2e0,0.0000,1.0000,True,True,regresión
+d5,sc-tr-08b90a7484e8,0.0000,0.0000,False,False,ok
+d5,sc-tr-0b1ba54b3bff,0.0000,0.0000,False,False,ok
+d5,sc-tr-1bcac31bb099,0.0000,0.2000,False,False,ok
+d5,sc-tr-1d3d63b4ec80,0.0000,0.2000,True,False,ok
+d5,sc-tr-3ee71ca0bdcf,0.0000,0.0000,False,False,ok
+d5,sc-tr-49f9d41b2bc6,0.0000,0.0000,False,False,ok
+d5,sc-tr-69b396c04669,0.0000,0.0000,False,False,señal débil
+d5,sc-tr-6c6ab21b3116,0.0000,0.0000,False,False,ok
+d5,sc-tr-8e76607664f8,0.0000,,False,False,ok
+d5,sc-tr-91931c2b95fa,0.0000,0.0000,False,False,ok
+d5,sc-tr-96424db58a33,0.2000,0.2000,True,False,ok
+d5,sc-tr-9a551596a82f,0.0000,0.0000,False,False,ok
+d5,sc-tr-a450dfb016b9,0.0000,0.0000,False,False,ok
+d5,sc-tr-b5c4babdd36b,0.0000,0.0000,False,False,ok
+d5,sc-tr-c54fe59dc976,0.4000,0.0000,False,False,ok
+d5,sc-tr-d707df857e02,0.4000,0.6000,True,False,ok
+d5,sc-tr-dcdc60171b83,0.0000,0.0000,False,False,ok
+d5,sc-tr-e326cdcb18af,0.8000,0.6000,True,False,ok
+d5,sc-tr-f4615497b746,0.2000,0.2000,False,False,ok
+d5,sc-tr-f4fbcd9bf2e0,0.0000,0.0000,True,False,ok
+d6,sc-tr-08b90a7484e8,0.0000,0.0000,True,False,regresión
+d6,sc-tr-0b1ba54b3bff,0.0000,0.2000,True,False,regresión
+d6,sc-tr-1bcac31bb099,0.0000,0.0000,True,False,regresión
+d6,sc-tr-1d3d63b4ec80,0.0000,0.0000,True,False,ok
+d6,sc-tr-3ee71ca0bdcf,0.0000,0.0000,False,False,ok
+d6,sc-tr-49f9d41b2bc6,0.0000,0.0000,False,False,ok
+d6,sc-tr-69b396c04669,0.0000,0.0000,True,False,señal débil
+d6,sc-tr-6c6ab21b3116,0.0000,0.0000,False,False,ok
+d6,sc-tr-8e76607664f8,0.0000,0.0000,False,False,ok
+d6,sc-tr-91931c2b95fa,0.0000,0.2000,True,False,regresión
+d6,sc-tr-96424db58a33,0.0000,0.0000,True,False,señal débil
+d6,sc-tr-9a551596a82f,0.0000,0.0000,False,False,ok
+d6,sc-tr-a450dfb016b9,0.0000,0.0000,True,False,regresión
+d6,sc-tr-b5c4babdd36b,0.0000,0.0000,False,False,ok
+d6,sc-tr-c54fe59dc976,0.0000,0.0000,False,False,ok
+d6,sc-tr-d707df857e02,0.0000,0.2000,True,False,ok
+d6,sc-tr-dcdc60171b83,0.0000,0.0000,False,False,ok
+d6,sc-tr-e326cdcb18af,0.0000,0.0000,True,False,ok
+d6,sc-tr-f4615497b746,0.0000,0.0000,True,False,señal débil
+d6,sc-tr-f4fbcd9bf2e0,0.0000,0.0000,False,False,ok

@@ -1,0 +1,7 @@
+Costo por componente (precios al 2026-10-16, USD por millón de tokens; el agente, según su SDK)
+componente         con registro sin registro    entrada    salida       USD  s medios
+inductor                     20            0      52340     10472    0.5235       8.0
+usuario simulado            800            0    1775327    106085    2.3058       3.3
+agente                      800            0    8251744    900000   37.8322      14.5
+evaluador                   800            0    1864133    404766   19.4398       7.2
+total: USD 60.1013 (a conciliar con la consola de Anthropic)
