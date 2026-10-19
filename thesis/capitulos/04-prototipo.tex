@@ -16,4 +16,31 @@ La dirección de las dependencias es la que hace creíble la evaluación. El paq
 \par
 Todos los datos se guardan como documentos JSON dentro del repositorio: las trazas semilla y los escenarios inducidos del corpus, y para cada corrida su manifiesto, sus trazas y sus juicios. Las cifras de la tesis se calculan a partir de esos archivos con un comando, sin volver a llamar a ningún modelo, así que cualquier lector puede regenerarlas.
 \par
+
+\subtituloapa{El núcleo de AgentProof}
+El núcleo implementa las etapas del pipeline como funciones independientes que se comunican solo a través del esquema de trazas y de los archivos que guarda. Una única función conduce cada conversación, tanto al grabar a una persona como al reejecutar un escenario: envía cada mensaje a la sesión del adaptador, numera los eventos que recibe y produce exactamente una traza, incluso cuando la conversación termina por un error. El motivo de terminación queda normalizado en la traza: el usuario dio la conversación por terminada, se agotó el presupuesto de diez turnos, el agente alcanzó su límite de pasos o falló el agente o el usuario simulado.
+\par
+Las tres etapas cognitivas usan la API del proveedor con los modelos fijados en un único módulo. El inductor y el evaluador piden una salida estructurada que se valida contra un esquema antes de aceptarse. El inductor produce, a partir de una traza semilla, el objetivo del usuario, el mensaje inicial y entre dos y cinco criterios sobre el desenlace de la conversación. El evaluador recibe solo los criterios y la transcripción ciega, y debe calificar cada criterio exactamente una vez; si su respuesta omite o repite alguno, se le vuelve a preguntar y, si falla de nuevo, el juicio queda registrado como fallido, sin completar nunca un resultado que el modelo no dio. La repetición aprueba solo si cumple todos los criterios. El usuario simulado conoce el objetivo del escenario y ve únicamente lo que vería un cliente, los mensajes del agente y no sus llamadas a herramientas, y señala el fin de la conversación con una marca explícita.
+\par
+El ejecutor reejecuta cada escenario el número de repeticiones pedido contra una variante del agente y aplica la regla de repeticiones inválidas decidida antes del experimento: repite la conversación si falló el usuario simulado, vuelve a juzgar la misma traza si falló el evaluador y nunca repite una conversación por algo que hizo el agente, porque eso es lo que se mide. Los intentos fallidos se conservan con su número, y los topes de reintentos se reparten entre la conversación y el juicio. Una corrida interrumpida se retoma sin repetir lo ya hecho, y un archivo de bloqueo con el identificador del proceso impide que la misma corrida se ejecute dos veces a la vez, un defecto que apareció en una prueba en vivo y que la prueba correspondiente ahora fija.
+\par
+El reporte compara dos corridas escenario por escenario con la prueba exacta de Fisher, corrige por comparaciones múltiples con Benjamini-Hochberg y clasifica cada escenario como regresión, señal débil u ok. Solo la regresión hace que el comando termine con código 2, lo que permite usarlo como compuerta en un sistema de integración continua. Cada etapa registra los tokens y los segundos de cada llamada, y el costo se calcula con una tabla de precios fechada; para el agente, que usa caché de prompts, se registra además la estimación de su SDK, y ambos se concilian con la facturación del proveedor. Todas las operaciones se exponen en una interfaz de línea de comandos (Tabla~\ref{tab:comandos}).
+\par
+
+\begin{table}[H]
+  \setstretch{0.952}
+  \caption{Comandos de AgentProof}
+  \label{tab:comandos}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{0.8in}|>{\raggedright\arraybackslash}p{5in}|}
+    \hline
+    \textbf{Comando} & \textbf{Qué hace} \\ \hline
+    \texttt{record} & Graba una conversación con una persona como traza semilla, ligada a su tarjeta de situación \\ \hline
+    \texttt{induce} & Induce el escenario de cada traza semilla que aún no lo tiene \\ \hline
+    \texttt{run} & Reejecuta los escenarios con el usuario simulado contra una variante del agente, con repeticiones \\ \hline
+    \texttt{resume} & Retoma una corrida interrumpida sin repetir lo que ya se ejecutó \\ \hline
+    \texttt{judge} & Juzga las trazas de una corrida que aún no tienen juicio \\ \hline
+    \texttt{report} & Compara dos corridas; termina con 2 si hay regresiones y con 0 si no \\ \hline
+    \texttt{cost} & Informa el costo y la latencia por componente, con la fecha de los precios \\ \hline
+  \end{tabular}
+\end{table}
 \endgroup
