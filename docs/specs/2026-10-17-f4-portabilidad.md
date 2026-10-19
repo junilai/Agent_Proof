@@ -2,7 +2,7 @@
 
 - **Autor:** Jarod Tierra Medina
 - **Fecha:** 17 de octubre de 2026
-- **Estado:** borrador
+- **Estado:** aprobado el 19 de octubre de 2026
 - **Contexto:** fase F4 del [plan maestro](2026-09-21-plan-maestro.md). "§" remite a la [planificación](../planificacion.pdf). El protocolo vigente es el del tag `preregistro-v2` ([pre-registro](../preregistro.md)).
 
 ## 1. Alcance
