@@ -109,8 +109,10 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
   - [x] Réplica de la búsqueda en Scopus, IEEE Xplore y ACM Digital Library (§5, A2). Evidencia: 18 consultas el 22-sep-2026, 709 resultados, 256 revisados por título y resumen; ningún trabajo cubre la combinación completa y tres cubren eslabones aislados, ahora citados en la brecha
 - [x] T2 Diseño experimental y pre-registro — oct. Capítulo 5 completo, con el corpus y la validación del oráculo (Tabla 4); 43 páginas al 17-oct-2026
   - [x] Borrador del capítulo, con sus seis secciones y las referencias de Benjamini-Hochberg, Fleiss y Hayes-Krippendorff verificadas en Crossref
-  - [ ] Cifras del corpus y conjuntos expuestos, al cerrar el corpus
+  - [x] Cifras del corpus y conjuntos expuestos, al cerrar el corpus
 - [ ] T3 Desarrollo del prototipo — nov
+  - [x] Borrador del capítulo, adelantado para el segundo entregable del 25 de octubre: organización del código, núcleo, agente del caso de estudio, operadores de mutación, oráculo y pruebas. Falta la portabilidad, al cerrar F4
 - [ ] T4 Resultados y conclusiones; al final, introducción, resumen y abstract — nov – dic
   - [x] Borrador de la introducción, adelantado para el primer entregable del 27 de septiembre
+  - [x] Resultados preliminares de E1, para el segundo entregable: ejecución, detección por operador y lectura, sujetos a la auditoría del oráculo y a E2
 - [ ] T5 Defensa, entrega, tag `entrega-final` y decisión sobre el historial del prototipo previo — dic
