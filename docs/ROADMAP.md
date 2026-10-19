@@ -87,7 +87,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F6 E2 y E3 — objetivo: noviembre – diciembre
 
-- [ ] Muestra estratificada de 40 pares con semilla registrada (§5.5)
+- [x] Muestra estratificada de 40 pares con semilla registrada (§5.5). Evidencia: `results/samples/e2.json`, 19-oct-2026, semilla `20261018`; 20 aprobados y 20 reprobados, con la contingencia activada (topes de tres por escenario y por versión, [D-011](decisiones.md)). Con el mismo comando, `python -m experiments.samples --data .`, se sortearon las 40 trazas de la auditoría del oráculo (`results/samples/auditoria.json`, semilla `20261021`, 3 con ticket y 2 sin ticket por condición)
 - [ ] Paquetes ciegos para los anotadores (§5.5)
 - [ ] Fichas Likert de fidelidad (§5.8)
 - [ ] Función opcional de revisión de escenarios y suite curada (§5.3)

@@ -1,0 +1,359 @@
+{
+  "seed": 20261021,
+  "traces": [
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-9661686c0f99",
+      "scenario_id": "sc-tr-49f9d41b2bc6",
+      "condition": "baseline-a",
+      "variant": "baseline",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-6d87e694318a",
+      "scenario_id": "sc-tr-a450dfb016b9",
+      "condition": "baseline-a",
+      "variant": "baseline",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-a8189505f9d5",
+      "scenario_id": "sc-tr-91931c2b95fa",
+      "condition": "baseline-a",
+      "variant": "baseline",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-06da731041f5",
+      "scenario_id": "sc-tr-f4fbcd9bf2e0",
+      "condition": "baseline-a",
+      "variant": "baseline",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-92d58142f67d",
+      "scenario_id": "sc-tr-9a551596a82f",
+      "condition": "baseline-a",
+      "variant": "baseline",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "baseline-b-20261018-053952",
+      "trace_id": "tr-6a60814572bc",
+      "scenario_id": "sc-tr-b5c4babdd36b",
+      "condition": "baseline-b",
+      "variant": "baseline",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "baseline-b-20261018-053952",
+      "trace_id": "tr-5e12cf1d31cf",
+      "scenario_id": "sc-tr-91931c2b95fa",
+      "condition": "baseline-b",
+      "variant": "baseline",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "baseline-b-20261018-053952",
+      "trace_id": "tr-bed4450d026f",
+      "scenario_id": "sc-tr-0b1ba54b3bff",
+      "condition": "baseline-b",
+      "variant": "baseline",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "baseline-b-20261018-053952",
+      "trace_id": "tr-e209639ea78c",
+      "scenario_id": "sc-tr-3ee71ca0bdcf",
+      "condition": "baseline-b",
+      "variant": "baseline",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "baseline-b-20261018-053952",
+      "trace_id": "tr-64447aed96ec",
+      "scenario_id": "sc-tr-f4fbcd9bf2e0",
+      "condition": "baseline-b",
+      "variant": "baseline",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-8ca2295eda83",
+      "scenario_id": "sc-tr-08b90a7484e8",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-82259013a79b",
+      "scenario_id": "sc-tr-3ee71ca0bdcf",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-0a7342ff884c",
+      "scenario_id": "sc-tr-3ee71ca0bdcf",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-7b7248d6e975",
+      "scenario_id": "sc-tr-8e76607664f8",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-23b8687799dc",
+      "scenario_id": "sc-tr-f4fbcd9bf2e0",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-0628fac414b8",
+      "scenario_id": "sc-tr-0b1ba54b3bff",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-f41c3cb2f5d3",
+      "scenario_id": "sc-tr-e326cdcb18af",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-d30f4a917f89",
+      "scenario_id": "sc-tr-08b90a7484e8",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-b2413a7f3f88",
+      "scenario_id": "sc-tr-96424db58a33",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-ccbe60b71f73",
+      "scenario_id": "sc-tr-f4fbcd9bf2e0",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-075e54e623aa",
+      "scenario_id": "sc-tr-49f9d41b2bc6",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-2310586c680f",
+      "scenario_id": "sc-tr-8e76607664f8",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-82b4e390f66b",
+      "scenario_id": "sc-tr-69b396c04669",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-9906613c0ce5",
+      "scenario_id": "sc-tr-8e76607664f8",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-0dfa699907a2",
+      "scenario_id": "sc-tr-f4fbcd9bf2e0",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-3130ac13781f",
+      "scenario_id": "sc-tr-91931c2b95fa",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-79bbd837bc84",
+      "scenario_id": "sc-tr-8e76607664f8",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-65675f197702",
+      "scenario_id": "sc-tr-a450dfb016b9",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-75442b9d766b",
+      "scenario_id": "sc-tr-6c6ab21b3116",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-568159851a09",
+      "scenario_id": "sc-tr-1d3d63b4ec80",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-2a7bc490fadd",
+      "scenario_id": "sc-tr-91931c2b95fa",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-203d7fcd22a2",
+      "scenario_id": "sc-tr-91931c2b95fa",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-bbadab1f6c3b",
+      "scenario_id": "sc-tr-a450dfb016b9",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-33ba1e669c88",
+      "scenario_id": "sc-tr-49f9d41b2bc6",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-492c9344d2cd",
+      "scenario_id": "sc-tr-dcdc60171b83",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-e7587467ef84",
+      "scenario_id": "sc-tr-1bcac31bb099",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-1eee6ca656fc",
+      "scenario_id": "sc-tr-e326cdcb18af",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-eead92a75bd8",
+      "scenario_id": "sc-tr-3ee71ca0bdcf",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "con ticket"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-54496a6d910d",
+      "scenario_id": "sc-tr-6c6ab21b3116",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "sin ticket"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-23cc3b2bc2e1",
+      "scenario_id": "sc-tr-9a551596a82f",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "sin ticket"
+    }
+  ],
+  "ticket_share": {
+    "baseline-a": [
+      54,
+      100
+    ],
+    "baseline-b": [
+      52,
+      100
+    ],
+    "d1": [
+      60,
+      100
+    ],
+    "d2": [
+      48,
+      100
+    ],
+    "d3": [
+      52,
+      100
+    ],
+    "d4": [
+      35,
+      100
+    ],
+    "d5": [
+      52,
+      100
+    ],
+    "d6": [
+      49,
+      100
+    ]
+  }
+}

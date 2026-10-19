@@ -1,0 +1,330 @@
+{
+  "seed": 20261018,
+  "pairs": [
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-f8ab143eee8d",
+      "scenario_id": "sc-tr-dcdc60171b83",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-46332da948a0",
+      "scenario_id": "sc-tr-08b90a7484e8",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-6e22c4ddd065",
+      "scenario_id": "sc-tr-a450dfb016b9",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-f7f1b0163df9",
+      "scenario_id": "sc-tr-9a551596a82f",
+      "condition": "baseline-a",
+      "variant": "baseline",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-0f59e25df25c",
+      "scenario_id": "sc-tr-08b90a7484e8",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-9693d164f40c",
+      "scenario_id": "sc-tr-8e76607664f8",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-a530da5829a8",
+      "scenario_id": "sc-tr-69b396c04669",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "baseline-b-20261018-053952",
+      "trace_id": "tr-afd6b5fd9769",
+      "scenario_id": "sc-tr-9a551596a82f",
+      "condition": "baseline-b",
+      "variant": "baseline",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-20aef36a233e",
+      "scenario_id": "sc-tr-0b1ba54b3bff",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-4b1b1d1044b9",
+      "scenario_id": "sc-tr-f4fbcd9bf2e0",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-0dfa699907a2",
+      "scenario_id": "sc-tr-f4fbcd9bf2e0",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "baseline-b-20261018-053952",
+      "trace_id": "tr-5e12cf1d31cf",
+      "scenario_id": "sc-tr-91931c2b95fa",
+      "condition": "baseline-b",
+      "variant": "baseline",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-5895872a19bc",
+      "scenario_id": "sc-tr-e326cdcb18af",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-bda49284d240",
+      "scenario_id": "sc-tr-1d3d63b4ec80",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-ec4e8b45b119",
+      "scenario_id": "sc-tr-3ee71ca0bdcf",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-24ae61385fb7",
+      "scenario_id": "sc-tr-d707df857e02",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-afef4e7908fb",
+      "scenario_id": "sc-tr-1bcac31bb099",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-e107e1e07f06",
+      "scenario_id": "sc-tr-1d3d63b4ec80",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-f227b45ded35",
+      "scenario_id": "sc-tr-9a551596a82f",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-8bb3a16f553b",
+      "scenario_id": "sc-tr-8e76607664f8",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "aprobado"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-544f8bfa4a9c",
+      "scenario_id": "sc-tr-69b396c04669",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-c1cec1a7bf9f",
+      "scenario_id": "sc-tr-b5c4babdd36b",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-9795f182ad27",
+      "scenario_id": "sc-tr-b5c4babdd36b",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-6fd4a66a466f",
+      "scenario_id": "sc-tr-b5c4babdd36b",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-3c351a9161f6",
+      "scenario_id": "sc-tr-a450dfb016b9",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-b104dd6253c4",
+      "scenario_id": "sc-tr-49f9d41b2bc6",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-460bebd86c0e",
+      "scenario_id": "sc-tr-dcdc60171b83",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d4-20261018-044845",
+      "trace_id": "tr-027d21015b71",
+      "scenario_id": "sc-tr-0b1ba54b3bff",
+      "condition": "d4",
+      "variant": "d4",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-468ea9d0c353",
+      "scenario_id": "sc-tr-49f9d41b2bc6",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "baseline-b-20261018-053952",
+      "trace_id": "tr-bc39eee1d70e",
+      "scenario_id": "sc-tr-96424db58a33",
+      "condition": "baseline-b",
+      "variant": "baseline",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "baseline-b-20261018-053952",
+      "trace_id": "tr-c3209087a00a",
+      "scenario_id": "sc-tr-c54fe59dc976",
+      "condition": "baseline-b",
+      "variant": "baseline",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-9985ae0ca8e3",
+      "scenario_id": "sc-tr-d707df857e02",
+      "condition": "d1",
+      "variant": "d1",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-a85966f2d7df",
+      "scenario_id": "sc-tr-8e76607664f8",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-729fffa55391",
+      "scenario_id": "sc-tr-96424db58a33",
+      "condition": "baseline-a",
+      "variant": "baseline",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d5-20261018-053956",
+      "trace_id": "tr-71a0395c6fcf",
+      "scenario_id": "sc-tr-6c6ab21b3116",
+      "condition": "d5",
+      "variant": "d5",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d3-20261018-053958",
+      "trace_id": "tr-4670f1c04162",
+      "scenario_id": "sc-tr-c54fe59dc976",
+      "condition": "d3",
+      "variant": "d3",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-a923fb28c752",
+      "scenario_id": "sc-tr-69b396c04669",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-d9aabd39662c",
+      "scenario_id": "sc-tr-0b1ba54b3bff",
+      "condition": "d6",
+      "variant": "d6",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-48feb38e2297",
+      "scenario_id": "sc-tr-8e76607664f8",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "reprobado"
+    },
+    {
+      "run_id": "d2-20261018-053954",
+      "trace_id": "tr-017304fef7fc",
+      "scenario_id": "sc-tr-69b396c04669",
+      "condition": "d2",
+      "variant": "d2",
+      "stratum": "reprobado"
+    }
+  ],
+  "caps": {
+    "aprobado": 3,
+    "reprobado": 3
+  },
+  "per_stratum": 20
+}
