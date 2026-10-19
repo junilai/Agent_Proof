@@ -1,0 +1,119 @@
+[
+  {
+    "run_id": "d2-20261018-053954",
+    "trace_id": "tr-92a1cc44c720",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T01:31:33.249400Z",
+    "manual": true
+  },
+  {
+    "run_id": "baseline-a-20261018-000105",
+    "trace_id": "tr-990f3c6c7bbd",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T01:57:49.268504Z",
+    "manual": true
+  },
+  {
+    "run_id": "d5-20261018-053956",
+    "trace_id": "tr-ce82d1afd0a3",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:21:42.825538Z",
+    "manual": true
+  },
+  {
+    "run_id": "d5-20261018-053956",
+    "trace_id": "tr-6dc8464c9914",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:23:11.296259Z",
+    "manual": true
+  },
+  {
+    "run_id": "d2-20261018-053954",
+    "trace_id": "tr-39ad5c8bc1d6",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:32:40.773332Z",
+    "manual": true
+  },
+  {
+    "run_id": "d2-20261018-053954",
+    "trace_id": "tr-4d33cf7da76c",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:34:12.462214Z",
+    "manual": true
+  },
+  {
+    "run_id": "d5-20261018-053956",
+    "trace_id": "tr-543a74c8f3c2",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:35:43.786884Z",
+    "manual": true
+  },
+  {
+    "run_id": "d5-20261018-053956",
+    "trace_id": "tr-67b7b84e51ca",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:49:27.589946Z",
+    "manual": true
+  },
+  {
+    "run_id": "d5-20261018-053956",
+    "trace_id": "tr-711a14473d44",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:51:31.498274Z",
+    "manual": true
+  },
+  {
+    "run_id": "d2-20261018-053954",
+    "trace_id": "tr-b2413a7f3f88",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:53:13.392576Z",
+    "manual": true
+  },
+  {
+    "run_id": "d2-20261018-053954",
+    "trace_id": "tr-989dbf3e6d40",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:54:51.366250Z",
+    "manual": true
+  },
+  {
+    "run_id": "baseline-a-20261018-000105",
+    "trace_id": "tr-c4d485e7944e",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:57:24.725918Z",
+    "manual": true
+  },
+  {
+    "run_id": "baseline-a-20261018-000105",
+    "trace_id": "tr-50ccc637a897",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-10-19T02:59:22.003707Z",
+    "manual": true
+  }
+]
