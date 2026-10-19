@@ -1,0 +1,37 @@
+{
+  "trace_id": "tr-d30f4a917f89",
+  "scenario_id": "sc-tr-08b90a7484e8",
+  "run_id": "d2-20261018-053954",
+  "criteria": [
+    {
+      "criterion": "El agente solicita el número de pedido antes de resolver el caso.",
+      "met": true,
+      "justification": "El agente pidió explícitamente el número de pedido antes de proceder, y el cliente respondió AT-1002."
+    },
+    {
+      "criterion": "El agente informa que el reembolso procede por estar dentro del plazo permitido tras la entrega.",
+      "met": true,
+      "justification": "El agente indicó que la solicitud está dentro del plazo de 30 días y que por ello el reembolso procede."
+    },
+    {
+      "criterion": "El agente comunica que el caso se escala a un supervisor para su aprobación final por tratarse de un monto elevado.",
+      "met": true,
+      "justification": "El agente comunicó que, por superar los $500, debía escalar el caso a un supervisor para aprobación final."
+    },
+    {
+      "criterion": "El agente entrega al cliente el número de ticket generado por el escalamiento.",
+      "met": true,
+      "justification": "El agente entregó el número de ticket TCK-C1F464EC y lo repitió para seguimiento."
+    }
+  ],
+  "judged_by": "claude-opus-5",
+  "created_at": "2026-10-18T06:11:42.510547Z",
+  "attempts": 1,
+  "usage": {
+    "input_tokens": 2727,
+    "output_tokens": 225,
+    "cost_usd": null
+  },
+  "seconds": 3.2179724579909816,
+  "passed": true
+}

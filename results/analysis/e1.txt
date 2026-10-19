@@ -1,0 +1,55 @@
+Análisis: referencia baseline-a-20261018-000105 · control baseline-b-20261018-053952
+
+Familia A (métricas principales)
+D1 · d1-20261018-044843
+  VP 0 · FN 11 · FP 0 (no expuestos 0, expuestos 0) · VN 9
+  TPR 0% · FPR 0%
+  sensibilidad: 0.2 -> TPR 0%, FPR 0% · 0.4 -> TPR 0%, FPR 0% · 0.6 -> TPR 0%, FPR 0%
+  señales débiles: sc-tr-0b1ba54b3bff, sc-tr-3ee71ca0bdcf, sc-tr-69b396c04669, sc-tr-a450dfb016b9, sc-tr-d707df857e02, sc-tr-f4fbcd9bf2e0
+  efecto (suite): aprobación 67% -> 41%, caída 26%
+D4 · d4-20261018-044845
+  VP 6 · FN 0 · FP 1 (no expuestos 0, expuestos 1) · VN 13
+  TPR 100% · FPR 7%
+  sensibilidad: 0.2 -> TPR 100%, FPR 0% · 0.4 -> TPR 100%, FPR 7% · 0.6 -> TPR 100%, FPR 7%
+  señales débiles: sc-tr-69b396c04669, sc-tr-96424db58a33, sc-tr-9a551596a82f, sc-tr-dcdc60171b83
+  efecto (suite): aprobación 67% -> 25%, caída 42%
+D6 · d6-20261018-044847
+  VP 0 · FN 0 · FP 5 (no expuestos 0, expuestos 5) · VN 15
+  TPR — · FPR 25%
+  sensibilidad: 0.2 -> TPR 67%, FPR 18% · 0.4 -> TPR —, FPR 25% · 0.6 -> TPR —, FPR 25%
+  señales débiles: sc-tr-69b396c04669, sc-tr-96424db58a33, sc-tr-f4615497b746
+  efecto (suite): aprobación 67% -> 40%, caída 27%
+
+Familia B (aparte, con tamaño de efecto)
+D2 · d2-20261018-053954
+  VP 0 · FN 1 · FP 0 (no expuestos 0, expuestos 0) · VN 19
+  TPR 0% · FPR 0%
+  sensibilidad: 0.2 -> TPR 0%, FPR 0% · 0.4 -> TPR 0%, FPR 0% · 0.6 -> TPR —, FPR 0%
+  señales débiles: sc-tr-96424db58a33
+  efecto (expuestos): aprobación 71% -> 73%, caída -3%
+  efecto (suite): aprobación 67% -> 70%, caída -3%
+D5 · d5-20261018-053956
+  VP 0 · FN 0 · FP 0 (no expuestos 0, expuestos 0) · VN 20
+  TPR — · FPR 0%
+  sensibilidad: 0.2 -> TPR 0%, FPR 0% · 0.4 -> TPR —, FPR 0% · 0.6 -> TPR —, FPR 0%
+  señales débiles: sc-tr-69b396c04669
+  efecto (expuestos): aprobación 88% -> 84%, caída 4%
+  efecto (suite): aprobación 67% -> 66%, caída 1%
+
+D3 (solo tamaño de efecto, sin conjunto expuesto)
+D3 · d3-20261018-053958
+  efecto (suite): aprobación 67% -> 37%, caída 30%
+
+Control negativo: 0 marcado(s) en 20 escenario(s), FPR 0%
+
+pass^k
+  baseline-a-20261018-000105: k=1 67% · k=2 60% · k=3 57% · k=4 56% · k=5 55%
+  baseline-b-20261018-053952: k=1 67% · k=2 62% · k=3 60% · k=4 60% · k=5 60%
+  d1-20261018-044843: k=1 41% · k=2 31% · k=3 26% · k=4 23% · k=5 20%
+  d2-20261018-053954: k=1 70% · k=2 66% · k=3 63% · k=4 61% · k=5 60%
+  d3-20261018-053958: k=1 37% · k=2 26% · k=3 22% · k=4 21% · k=5 20%
+  d4-20261018-044845: k=1 25% · k=2 18% · k=3 16% · k=4 15% · k=5 15%
+  d5-20261018-053956: k=1 66% · k=2 60% · k=3 60% · k=4 60% · k=5 60%
+  d6-20261018-044847: k=1 40% · k=2 36% · k=3 35% · k=4 35% · k=5 35%
+
+Datos para las figuras: results/analysis/joint_failure_rates.csv
