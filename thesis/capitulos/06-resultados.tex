@@ -15,4 +15,30 @@ No hubo ningún reintento. Ninguna conversación terminó por un fallo del usuar
 \par
 E1 costó USD 37.89 según la facturación del proveedor: 19.44 del evaluador, 13.26 del agente y 5.19 del modelo menor, que usan el usuario simulado, el agente de D3 y algunas llamadas internas del SDK. El costo del evaluador coincide al centavo con el registro de AgentProof. El del agente es el 40\,\% de lo que estima su SDK, por la caché de prompts, una diferencia que se observó desde el piloto y por la que la tesis toma el costo del agente de la facturación.
 \par
+
+\subtituloapa{E1: detección por operador}
+La línea base de referencia aprueba el 67\,\% de las repeticiones, y la de control, que es el mismo agente corrido otra vez, también el 67\,\%. Once escenarios aprueban en las cinco repeticiones y cuatro no aprueban en ninguna. En estos últimos ninguna regresión puede detectarse, porque no hay de dónde caer. La aprobación en todas las repeticiones a la vez, pass$^k$, baja del 67\,\% con $k = 1$ al 55\,\% con $k = 5$, de modo que incluso el agente sano es inconsistente en parte de la suite.
+\par
+La Tabla~\ref{tab:e1-deteccion} resume la detección por operador. Una regresión declarada por AgentProof cuenta como verdadero positivo si el escenario está en el conjunto manifestado del oráculo y como falso positivo si no; una señal débil, una caída de al menos cuatro décimas sin significancia estadística, no cuenta como detección y se informa aparte.
+\par
+
+\begin{table}[H]
+  \setstretch{0.952}
+  \caption{Detección por operador en E1, sobre veinte escenarios con cinco repeticiones. Exp.: escenarios expuestos; Man.: manifestados según el oráculo; Reg.: regresiones declaradas, divididas en verdaderos (VP) y falsos (FP) positivos; Déb.: señales débiles; Caída: caída de la tasa de aprobación en la suite, en puntos porcentuales}
+  \label{tab:e1-deteccion}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{0.75in}|>{\raggedright\arraybackslash}p{0.45in}|>{\raggedright\arraybackslash}p{0.45in}|>{\raggedright\arraybackslash}p{0.85in}|>{\raggedright\arraybackslash}p{0.45in}|>{\raggedright\arraybackslash}p{0.55in}|>{\raggedright\arraybackslash}p{0.5in}|>{\raggedright\arraybackslash}p{0.75in}|}
+    \hline
+    \textbf{Condición} & \textbf{Exp.} & \textbf{Man.} & \textbf{Reg. (VP / FP)} & \textbf{Déb.} & \textbf{TPR} & \textbf{FPR} & \textbf{Caída} \\ \hline
+    D1 & 17 & 11 & 0 (0 / 0) & 6 & 0\,\% & 0\,\% & 26 \\ \hline
+    D4 & 17 & 6 & 7 (6 / 1) & 4 & 100\,\% & 7\,\% & 42 \\ \hline
+    D6 & 11 & 0 & 5 (0 / 5) & 3 & --- & 25\,\% & 27 \\ \hline
+    D2 & 15 & 1 & 0 (0 / 0) & 1 & 0\,\% & 0\,\% & $-3$ \\ \hline
+    D5 & 5 & 0 & 0 (0 / 0) & 1 & --- & 0\,\% & 1 \\ \hline
+    D3 & --- & --- & 0 & 9 & --- & --- & 30 \\ \hline
+    Control & --- & --- & 0 & 1 & --- & 0\,\% & 0 \\ \hline
+  \end{tabular}
+\end{table}
+
+D4 se detectó por completo: las seis regresiones de su conjunto manifestado aparecen como regresión, con un falso positivo en un escenario expuesto donde el oráculo no registró fallo. D1 degrada la suite en 26 puntos y tiene once escenarios manifestados, pero ninguno llega a declararse regresión: tres caen del 100\,\% al 0\,\% y quedan como señal débil. D6 produce cinco regresiones, todas en escenarios expuestos, pero su conjunto manifestado está vacío, de modo que por la definición pre-registrada las cinco son falsos positivos y su TPR no está definida. Las mutaciones de la familia B, D2 y D5, casi no cambian la aprobación, y D3, el modelo de menor capacidad, la baja en 30 puntos con nueve señales débiles y ninguna regresión. El control negativo no marca ninguna regresión.
+\par
 \endgroup
