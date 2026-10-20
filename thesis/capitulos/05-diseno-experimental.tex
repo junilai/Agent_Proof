@@ -103,13 +103,13 @@ La Figura~\ref{fig:verdad} resume cómo se relacionan las piezas. Los dos camino
     \node[caja, below=1.5cm of mut] (esc) {\textbf{Escenarios inducidos}\\reejecutados con el agente degradado};
     \node[caja, right=of esc] (jui) {\textbf{Juicios}\\del evaluador, criterio por criterio};
     \node[caja, right=of jui] (reg) {\textbf{Regresiones}\\declaradas por AgentProof};
-    \node[caja, right=1.6cm of $(man)!0.5!(reg)$] (mat) {\textbf{Matriz de confusión}\\VP, FN, FP y VN por escenario\\[2pt]\textbf{TPR y FPR}};
+    \node[caja, right=1.9cm of $(man)!0.5!(reg)$] (mat) {\textbf{Matriz de confusión}\\VP, FN, FP y VN por escenario\\[2pt]\textbf{TPR y FPR}};
     \draw[flecha] (mut) -- (exp);
     \draw[flecha] (exp) -- (man);
     \draw[flecha] (esc) -- (jui);
     \draw[flecha] (jui) -- (reg);
-    \draw[flecha] (man) -- node[etiqueta, pos=0.45, above=3pt] {clase\\real} (mat);
-    \draw[flecha] (reg) -- node[etiqueta, pos=0.45, below=3pt] {predic-\\ción} (mat);
+    \draw[flecha] (man.east) -| node[etiqueta, pos=0.3, above] {clase real} (mat.north);
+    \draw[flecha] (reg.east) -| node[etiqueta, pos=0.3, below] {predicción} (mat.south);
     \draw[flecha] (mut) -- (esc);
     \node[etiqueta, below=0.15cm of exp, text width=2.8cm] {tarjeta y traza semilla, antes de inducir};
     \node[etiqueta, below=0.15cm of man, text width=2.8cm] {predicado de fallo; caída $\geq 0.4$ frente a la línea base};
