@@ -12,6 +12,37 @@ Este capítulo describe cómo se implementaron AgentProof y el aparato experimen
 \subtituloapa{Organización del código}
 El código vive en un repositorio público con licencia MIT. Está escrito en Python 3.12, con las dependencias fijadas en un archivo de bloqueo para que cualquier persona reproduzca el mismo entorno, y se organiza en tres paquetes con dependencias en una sola dirección. El paquete \texttt{agentproof} es la herramienta, con unas 1850 líneas en su núcleo y un adaptador por framework. El paquete \texttt{casestudy} contiene el agente del caso de estudio: un dominio sin dependencias de ningún framework, de unas 390 líneas, y una edición por framework. El paquete \texttt{experiments}, de unas 2100 líneas, reúne lo que solo sirve para la tesis: las tarjetas de situación, el informe de cobertura, las condiciones experimentales, el oráculo, el análisis estadístico, el pre-registro y los sorteos.
 \par
+La Figura~\ref{fig:arquitectura} muestra los paquetes y sus dependencias.
+\par
+
+\begin{figure}[H]
+  \centering
+  \setstretch{1}
+  \begin{tikzpicture}[
+      paquete/.style={draw, rounded corners=3pt, align=center, font=\footnotesize, text width=5.9cm, inner sep=5pt},
+      externo/.style={draw, dashed, rounded corners=3pt, align=center, font=\footnotesize, text width=5.9cm, inner sep=5pt},
+      usa/.style={-{Stealth[length=2mm]}, thick},
+      etiqueta/.style={font=\scriptsize, fill=white, inner sep=1pt, align=center}]
+    \node[paquete, text width=14.2cm] (exp) {\textbf{experiments}: solo para la tesis\\tarjetas de situación y cobertura $\cdot$ condiciones $\cdot$ oráculo (decisión, atributos, predicados, conjunto manifestado, cola manual) $\cdot$ análisis estadístico $\cdot$ pre-registro y sorteos};
+    \node[paquete, below left=1.3cm and 1cm of exp.south] (nucleo) {\textbf{agentproof}: núcleo de la herramienta\\esquema de trazas $\cdot$ protocolo de sesión $\cdot$ conducción de la conversación $\cdot$ inductor $\cdot$ usuario simulado $\cdot$ evaluador $\cdot$ ejecutor con reintentos $\cdot$ reporte $\cdot$ costo $\cdot$ comandos};
+    \node[paquete, below right=1.3cm and 1cm of exp.south] (dominio) {\textbf{casestudy}: dominio sin framework\\pedidos $\cdot$ política calculable $\cdot$ herramientas $\cdot$ prompt $\cdot$ mutaciones D1--D6};
+    \node[paquete, below=1.1cm of nucleo] (adaptador) {\textbf{agentproof.adapters}\\un adaptador por framework: traduce cada turno nativo a eventos del esquema};
+    \node[paquete, below=1.1cm of dominio] (edicion) {\textbf{casestudy.editions}\\una edición por framework: el agente construido con las piezas nativas de su framework};
+    \node[externo, below=0.9cm of adaptador] (datos) {Archivos JSON del repositorio: corpus semilla, escenarios, corridas, juicios y anotaciones};
+    \node[externo, below=0.9cm of edicion] (framework) {Framework de agentes (Claude Agent SDK, LangGraph, \ldots) y API del modelo};
+    \draw[usa] (exp.south -| nucleo) -- node[etiqueta] {usa} (nucleo);
+    \draw[usa] (exp.south -| dominio) -- node[etiqueta] {usa} (dominio);
+    \draw[usa, dashed] (dominio) -- node[etiqueta] {solo la\\fijación\\de modelos} (nucleo);
+    \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, thick] (nucleo) -- node[etiqueta] {protocolo de sesión} (adaptador);
+    \draw[usa] (adaptador) -- node[etiqueta] {carga\\por su\\nombre} (edicion);
+    \draw[usa] (dominio) -- node[etiqueta] {aplica} (edicion);
+    \draw[usa] (edicion) -- (framework);
+    \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, thick] (nucleo.west) -- ++(-0.35,0) |- node[etiqueta, pos=0.25, rotate=90] {guarda y lee} (datos.west);
+  \end{tikzpicture}
+  \caption{Arquitectura de software. Las flechas son dependencias de código; el núcleo no importa ningún framework ni los paquetes del caso de estudio y de experimentos, y una prueba automática lo verifica. El oráculo lee las trazas desde los archivos JSON}
+  \label{fig:arquitectura}
+\end{figure}
+
 La dirección de las dependencias es la que hace creíble la evaluación. El paquete de experimentos puede usar los otros dos; el caso de estudio solo toma de la herramienta el módulo que fija los modelos; y el núcleo no importa ninguno de los dos ni ningún framework de agentes. Así, la herramienta no puede saber qué degradación tiene el agente que evalúa, ni el oráculo, que define la verdad de referencia, puede reutilizar la lógica del detector que se mide con él. Una prueba automática recorre el árbol sintáctico de cada módulo, incluidas las importaciones dentro de funciones, y falla si alguna de estas reglas se rompe. Los frameworks se declaran como dependencias opcionales, de modo que instalar la herramienta no instala ninguno.
 \par
 Todos los datos se guardan como documentos JSON dentro del repositorio: las trazas semilla y los escenarios inducidos del corpus, y para cada corrida su manifiesto, sus trazas y sus juicios. Las cifras de la tesis se calculan a partir de esos archivos con un comando, sin volver a llamar a ningún modelo, así que cualquier lector puede regenerarlas.
