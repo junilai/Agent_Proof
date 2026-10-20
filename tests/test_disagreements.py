@@ -1,6 +1,12 @@
+import json
 import random
+from pathlib import Path
 
-from experiments.disagreements import SEED, Repetition, disagrees, pick
+from agentproof.store import Store
+from experiments.disagreements import SEED, Repetition, disagreement_sample, disagrees, pick
+
+ROOT = Path(__file__).resolve().parent.parent
+PUBLISHED = ROOT / "results" / "samples" / "desacuerdos.json"
 
 
 def rep(trace_id, predicate_fails, judge_passed):
@@ -35,3 +41,12 @@ def test_the_draw_does_not_depend_on_the_order_of_the_repetitions():
     reps = [rep(f"tr-{n}", True, True) for n in range(5)]
     drawn = pick("falso negativo", reps, random.Random(SEED))
     assert pick("falso negativo", reps[::-1], random.Random(SEED)) == drawn
+
+
+def test_the_published_sample_is_the_one_the_seed_draws():
+    published = json.loads(PUBLISHED.read_text(encoding="utf-8"))
+    store = Store(ROOT)
+    candidates = sorted({t["run_id"] for t in published["traces"]})
+    drawn = disagreement_sample(store, published["reference"], candidates)
+    assert published["seed"] == SEED
+    assert published["traces"] == [d.model_dump() for d in drawn]
