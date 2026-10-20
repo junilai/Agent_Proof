@@ -253,6 +253,10 @@ Es un estudio de estimación: no se declaran umbrales de TPR, FPR ni concordanci
    - **Efecto esperado.** Menos falsos positivos de D1 en las tarjetas de pedidos sin entregar, y ninguno nuevo. Verificado sin cambios en las 70 conversaciones de validación, los 120 mensajes del corpus y las 28 respuestas de la calibración. Las cuatro trazas del piloto ya no contradicen la base.
    - **Momento.** Antes de E1: ningún dato del experimento se vio antes de esta enmienda.
 
+*Análisis agregados después de E1 (no son enmiendas):*
+
+- **Desacuerdos entre el oráculo y AgentProof (20 de octubre de 2026, [D-016](decisiones.md)).** A pedido del tutor, los falsos negativos y falsos positivos de E1 se clasifican en desacuerdos de traza y de agregación. Una traza de cada desacuerdo de traza, sorteada con la semilla `20261022`, la anotan a ciegas los tres anotadores de F6, para atribuirlo al evaluador, a los criterios o a las reglas del oráculo. Es exploratorio: no cambia ninguna pieza de la huella ni ningún resultado.
+
 ## 9. Conjuntos expuestos del corpus
 
 Generada con `python -m experiments.preregistration --data .`. Una prueba exige que esta sección coincida con lo que imprime el comando. D3 no define conjunto expuesto.
