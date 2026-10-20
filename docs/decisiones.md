@@ -414,7 +414,7 @@ En E1, el oráculo y AgentProof no siempre coinciden. D1 tiene once escenarios e
 Se toman todos los falsos negativos y falsos positivos de la matriz de confusión de E1: 18 en total (11 de D1, 1 de D2, 1 de D4 y 5 de D6).
 
 - **De traza.** Alguna repetición del escenario discrepa por sí sola: el predicado falla y el evaluador aprobó, para un falso negativo; o el evaluador reprobó y el predicado no falla, para un falso positivo. Son 10: 5 de D1 y 5 de D6. Se sortea una de esas repeticiones con la semilla `20261022` y se anota.
-- **De agregación.** En ninguna repetición discrepan por sí solos: donde uno falla, el otro también. La diferencia viene de cómo se agregan las cinco repeticiones (la corrección de Benjamini-Hochberg con R = 5, el umbral de 0.4 o una línea base que ya fallaba). Son 8: 6 de D1, 1 de D2 y 1 de D4. Se informan clasificados así, sin anotación.
+- **De agregación.** En ninguna repetición discrepan por sí solos: donde uno falla, el otro también. La diferencia viene de cómo se agregan las cinco repeticiones (la corrección de Benjamini-Hochberg con R = 5, el umbral de 0.4 o una línea base que ya fallaba). Son 8: 6 de D1, 1 de D2 y 1 de D4. Se informan clasificados así, sin anotación: cada vez que uno de los dos registra el fallo que origina el desacuerdo, el otro lo registra en la misma repetición, y como no comparten información se corroboran entre sí. La corrección general de las reglas del oráculo la mide la auditoría.
 
 La lista y las trazas sorteadas están en `results/samples/desacuerdos.json`, que genera `python -m experiments.disagreements --data . --reference baseline-a-20261018-000105 --candidate <corrida> ...`. Una prueba exige que el archivo publicado sea el que la semilla produce.
 
