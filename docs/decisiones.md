@@ -398,3 +398,50 @@ La planificación (§5.5) y el pre-registro (§6) dicen que, dentro de cada estr
 - **Es la lectura literal**, y la contingencia que resuelve el déficit ya estaba pre-registrada; no se agrega una regla nueva.
 - **Diversifica más que el tope por celda**, que permitiría que un mismo escenario aportara hasta 14 pares de un estrato.
 - **Se reporta.** La tesis declara que la contingencia se activó y con qué topes quedó cada estrato.
+
+## D-016 · Análisis de los desacuerdos entre el oráculo y AgentProof
+
+- **Fecha:** 20 de octubre de 2026
+- **Estado:** decidida con el autor después de E1 y antes de que ningún anotador vea una traza; se implementa en `src/experiments/disagreements.py`
+- **Origen:** retroalimentación del tutor al segundo entregable
+
+### El problema
+
+En E1, el oráculo y AgentProof no siempre coinciden. D1 tiene once escenarios en el conjunto manifestado que el reporte no declaró como regresión (falsos negativos), y D6 tiene cinco regresiones que el oráculo no considera manifestadas (falsos positivos). La auditoría del oráculo y E2 miden cada plano por separado, sobre muestras sorteadas antes de ver estos desacuerdos, y solo cubren unos pocos de ellos por azar. Hace falta un procedimiento, fijado antes de mirar ninguna anotación, que diga si cada desacuerdo viene del evaluador, de los criterios inducidos o de las reglas del oráculo.
+
+### Dos clases de desacuerdo
+
+Se toman todos los falsos negativos y falsos positivos de la matriz de confusión de E1: 18 en total (11 de D1, 1 de D2, 1 de D4 y 5 de D6).
+
+- **De traza.** Alguna repetición del escenario discrepa por sí sola: el predicado falla y el evaluador aprobó, para un falso negativo; o el evaluador reprobó y el predicado no falla, para un falso positivo. Son 10: 5 de D1 y 5 de D6. Se sortea una de esas repeticiones con la semilla `20261022` y se anota.
+- **De agregación.** En ninguna repetición discrepan por sí solos: donde uno falla, el otro también. La diferencia viene de cómo se agregan las cinco repeticiones (la corrección de Benjamini-Hochberg con R = 5, el umbral de 0.4 o una línea base que ya fallaba). Son 8: 6 de D1, 1 de D2 y 1 de D4. Se informan clasificados así, sin anotación: cada vez que uno de los dos registra el fallo que origina el desacuerdo, el otro lo registra en la misma repetición, y como no comparten información se corroboran entre sí. La corrección general de las reglas del oráculo la mide la auditoría.
+
+La lista y las trazas sorteadas están en `results/samples/desacuerdos.json`, que genera `python -m experiments.disagreements --data . --reference baseline-a-20261018-000105 --candidate <corrida> ...`. Una prueba exige que el archivo publicado sea el que la semilla produce.
+
+### Qué anotan los tres anotadores
+
+Cada traza de la muestra se presenta a ciegas, como en la auditoría: la situación, los datos del pedido, la transcripción y los criterios del escenario, sin la condición ni la salida del oráculo o del evaluador, mezclada con las demás trazas de F6. Para cada una responden:
+
+1. qué decisión comunicó el agente y si enunció algún dato del pedido que contradice la base (la pregunta del oráculo);
+2. si se cumple cada criterio del escenario (la pregunta del evaluador, con la rúbrica de E2);
+3. si la conversación tiene un error del agente que ningún criterio recoge.
+
+### Cómo se atribuye cada desacuerdo
+
+Con la mayoría de los tres anotadores, y fijado antes de ver ninguna anotación:
+
+| Desacuerdo | Los anotadores dicen | Se atribuye a |
+|---|---|---|
+| Falso negativo (el oráculo falla, el evaluador aprueba) | no hay el fallo que leyó el oráculo | las reglas del oráculo |
+| | hay fallo, y algún criterio que el evaluador dio por cumplido no se cumple | el evaluador |
+| | hay fallo, y todos los criterios se cumplen | los criterios, que no cubren el fallo |
+| Falso positivo (el evaluador reprueba, el oráculo no) | el criterio reprobado sí se cumple | el evaluador |
+| | el criterio no se cumple, y la decisión sí se comunicó | los criterios, que exigen más que el predicado |
+| | la decisión no se comunicó | las reglas del oráculo |
+
+Se informan los conteos por clase y por operador, y los casos en que los anotadores no llegan a mayoría.
+
+### Lo que este análisis no hace
+
+- **No es una enmienda.** No cambia ninguna pieza de la huella, ningún resultado de E1 ni la definición del conjunto manifestado. Es un análisis exploratorio, agregado después de ver los resultados de E1 y declarado como tal en la §8 del pre-registro.
+- **Si atribuye un desacuerdo a las reglas del oráculo,** la corrección sigue el camino ya pre-registrado para la auditoría: una enmienda con su motivo, E1 vuelto a puntuar y las dos puntuaciones reportadas.
