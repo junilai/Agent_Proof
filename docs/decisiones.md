@@ -405,7 +405,7 @@ La planificación (§5.5) y el pre-registro (§6) dicen que, dentro de cada estr
 - **Estado:** decidida con el autor después de E1 y antes de que ningún anotador vea una traza; se implementa en `src/experiments/disagreements.py`
 - **Origen:** retroalimentación del tutor al segundo entregable
 
-**Corrección del 21 de octubre.** La primera versión miraba solo las repeticiones de la candidata y una sola dirección de discordancia, y clasificaba los 18 desacuerdos en 10 "de traza" y 8 "de agregación". El tutor mostró dos casos mal clasificados. En D1, sc-tr-d707df857e02, el evaluador reprueba 5 de 5 repeticiones de la candidata y el oráculo marca 2, y se había clasificado como de agregación. En D4, sc-tr-e326cdcb18af, en la línea base el oráculo marca 4 fallos y el evaluador ninguno, y no se miraba. La versión corregida mira las dos corridas y las dos direcciones, y separa dos ejes que la primera confundía. La afirmación de que en los casos "de agregación" los dos mecanismos se corroboraban era falsa en 7 de esos 8 casos y se retiró. Ningún anotador había visto la primera muestra, así que se reemplazó y se conservó la semilla.
+**Corrección del 21 de octubre.** La primera versión miraba solo las repeticiones de la candidata y una sola dirección de discordancia, y clasificaba los 18 desacuerdos en 10 "de traza" y 8 "de agregación". El tutor mostró dos casos mal clasificados. En D1, sc-tr-d707df857e02 (tc-09), el evaluador reprueba 5 de 5 repeticiones de la candidata y el oráculo marca 2, y se había clasificado como de agregación. En D4, sc-tr-e326cdcb18af (tc-07), en la línea base el oráculo marca 4 fallos y el evaluador ninguno, y no se miraba. La versión corregida mira las dos corridas y las dos direcciones, y separa dos ejes que la primera confundía. La afirmación de que en los casos "de agregación" los dos mecanismos se corroboraban era falsa en 7 de esos 8 casos y se retiró. Ningún anotador había visto la primera muestra, así que se reemplazó y se conservó la semilla.
 
 ### El problema
 
@@ -415,10 +415,10 @@ En E1, el oráculo y AgentProof no siempre coinciden. D1 tiene once escenarios e
 
 Se toman todos los falsos negativos y falsos positivos de la matriz de confusión de E1: 18 escenarios (11 de D1, 1 de D2, 1 de D4 y 5 de D6). Cada uno se describe sobre las cinco repeticiones de la línea base de referencia y las cinco de la candidata, con dos ejes independientes:
 
-- **Repeticiones discordantes.** Una repetición es discordante si el predicado del oráculo falla y el evaluador la aprobó, o si el evaluador la reprobó y el predicado no falla. Cuentan las dos corridas y las dos direcciones. 17 de los 18 escenarios tienen al menos una; el único sin ninguna es sc-tr-3ee71ca0bdcf de D1.
-- **Origen de la diferencia de clasificación.** Para cada mecanismo se calcula cuánto sube la tasa de fallo de la candidata respecto de la referencia. Si los dos llegan al umbral de 0.4, o ninguno, los dos vieron el mismo cambio y la diferencia viene de la **agregación**: el reporte exige además significancia estadística, que con cinco repeticiones no se alcanzó. Si uno llega y el otro no, la diferencia viene de las **trazas**. Son 3 de agregación, todos de D1 (sc-tr-3ee71ca0bdcf, sc-tr-69b396c04669 y sc-tr-d707df857e02), y 15 de trazas.
+- **Repeticiones discordantes.** Una repetición es discordante si el predicado del oráculo falla y el evaluador la aprobó, o si el evaluador la reprobó y el predicado no falla. Cuentan las dos corridas y las dos direcciones. 17 de los 18 escenarios tienen al menos una; el único sin ninguna es sc-tr-3ee71ca0bdcf (tc-16) de D1.
+- **Origen de la diferencia de clasificación.** Para cada mecanismo se calcula cuánto sube la tasa de fallo de la candidata respecto de la referencia. Si los dos llegan al umbral de 0.4, o ninguno, los dos vieron el mismo cambio y la diferencia viene de la **agregación**: el reporte exige además significancia estadística, que con cinco repeticiones no se alcanzó. Si uno llega y el otro no, la diferencia viene de las **trazas**. Son 3 de agregación, todos de D1 (sc-tr-3ee71ca0bdcf (tc-16), sc-tr-69b396c04669 (tc-05) y sc-tr-d707df857e02 (tc-09)), y 15 de trazas.
 
-Los dos ejes pueden coincidir en un mismo escenario: sc-tr-69b396c04669 y sc-tr-d707df857e02 tienen origen en la agregación y además repeticiones discordantes.
+Los dos ejes pueden coincidir en un mismo escenario: sc-tr-69b396c04669 (tc-05) y sc-tr-d707df857e02 (tc-09) tienen origen en la agregación y además repeticiones discordantes.
 
 ### El sorteo
 
