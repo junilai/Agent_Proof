@@ -255,7 +255,7 @@ Es un estudio de estimación: no se declaran umbrales de TPR, FPR ni concordanci
 
 *Análisis agregados después de E1 (no son enmiendas):*
 
-- **Desacuerdos entre el oráculo y AgentProof (20 de octubre de 2026, [D-016](decisiones.md)).** A pedido del tutor, los falsos negativos y falsos positivos de E1 se clasifican en desacuerdos de traza y de agregación. Una traza de cada desacuerdo de traza, sorteada con la semilla `20261022`, la anotan a ciegas los tres anotadores de F6, para atribuirlo al evaluador, a los criterios o a las reglas del oráculo. Es exploratorio: no cambia ninguna pieza de la huella ni ningún resultado.
+- **Desacuerdos entre el oráculo y AgentProof (20 de octubre de 2026, corregido el 21, [D-016](decisiones.md)).** A pedido del tutor, los 18 falsos negativos y falsos positivos de E1 se describen con dos ejes, sobre las repeticiones de la línea base y de la candidata y en las dos direcciones: si tienen repeticiones discordantes (17 de 18) y si la diferencia de clasificación viene de la agregación (3) o de las trazas (15). De cada corrida y dirección con repeticiones discordantes se sortea una traza con la semilla `20261022`: 23 celdas y 22 trazas distintas, que los tres anotadores de F6 etiquetan a ciegas. La atribución al evaluador, a los criterios o a las reglas del oráculo se calcula a partir de sus etiquetas. Es exploratorio: no cambia ninguna pieza de la huella ni ningún resultado. La primera versión, que miraba solo la candidata y una dirección, se corrigió antes de que nadie la anotara.
 
 ## 9. Conjuntos expuestos del corpus
 
