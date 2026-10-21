@@ -1,22 +1,17 @@
-import json
 import random
-from pathlib import Path
 
-from agentproof.store import Store
 from experiments.disagreements import (
     SEED,
+    Cell,
+    Disagreement,
     Rates,
     Repetition,
+    cells,
     direction,
-    disagreement_sample,
-    disagrees,
     origin,
-    pick,
     rates,
+    to_annotate,
 )
-
-ROOT = Path(__file__).resolve().parent.parent
-PUBLISHED = ROOT / "results" / "samples" / "desacuerdos.json"
 
 
 def rep(trace_id, predicate_fails, judge_passed):
@@ -59,40 +54,46 @@ def test_the_threshold_is_inclusive():
     assert origin(five(0, 0), five(2, 2)) == "agregación"
 
 
-def test_a_false_negative_disagrees_when_the_oracle_fails_and_the_judge_passes():
-    assert disagrees("falso negativo", rep("tr-1", True, True))
-    assert not disagrees("falso negativo", rep("tr-1", True, False))
-    assert not disagrees("falso negativo", rep("tr-1", False, True))
-    assert not disagrees("falso negativo", rep("tr-1", None, True))
+def test_one_cell_per_direction_with_a_drawn_discordant_repetition():
+    reps = [rep("tr-1", True, True), rep("tr-2", False, False), rep("tr-3", False, False)]
+    found = cells("candidata", "d1-run", reps, random.Random(SEED))
+    assert [(c.direction, c.discordant) for c in found] == [
+        ("oráculo falla, evaluador aprueba", 1),
+        ("evaluador reprueba, oráculo no", 2),
+    ]
+    assert found[0].trace_id == "tr-1"
+    assert found[1].trace_id in {"tr-2", "tr-3"}
 
 
-def test_a_false_positive_disagrees_when_the_judge_fails_and_the_oracle_does_not():
-    assert disagrees("falso positivo", rep("tr-1", False, False))
-    assert not disagrees("falso positivo", rep("tr-1", True, False))
-    assert not disagrees("falso positivo", rep("tr-1", False, True))
-    assert not disagrees("falso positivo", rep("tr-1", None, False))
-
-
-def test_only_a_repetition_that_disagrees_is_drawn():
-    reps = [rep("tr-1", True, False), rep("tr-2", True, True), rep("tr-3", False, True)]
-    assert pick("falso negativo", reps, random.Random(SEED)) == "tr-2"
-
-
-def test_without_a_disagreeing_repetition_it_is_of_aggregation():
+def test_a_run_without_discordant_repetitions_has_no_cells():
     reps = [rep("tr-1", True, False), rep("tr-2", False, True)]
-    assert pick("falso negativo", reps, random.Random(SEED)) is None
+    assert cells("referencia", "base-run", reps, random.Random(SEED)) == []
 
 
 def test_the_draw_does_not_depend_on_the_order_of_the_repetitions():
     reps = [rep(f"tr-{n}", True, True) for n in range(5)]
-    drawn = pick("falso negativo", reps, random.Random(SEED))
-    assert pick("falso negativo", reps[::-1], random.Random(SEED)) == drawn
+    drawn = cells("candidata", "run", reps, random.Random(SEED))
+    assert cells("candidata", "run", reps[::-1], random.Random(SEED)) == drawn
 
 
-def test_the_published_sample_is_the_one_the_seed_draws():
-    published = json.loads(PUBLISHED.read_text(encoding="utf-8"))
-    store = Store(ROOT)
-    candidates = sorted({t["run_id"] for t in published["traces"]})
-    drawn = disagreement_sample(store, published["reference"], candidates)
-    assert published["seed"] == SEED
-    assert published["traces"] == [d.model_dump() for d in drawn]
+def test_a_trace_drawn_for_two_operators_is_annotated_once():
+    cell = Cell(
+        run="referencia",
+        run_id="base",
+        direction="evaluador reprueba, oráculo no",
+        discordant=2,
+        trace_id="tr-9",
+    )
+
+    def found(operator):
+        return Disagreement(
+            operator=operator,
+            kind="falso negativo",
+            scenario_id="sc-1",
+            reference=five(0, 2),
+            candidate=five(2, 2),
+            origin="traza",
+            cells=[cell],
+        )
+
+    assert [t.trace_id for t in to_annotate([found("d1"), found("d2")])] == ["tr-9"]
