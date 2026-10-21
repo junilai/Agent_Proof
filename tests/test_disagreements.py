@@ -1,5 +1,9 @@
+import json
 import random
+from functools import cache
+from pathlib import Path
 
+from agentproof.store import Store
 from experiments.disagreements import (
     SEED,
     Cell,
@@ -8,10 +12,14 @@ from experiments.disagreements import (
     Repetition,
     cells,
     direction,
+    disagreements,
     origin,
     rates,
     to_annotate,
 )
+
+ROOT = Path(__file__).resolve().parent.parent
+PUBLISHED = ROOT / "results" / "samples" / "desacuerdos.json"
 
 
 def rep(trace_id, predicate_fails, judge_passed):
@@ -97,3 +105,49 @@ def test_a_trace_drawn_for_two_operators_is_annotated_once():
         )
 
     assert [t.trace_id for t in to_annotate([found("d1"), found("d2")])] == ["tr-9"]
+
+
+@cache
+def published():
+    return json.loads(PUBLISHED.read_text(encoding="utf-8"))
+
+
+def in_e1(operator, scenario_id):
+    """A disagreement of E1 as published."""
+    return next(
+        d
+        for d in published()["disagreements"]
+        if d["operator"] == operator and d["scenario_id"] == scenario_id
+    )
+
+
+def test_the_published_sample_is_the_one_the_seed_draws():
+    sample = published()
+    found = disagreements(Store(ROOT), sample["reference"], sample["candidates"])
+    assert sample["seed"] == SEED
+    assert sample["disagreements"] == [d.model_dump() for d in found]
+    assert sample["to_annotate"] == [t.model_dump() for t in to_annotate(found)]
+
+
+def test_d1_d707_has_discordant_repetitions_and_an_aggregation_origin():
+    """First example of the tutor: oracle 2/5, judge 5/5 in the candidate."""
+    found = in_e1("d1", "sc-tr-d707df857e02")
+    assert (found["candidate"]["oracle"], found["candidate"]["judge"]) == (2, 5)
+    assert found["origin"] == "agregación"
+    assert [(c["run"], c["direction"], c["discordant"]) for c in found["cells"]] == [
+        ("candidata", "evaluador reprueba, oráculo no", 3)
+    ]
+
+
+def test_d4_e326_counts_the_discordances_of_the_reference():
+    """Second example of the tutor: oracle 4/5, judge 0/5 in the reference."""
+    found = in_e1("d4", "sc-tr-e326cdcb18af")
+    assert (found["reference"]["oracle"], found["reference"]["judge"]) == (4, 0)
+    assert [(c["run"], c["direction"], c["discordant"]) for c in found["cells"]] == [
+        ("referencia", "oráculo falla, evaluador aprueba", 4)
+    ]
+
+
+def test_only_one_disagreement_has_no_discordant_repetition():
+    without = [d["scenario_id"] for d in published()["disagreements"] if not d["cells"]]
+    assert without == ["sc-tr-3ee71ca0bdcf"]

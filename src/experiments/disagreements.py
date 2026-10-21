@@ -189,6 +189,7 @@ def to_annotate(found: list[Disagreement]) -> list[ToAnnotate]:
 class DisagreementSample(BaseModel):
     seed: int = SEED
     reference: str
+    candidates: list[str]
     disagreements: list[Disagreement]
     to_annotate: list[ToAnnotate]
 
@@ -205,7 +206,10 @@ def main(data: Path = DATA, reference: str = REFERENCE, candidate: list[str] = C
     store = Store(data)
     found = disagreements(store, reference, candidate)
     sample = DisagreementSample(
-        reference=reference, disagreements=found, to_annotate=to_annotate(found)
+        reference=reference,
+        candidates=sorted(candidate),
+        disagreements=found,
+        to_annotate=to_annotate(found),
     )
     folder = store.root / "results" / "samples"
     folder.mkdir(parents=True, exist_ok=True)

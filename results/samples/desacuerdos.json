@@ -1,132 +1,587 @@
 {
   "seed": 20261022,
   "reference": "baseline-a-20261018-000105",
-  "traces": [
+  "candidates": [
+    "d1-20261018-044843",
+    "d2-20261018-053954",
+    "d4-20261018-044845",
+    "d5-20261018-053956",
+    "d6-20261018-044847"
+  ],
+  "disagreements": [
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-08b90a7484e8",
-      "trace_id": "tr-a4707abf6dc4"
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 5,
+        "judge": 1
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "candidata",
+          "run_id": "d1-20261018-044843",
+          "direction": "oráculo falla, evaluador aprueba",
+          "discordant": 4,
+          "trace_id": "tr-a4707abf6dc4"
+        }
+      ]
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-1bcac31bb099",
-      "trace_id": "tr-b49ea9675671"
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 4,
+        "judge": 1
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "candidata",
+          "run_id": "d1-20261018-044843",
+          "direction": "oráculo falla, evaluador aprueba",
+          "discordant": 3,
+          "trace_id": "tr-b49ea9675671"
+        }
+      ]
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-3ee71ca0bdcf",
-      "trace_id": null
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 5,
+        "judge": 5
+      },
+      "origin": "agregación",
+      "cells": []
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-49f9d41b2bc6",
-      "trace_id": null
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 4
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 5,
+        "judge": 5
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "referencia",
+          "run_id": "baseline-a-20261018-000105",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 4,
+          "trace_id": "tr-749642038cc0"
+        }
+      ]
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-69b396c04669",
-      "trace_id": null
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 2
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 4,
+        "judge": 5
+      },
+      "origin": "agregación",
+      "cells": [
+        {
+          "run": "referencia",
+          "run_id": "baseline-a-20261018-000105",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 2,
+          "trace_id": "tr-29aa60c1b351"
+        },
+        {
+          "run": "candidata",
+          "run_id": "d1-20261018-044843",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 1,
+          "trace_id": "tr-31aa4ee2c71d"
+        }
+      ]
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-6c6ab21b3116",
-      "trace_id": null
+      "reference": {
+        "repetitions": 5,
+        "oracle": 1,
+        "judge": 5
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 5,
+        "judge": 5
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "referencia",
+          "run_id": "baseline-a-20261018-000105",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 4,
+          "trace_id": "tr-770f679e595b"
+        }
+      ]
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-8e76607664f8",
-      "trace_id": "tr-c5cfc89503b4"
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 5
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 3,
+        "judge": 3
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "referencia",
+          "run_id": "baseline-a-20261018-000105",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 5,
+          "trace_id": "tr-2b409bde146c"
+        },
+        {
+          "run": "candidata",
+          "run_id": "d1-20261018-044843",
+          "direction": "oráculo falla, evaluador aprueba",
+          "discordant": 2,
+          "trace_id": "tr-7b7248d6e975"
+        },
+        {
+          "run": "candidata",
+          "run_id": "d1-20261018-044843",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 2,
+          "trace_id": "tr-831764d3cddf"
+        }
+      ]
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-96424db58a33",
-      "trace_id": null
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 3
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 4,
+        "judge": 4
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "referencia",
+          "run_id": "baseline-a-20261018-000105",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 3,
+          "trace_id": "tr-729fffa55391"
+        }
+      ]
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-c54fe59dc976",
-      "trace_id": "tr-6da1e11c54da"
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 5
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 2,
+        "judge": 4
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "referencia",
+          "run_id": "baseline-a-20261018-000105",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 5,
+          "trace_id": "tr-ccfcd62f43b3"
+        },
+        {
+          "run": "candidata",
+          "run_id": "d1-20261018-044843",
+          "direction": "oráculo falla, evaluador aprueba",
+          "discordant": 1,
+          "trace_id": "tr-6da1e11c54da"
+        },
+        {
+          "run": "candidata",
+          "run_id": "d1-20261018-044843",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 3,
+          "trace_id": "tr-3391b58cae59"
+        }
+      ]
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-d707df857e02",
-      "trace_id": null
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 2,
+        "judge": 5
+      },
+      "origin": "agregación",
+      "cells": [
+        {
+          "run": "candidata",
+          "run_id": "d1-20261018-044843",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 3,
+          "trace_id": "tr-2812024fadd8"
+        }
+      ]
     },
     {
       "operator": "d1",
       "kind": "falso negativo",
-      "run_id": "d1-20261018-044843",
       "scenario_id": "sc-tr-f4615497b746",
-      "trace_id": "tr-793ca97c3215"
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 3
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 5,
+        "judge": 4
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "referencia",
+          "run_id": "baseline-a-20261018-000105",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 3,
+          "trace_id": "tr-00630db1696b"
+        },
+        {
+          "run": "candidata",
+          "run_id": "d1-20261018-044843",
+          "direction": "oráculo falla, evaluador aprueba",
+          "discordant": 1,
+          "trace_id": "tr-793ca97c3215"
+        }
+      ]
     },
     {
       "operator": "d2",
       "kind": "falso negativo",
-      "run_id": "d2-20261018-053954",
       "scenario_id": "sc-tr-69b396c04669",
-      "trace_id": null
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 2
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 2,
+        "judge": 2
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "referencia",
+          "run_id": "baseline-a-20261018-000105",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 2,
+          "trace_id": "tr-29aa60c1b351"
+        }
+      ]
     },
     {
       "operator": "d4",
       "kind": "falso positivo",
-      "run_id": "d4-20261018-044845",
       "scenario_id": "sc-tr-e326cdcb18af",
-      "trace_id": null
+      "reference": {
+        "repetitions": 5,
+        "oracle": 4,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 5,
+        "judge": 5
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "referencia",
+          "run_id": "baseline-a-20261018-000105",
+          "direction": "oráculo falla, evaluador aprueba",
+          "discordant": 4,
+          "trace_id": "tr-a046b3148545"
+        }
+      ]
     },
     {
       "operator": "d6",
       "kind": "falso positivo",
-      "run_id": "d6-20261018-044847",
       "scenario_id": "sc-tr-08b90a7484e8",
-      "trace_id": "tr-b77553c70015"
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 5
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "candidata",
+          "run_id": "d6-20261018-044847",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 5,
+          "trace_id": "tr-b77553c70015"
+        }
+      ]
     },
     {
       "operator": "d6",
       "kind": "falso positivo",
-      "run_id": "d6-20261018-044847",
       "scenario_id": "sc-tr-0b1ba54b3bff",
-      "trace_id": "tr-9284bede456a"
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 1,
+        "judge": 5
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "candidata",
+          "run_id": "d6-20261018-044847",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 4,
+          "trace_id": "tr-86f921b38c7c"
+        }
+      ]
     },
     {
       "operator": "d6",
       "kind": "falso positivo",
-      "run_id": "d6-20261018-044847",
       "scenario_id": "sc-tr-1bcac31bb099",
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 5
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "candidata",
+          "run_id": "d6-20261018-044847",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 5,
+          "trace_id": "tr-8cb5ed0aa69b"
+        }
+      ]
+    },
+    {
+      "operator": "d6",
+      "kind": "falso positivo",
+      "scenario_id": "sc-tr-91931c2b95fa",
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 1,
+        "judge": 5
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "candidata",
+          "run_id": "d6-20261018-044847",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 4,
+          "trace_id": "tr-e71962bde2f8"
+        }
+      ]
+    },
+    {
+      "operator": "d6",
+      "kind": "falso positivo",
+      "scenario_id": "sc-tr-a450dfb016b9",
+      "reference": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 0
+      },
+      "candidate": {
+        "repetitions": 5,
+        "oracle": 0,
+        "judge": 5
+      },
+      "origin": "traza",
+      "cells": [
+        {
+          "run": "candidata",
+          "run_id": "d6-20261018-044847",
+          "direction": "evaluador reprueba, oráculo no",
+          "discordant": 5,
+          "trace_id": "tr-0628253e74a6"
+        }
+      ]
+    }
+  ],
+  "to_annotate": [
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-00630db1696b"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-29aa60c1b351"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-2b409bde146c"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-729fffa55391"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-749642038cc0"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-770f679e595b"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-a046b3148545"
+    },
+    {
+      "run_id": "baseline-a-20261018-000105",
+      "trace_id": "tr-ccfcd62f43b3"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-2812024fadd8"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-31aa4ee2c71d"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-3391b58cae59"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-6da1e11c54da"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-793ca97c3215"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-7b7248d6e975"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-831764d3cddf"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-a4707abf6dc4"
+    },
+    {
+      "run_id": "d1-20261018-044843",
+      "trace_id": "tr-b49ea9675671"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-0628253e74a6"
+    },
+    {
+      "run_id": "d6-20261018-044847",
+      "trace_id": "tr-86f921b38c7c"
+    },
+    {
+      "run_id": "d6-20261018-044847",
       "trace_id": "tr-8cb5ed0aa69b"
     },
     {
-      "operator": "d6",
-      "kind": "falso positivo",
       "run_id": "d6-20261018-044847",
-      "scenario_id": "sc-tr-91931c2b95fa",
-      "trace_id": "tr-2196d233e34f"
+      "trace_id": "tr-b77553c70015"
     },
     {
-      "operator": "d6",
-      "kind": "falso positivo",
       "run_id": "d6-20261018-044847",
-      "scenario_id": "sc-tr-a450dfb016b9",
-      "trace_id": "tr-ea31aacc7c7f"
+      "trace_id": "tr-e71962bde2f8"
     }
   ]
 }
