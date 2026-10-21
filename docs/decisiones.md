@@ -401,47 +401,50 @@ La planificación (§5.5) y el pre-registro (§6) dicen que, dentro de cada estr
 
 ## D-016 · Análisis de los desacuerdos entre el oráculo y AgentProof
 
-- **Fecha:** 20 de octubre de 2026
+- **Fecha:** 20 de octubre de 2026; corregida el 21 de octubre de 2026
 - **Estado:** decidida con el autor después de E1 y antes de que ningún anotador vea una traza; se implementa en `src/experiments/disagreements.py`
 - **Origen:** retroalimentación del tutor al segundo entregable
 
+**Corrección del 21 de octubre.** La primera versión miraba solo las repeticiones de la candidata y una sola dirección de discordancia, y clasificaba los 18 desacuerdos en 10 "de traza" y 8 "de agregación". El tutor mostró dos casos mal clasificados. En D1, sc-tr-d707df857e02 (tc-09), el evaluador reprueba 5 de 5 repeticiones de la candidata y el oráculo marca 2, y se había clasificado como de agregación. En D4, sc-tr-e326cdcb18af (tc-07), en la línea base el oráculo marca 4 fallos y el evaluador ninguno, y no se miraba. La versión corregida mira las dos corridas y las dos direcciones, y separa dos ejes que la primera confundía. La afirmación de que en los casos "de agregación" los dos mecanismos se corroboraban era falsa en 7 de esos 8 casos y se retiró. Ningún anotador había visto la primera muestra, así que se reemplazó y se conservó la semilla.
+
 ### El problema
 
-En E1, el oráculo y AgentProof no siempre coinciden. D1 tiene once escenarios en el conjunto manifestado que el reporte no declaró como regresión (falsos negativos), y D6 tiene cinco regresiones que el oráculo no considera manifestadas (falsos positivos). La auditoría del oráculo y E2 miden cada plano por separado, sobre muestras sorteadas antes de ver estos desacuerdos, y solo cubren unos pocos de ellos por azar. Hace falta un procedimiento, fijado antes de mirar ninguna anotación, que diga si cada desacuerdo viene del evaluador, de los criterios inducidos o de las reglas del oráculo.
+En E1, el oráculo y AgentProof no siempre coinciden. D1 tiene once escenarios en el conjunto manifestado que el reporte no declaró como regresión (falsos negativos), y D6 tiene cinco regresiones que el oráculo no considera manifestadas (falsos positivos). La auditoría del oráculo y E2 miden cada mecanismo por separado, sobre muestras sorteadas antes de ver estos desacuerdos. Hace falta un procedimiento, fijado antes de mirar ninguna anotación, que diga de dónde viene cada desacuerdo y, cuando hay conversaciones con veredictos opuestos, si el error es del evaluador, de los criterios inducidos o de las reglas del oráculo.
 
-### Dos clases de desacuerdo
+### Los desacuerdos y sus dos ejes
 
-Se toman todos los falsos negativos y falsos positivos de la matriz de confusión de E1: 18 en total (11 de D1, 1 de D2, 1 de D4 y 5 de D6).
+Se toman todos los falsos negativos y falsos positivos de la matriz de confusión de E1: 18 escenarios (11 de D1, 1 de D2, 1 de D4 y 5 de D6). Cada uno se describe sobre las cinco repeticiones de la línea base de referencia y las cinco de la candidata, con dos ejes independientes:
 
-- **De traza.** Alguna repetición del escenario discrepa por sí sola: el predicado falla y el evaluador aprobó, para un falso negativo; o el evaluador reprobó y el predicado no falla, para un falso positivo. Son 10: 5 de D1 y 5 de D6. Se sortea una de esas repeticiones con la semilla `20261022` y se anota.
-- **De agregación.** En ninguna repetición discrepan por sí solos: donde uno falla, el otro también. La diferencia viene de cómo se agregan las cinco repeticiones (la corrección de Benjamini-Hochberg con R = 5, el umbral de 0.4 o una línea base que ya fallaba). Son 8: 6 de D1, 1 de D2 y 1 de D4. Se informan clasificados así, sin anotación: cada vez que uno de los dos registra el fallo que origina el desacuerdo, el otro lo registra en la misma repetición, y como no comparten información se corroboran entre sí. La corrección general de las reglas del oráculo la mide la auditoría.
+- **Repeticiones discordantes.** Una repetición es discordante si el predicado del oráculo falla y el evaluador la aprobó, o si el evaluador la reprobó y el predicado no falla. Cuentan las dos corridas y las dos direcciones. 17 de los 18 escenarios tienen al menos una; el único sin ninguna es sc-tr-3ee71ca0bdcf (tc-16) de D1.
+- **Origen de la diferencia de clasificación.** Para cada mecanismo se calcula cuánto sube la tasa de fallo de la candidata respecto de la referencia. Si los dos llegan al umbral de 0.4, o ninguno, los dos vieron el mismo cambio y la diferencia viene de la **agregación**: el reporte exige además significancia estadística, que con cinco repeticiones no se alcanzó. Si uno llega y el otro no, la diferencia viene de las **trazas**. Son 3 de agregación, todos de D1 (sc-tr-3ee71ca0bdcf (tc-16), sc-tr-69b396c04669 (tc-05) y sc-tr-d707df857e02 (tc-09)), y 15 de trazas.
 
-La lista y las trazas sorteadas están en `results/samples/desacuerdos.json`, que genera `python -m experiments.disagreements --data . --reference baseline-a-20261018-000105 --candidate <corrida> ...`. Una prueba exige que el archivo publicado sea el que la semilla produce.
+Los dos ejes pueden coincidir en un mismo escenario: sc-tr-69b396c04669 (tc-05) y sc-tr-d707df857e02 (tc-09) tienen origen en la agregación y además repeticiones discordantes.
+
+### El sorteo
+
+Para cada corrida y dirección con repeticiones discordantes de un escenario (una celda) se sortea una de esas repeticiones con la semilla `20261022`, recorriendo los desacuerdos en un orden fijo. Hay 23 celdas: 17 en la dirección "el evaluador reprueba y el oráculo no" y 6 en la dirección contraria; 9 en la línea base y 14 en la candidata. Una misma traza de la línea base sorteada para dos operadores se anota una sola vez, así que son 22 trazas distintas. Cada celda registra cuántas repeticiones discordantes representa.
+
+Todo está en `results/samples/desacuerdos.json`, que genera `python -m experiments.disagreements --data . --reference baseline-a-20261018-000105 --candidate <corrida> ...`, con los fallos de cada mecanismo por corrida, el origen y las celdas de cada desacuerdo. Las pruebas exigen que el archivo sea el que produce la semilla y fijan los dos casos que señaló el tutor.
 
 ### Qué anotan los tres anotadores
 
-Cada traza de la muestra se presenta a ciegas, como en la auditoría: la situación, los datos del pedido, la transcripción y los criterios del escenario, sin la condición ni la salida del oráculo o del evaluador, mezclada con las demás trazas de F6. Para cada una responden:
+Cada traza sorteada se presenta a ciegas: la situación, los datos del pedido, la transcripción y los criterios del escenario, sin la condición, la corrida ni la salida del oráculo o del evaluador. Va mezclada con las trazas de la auditoría y de E2, y si ya forma parte de una de esas muestras se etiqueta una sola vez. Las etiquetas son hechos, no atribuciones:
 
-1. qué decisión comunicó el agente y si enunció algún dato del pedido que contradice la base (la pregunta del oráculo);
-2. si se cumple cada criterio del escenario (la pregunta del evaluador, con la rúbrica de E2);
-3. si la conversación tiene un error del agente que ningún criterio recoge.
+1. qué decisión comunicó el agente (procede, no procede, escalamiento o ninguna);
+2. si enunció algún dato del pedido que contradice la base y, si la situación lo pide, si entregó el estado del pedido;
+3. si se cumple cada criterio del escenario, con la rúbrica de E2.
 
-### Cómo se atribuye cada desacuerdo
+### Cómo se atribuye cada discordancia
 
-Con la mayoría de los tres anotadores, y fijado antes de ver ninguna anotación:
+La atribución se calcula a partir de las etiquetas, con la mayoría de los tres anotadores, y quedó fijada antes de ver ninguna:
 
-| Desacuerdo | Los anotadores dicen | Se atribuye a |
-|---|---|---|
-| Falso negativo (el oráculo falla, el evaluador aprueba) | no hay el fallo que leyó el oráculo | las reglas del oráculo |
-| | hay fallo, y algún criterio que el evaluador dio por cumplido no se cumple | el evaluador |
-| | hay fallo, y todos los criterios se cumplen | los criterios, que no cubren el fallo |
-| Falso positivo (el evaluador reprueba, el oráculo no) | el criterio reprobado sí se cumple | el evaluador |
-| | el criterio no se cumple, y la decisión sí se comunicó | los criterios, que exigen más que el predicado |
-| | la decisión no se comunicó | las reglas del oráculo |
+1. **Reglas del oráculo.** Si el predicado del operador, aplicado a las etiquetas de los puntos 1 y 2, da distinto que el predicado del oráculo.
+2. **Evaluador.** Si la aprobación según las etiquetas del punto 3 (todos los criterios cumplidos) da distinto que el veredicto del evaluador.
+3. **Alcance distinto.** Si ni el oráculo ni el evaluador se equivocaron y la repetición sigue siendo discordante, los dos miden aspectos distintos. En la dirección "el oráculo falla y el evaluador aprueba", los criterios no cubren el fallo que mide el predicado. En la dirección contraria, los criterios exigen algo que el predicado no mide.
 
-Se informan los conteos por clase y por operador, y los casos en que los anotadores no llegan a mayoría.
+Los casos 1 y 2 pueden darse a la vez, y entonces se informan los dos. Se reportan los conteos por causa, por operador, por corrida y por dirección, ponderados por las repeticiones discordantes que representa cada celda. Una decisión sin mayoría entre los tres anotadores se informa aparte.
 
 ### Lo que este análisis no hace
 
 - **No es una enmienda.** No cambia ninguna pieza de la huella, ningún resultado de E1 ni la definición del conjunto manifestado. Es un análisis exploratorio, agregado después de ver los resultados de E1 y declarado como tal en la §8 del pre-registro.
-- **Si atribuye un desacuerdo a las reglas del oráculo,** la corrección sigue el camino ya pre-registrado para la auditoría: una enmienda con su motivo, E1 vuelto a puntuar y las dos puntuaciones reportadas.
+- **Si atribuye una discordancia a las reglas del oráculo,** la corrección sigue el camino ya pre-registrado para la auditoría: una enmienda con su motivo, E1 vuelto a puntuar y las dos puntuaciones reportadas.
