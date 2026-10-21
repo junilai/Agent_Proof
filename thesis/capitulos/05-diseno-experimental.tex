@@ -97,7 +97,7 @@ La Figura~\ref{fig:verdad} resume cómo se relacionan las piezas. Los dos camino
       flecha/.style={-{Stealth[length=2mm]}, thick},
       etiqueta/.style={font=\scriptsize, align=center},
       node distance=0.6cm]
-    \node[caja] (mut) {\textbf{Degradación}\\D1--D6 aplicada al agente};
+    \node[caja] (mut) {\textbf{Degradación}\\D1, D2, D4, D5 o D6 aplicada al agente};
     \node[caja, right=of mut] (exp) {\textbf{Conjunto expuesto}\\escenarios que la degradación puede afectar};
     \node[caja, right=of exp] (man) {\textbf{Conjunto manifestado}\\verdad de referencia del oráculo};
     \node[caja, below=1.5cm of mut] (esc) {\textbf{Escenarios inducidos}\\reejecutados con el agente degradado};
@@ -115,7 +115,7 @@ La Figura~\ref{fig:verdad} resume cómo se relacionan las piezas. Los dos camino
     \node[etiqueta, below=0.15cm of man, text width=2.8cm] {predicado de fallo; caída $\geq 0.4$ frente a la línea base};
     \node[etiqueta, below=0.15cm of reg, text width=2.8cm] {Fisher, Benjamini-Hochberg y caída $\geq 0.4$};
   \end{tikzpicture}
-  \caption{Relación entre las degradaciones, el oráculo, los escenarios y las métricas de detección. Arriba, el camino del oráculo; abajo, el de AgentProof. Solo se cruzan en la matriz de confusión}
+  \caption{Relación entre las degradaciones, el oráculo, los escenarios y las métricas de detección. Arriba, el camino del oráculo; abajo, el de AgentProof. Solo se cruzan en la matriz de confusión. D3 no participa en el cálculo de TPR y FPR, porque no tiene conjunto expuesto: se analiza solo por su tamaño de efecto sobre la suite}
   \label{fig:verdad}
 \end{figure}
 
