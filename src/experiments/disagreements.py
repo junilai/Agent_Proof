@@ -20,6 +20,7 @@ was added after E1 and is exploratory: it changes no result.
 from __future__ import annotations
 
 import random
+from fractions import Fraction
 from pathlib import Path
 from typing import Literal
 
@@ -29,17 +30,61 @@ from pydantic import BaseModel
 from agentproof.store import Store
 from experiments.analysis.detection import detection
 from experiments.oracle.annotation import judged, load_annotations
-from experiments.oracle.manifested import by_scenario
+from experiments.oracle.manifested import THRESHOLD, by_scenario
 
 SEED = 20261022
 
 Kind = Literal["falso negativo", "falso positivo"]
+Run = Literal["referencia", "candidata"]
+Direction = Literal["oráculo falla, evaluador aprueba", "evaluador reprueba, oráculo no"]
+Origin = Literal["agregación", "traza"]
+DIRECTIONS: tuple[Direction, ...] = (
+    "oráculo falla, evaluador aprueba",
+    "evaluador reprueba, oráculo no",
+)
 
 
 class Repetition(BaseModel):
     trace_id: str
     predicate_fails: bool | None
     judge_passed: bool
+
+
+def direction(repetition: Repetition) -> Direction | None:
+    """How the repetition is discordant, or None if both mechanisms agree on it."""
+    if repetition.predicate_fails is True and repetition.judge_passed:
+        return "oráculo falla, evaluador aprueba"
+    if repetition.predicate_fails is False and not repetition.judge_passed:
+        return "evaluador reprueba, oráculo no"
+    return None
+
+
+class Rates(BaseModel):
+    """Failures each mechanism counts among the repetitions of one run."""
+
+    repetitions: int
+    oracle: int
+    judge: int
+
+
+def rates(repetitions: list[Repetition]) -> Rates:
+    return Rates(
+        repetitions=len(repetitions),
+        oracle=sum(r.predicate_fails is True for r in repetitions),
+        judge=sum(not r.judge_passed for r in repetitions),
+    )
+
+
+def origin(reference: Rates, candidate: Rates) -> Origin:
+    """Aggregation if both mechanisms are on the same side of the threshold, else traces."""
+
+    def reaches(ours: int, theirs: int) -> bool:
+        increase = Fraction(ours, candidate.repetitions) - Fraction(theirs, reference.repetitions)
+        return increase >= THRESHOLD
+
+    oracle = reaches(candidate.oracle, reference.oracle)
+    judge = reaches(candidate.judge, reference.judge)
+    return "agregación" if oracle == judge else "traza"
 
 
 class Disagreement(BaseModel):
