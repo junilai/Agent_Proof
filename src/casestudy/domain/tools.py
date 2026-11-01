@@ -15,6 +15,15 @@ from casestudy.domain.orders import DOMAIN_TODAY, Order
 from casestudy.domain.policy import TRUE_POLICY, RefundPolicy
 from casestudy.domain.policy_text import policy_text
 
+# Shared by every edition, so each framework shows the model the same text.
+TOOL_DESCRIPTIONS = {
+    "lookup_order": "Consulta un pedido por su identificador (por ejemplo, AT-1001).",
+    "get_refund_policy": "Devuelve el texto de la política de reembolsos vigente.",
+    "create_ticket": (
+        "Escala un caso creando un ticket para un supervisor o un reclamo de garantía."
+    ),
+}
+
 
 def lookup_order(
     order_id: str,

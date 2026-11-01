@@ -15,15 +15,20 @@ from claude_agent_sdk import ClaudeAgentOptions, SdkMcpTool, create_sdk_mcp_serv
 
 from casestudy.domain.mutations import BASELINE, MUTATIONS, Mutation
 from casestudy.domain.prompt import system_prompt
-from casestudy.domain.tools import create_ticket, get_refund_policy, lookup_order
+from casestudy.domain.tools import (
+    TOOL_DESCRIPTIONS,
+    create_ticket,
+    get_refund_policy,
+    lookup_order,
+)
 
 SERVER_NAME = "store"
 STEP_LIMIT = 10
 VARIANTS = tuple(MUTATIONS)
 
-_LOOKUP = "Consulta un pedido por su identificador (por ejemplo, AT-1001)."
-_POLICY = "Devuelve el texto de la política de reembolsos vigente."
-_TICKET = "Escala un caso creando un ticket para un supervisor o un reclamo de garantía."
+_LOOKUP = TOOL_DESCRIPTIONS["lookup_order"]
+_POLICY = TOOL_DESCRIPTIONS["get_refund_policy"]
+_TICKET = TOOL_DESCRIPTIONS["create_ticket"]
 
 
 def _content(payload: Any) -> dict[str, Any]:
