@@ -151,6 +151,19 @@ def test_tracing_explicitly_off_is_fine():
     ensure_no_tracing({var: "false" for var in TRACING_VARS})
 
 
+def test_every_variable_langsmith_reads_is_guarded():
+    names = [
+        f"{ns}_{name}" for ns in ("LANGSMITH", "LANGCHAIN") for name in ("TRACING_V2", "TRACING")
+    ]
+    assert set(names) <= set(TRACING_VARS)
+
+
+def test_refuses_when_langsmith_itself_would_trace(monkeypatch):
+    monkeypatch.setattr("langsmith.utils.tracing_is_enabled", lambda *a, **k: True)
+    with pytest.raises(TracingEnabledError, match="LangSmith"):
+        ensure_no_tracing({})
+
+
 def test_the_session_keeps_memory_between_turns():
     model = ScriptedChatModel(responses=[say("Hola."), say("Sigo aquí.")])
     first, second = _talk(_graph(model), "hola", "¿sigues?")

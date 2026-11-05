@@ -23,12 +23,18 @@ from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import StateGraph
+from langsmith import utils as langsmith_utils
 
 from agentproof.pricing import PRICES
 from agentproof.schema import Usage
 from agentproof.session import AgentEvent, AgentTurn, SessionFactory
 
-TRACING_VARS = ("LANGSMITH_TRACING", "LANGCHAIN_TRACING_V2", "LANGCHAIN_TRACING")
+TRACING_VARS = (
+    "LANGSMITH_TRACING",
+    "LANGSMITH_TRACING_V2",
+    "LANGCHAIN_TRACING_V2",
+    "LANGCHAIN_TRACING",
+)
 STEP_LIMIT_KEY = "step_limit_reached"
 
 
@@ -43,6 +49,8 @@ def ensure_no_tracing(env: Mapping[str, str] = os.environ) -> None:
             f"el envío de trazas de LangChain está activo ({', '.join(enabled)}): "
             f"defina {enabled[0]}=false antes de correr"
         )
+    if langsmith_utils.tracing_is_enabled():
+        raise TracingEnabledError("LangSmith enviaría las trazas del agente: desactívelo")
 
 
 def _texts(message: AIMessage) -> list[str]:
