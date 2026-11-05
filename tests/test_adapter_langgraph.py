@@ -4,8 +4,10 @@ from typing import Annotated, TypedDict
 
 import pytest
 from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, ToolMessage
+from langchain_core.tools import tool
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode, tools_condition
 
 from agentproof.adapters.langgraph import (
     TRACING_VARS,
@@ -16,7 +18,7 @@ from agentproof.adapters.langgraph import (
     turn_from_messages,
 )
 from agentproof.models import TARGET_BASELINE_MODEL, TARGET_DOWNGRADED_MODEL
-from tests.fakes_langchain import ScriptedChatModel, say
+from tests.fakes_langchain import ScriptedChatModel, ask_tools, say
 
 LOOKUP_RESULT = {"pedido": "AT-1001", "estado": "entregado", "dias_desde_entrega": 10}
 USAGE = {"input_tokens": 100, "output_tokens": 20, "total_tokens": 120}
@@ -211,3 +213,31 @@ def test_the_session_prices_with_the_model_the_graph_requested():
     model = ScriptedChatModel(model=TARGET_DOWNGRADED_MODEL, responses=[say("x")])
     [turn] = _talk(_graph(model), "hola")
     assert turn.usage.cost_usd == pytest.approx(100 * 1 / 1e6 + 20 * 5 / 1e6)
+
+
+@tool
+def create_ticket(summary: str, order_id: str) -> dict:
+    """Escalates a case."""
+    return {"ticket": "TCK-1", "pedido": order_id}
+
+
+def test_an_error_keeps_what_the_agent_already_did_in_the_turn():
+    ticket = ask_tools(("create_ticket", {"summary": "s", "order_id": "AT-1"}))
+    model = ScriptedChatModel(responses=[ticket, RuntimeError("overloaded")])
+    bound = model.bind_tools([create_ticket])
+    graph = StateGraph(_State)
+    graph.add_node("model", lambda state: {"messages": [bound.invoke(state["messages"])]})
+    graph.add_node("tools", ToolNode([create_ticket]))
+    graph.add_edge(START, "model")
+    graph.add_conditional_edges("model", tools_condition)
+    graph.add_edge("tools", "model")
+    [turn] = _talk(graph, "crea un ticket")
+    assert turn.stop_reason == "error"
+    assert [(e.kind, e.tool) for e in turn.events] == [
+        ("tool_call", "create_ticket"),
+        ("error", None),
+    ]
+    assert turn.events[0].result["ticket"] == "TCK-1"
+    assert "overloaded" in turn.events[1].text
+    assert turn.usage.input_tokens == 100
+    assert turn.usage.cost_usd == pytest.approx(100 * 2 / 1e6 + 20 * 10 / 1e6)

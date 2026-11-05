@@ -143,17 +143,22 @@ class LangGraphSession:
     async def send(self, message: str) -> AgentTurn:
         requested = _RequestedModel()
         config = {"configurable": {"thread_id": self._thread}, "callbacks": [requested]}
-        before = len((await self._app.aget_state(config)).values.get("messages", []))
+        before = len(await self._messages(config))
         try:
             state = await self._app.ainvoke({"messages": [HumanMessage(message)]}, config)
         except Exception as exc:
+            partial = (await self._messages(config))[before:]
+            turn = turn_from_messages(partial, step_limit_reached=False, model=requested.model)
             error = AgentEvent(kind="error", text=f"{type(exc).__name__}: {exc}")
-            return AgentTurn(reply="", events=[error], stop_reason="error")
+            return turn.model_copy(update={"events": [*turn.events, error], "stop_reason": "error"})
         return turn_from_messages(
             state["messages"][before:],
             step_limit_reached=bool(state.get(STEP_LIMIT_KEY)),
             model=requested.model,
         )
+
+    async def _messages(self, config: dict[str, Any]) -> list[BaseMessage]:
+        return (await self._app.aget_state(config)).values.get("messages", [])
 
     async def __aexit__(self, *exc_info: object) -> None:
         self._app = None
