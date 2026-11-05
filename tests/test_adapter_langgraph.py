@@ -10,6 +10,7 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 
 from agentproof.adapters.langgraph import (
+    RECURSION_LIMIT,
     TRACING_VARS,
     LangGraphSession,
     TracingEnabledError,
@@ -241,3 +242,20 @@ def test_an_error_keeps_what_the_agent_already_did_in_the_turn():
     assert "overloaded" in turn.events[1].text
     assert turn.usage.input_tokens == 100
     assert turn.usage.cost_usd == pytest.approx(100 * 2 / 1e6 + 20 * 10 / 1e6)
+
+
+def test_a_runaway_loop_is_stopped_as_an_error():
+    """A graph whose own counter never cuts still ends, after a bounded number of calls."""
+    loop = ask_tools(("create_ticket", {"summary": "s", "order_id": "AT-1"}))
+    model = ScriptedChatModel(responses=[loop], repeat_last=True)
+    bound = model.bind_tools([create_ticket])
+    graph = StateGraph(_State)
+    graph.add_node("model", lambda state: {"messages": [bound.invoke(state["messages"])]})
+    graph.add_node("tools", ToolNode([create_ticket]))
+    graph.add_edge(START, "model")
+    graph.add_conditional_edges("model", tools_condition)
+    graph.add_edge("tools", "model")
+    [turn] = _talk(graph, "hola")
+    assert turn.stop_reason == "error"
+    assert "GraphRecursionError" in turn.events[-1].text
+    assert len(model.calls) == RECURSION_LIMIT // 2

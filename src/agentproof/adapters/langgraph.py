@@ -36,6 +36,8 @@ TRACING_VARS = (
     "LANGCHAIN_TRACING",
 )
 STEP_LIMIT_KEY = "step_limit_reached"
+RECURSION_LIMIT = 100
+"""Supersteps per turn: a cost guard far above the edition's own step limit, never the limit."""
 
 
 class TracingEnabledError(RuntimeError):
@@ -142,7 +144,11 @@ class LangGraphSession:
 
     async def send(self, message: str) -> AgentTurn:
         requested = _RequestedModel()
-        config = {"configurable": {"thread_id": self._thread}, "callbacks": [requested]}
+        config = {
+            "configurable": {"thread_id": self._thread},
+            "callbacks": [requested],
+            "recursion_limit": RECURSION_LIMIT,
+        }
         before = len(await self._messages(config))
         try:
             state = await self._app.ainvoke({"messages": [HumanMessage(message)]}, config)
