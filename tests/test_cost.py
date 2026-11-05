@@ -3,9 +3,11 @@ from typer.testing import CliRunner
 
 from agentproof import cli
 from agentproof.cost import cost_summary, render_cost
-from agentproof.models import SIM_USER
+from agentproof.models import SIM_USER, TARGET_DOWNGRADED_MODEL
+from agentproof.pricing import PRICES as PRICE_TABLE
 from agentproof.schema import Usage
 from agentproof.store import Store
+from casestudy.domain.mutations import MUTATIONS
 from tests.factories import manifest, scenario, trace, verdict
 
 PRICES = {"inducer-model": (2.0, 10.0), SIM_USER.model: (1.0, 5.0), "claude-opus-5": (5.0, 25.0)}
@@ -70,3 +72,10 @@ def test_the_command_prints_the_date_of_the_prices(tmp_path):
     assert "precios al 2026-10-16" in result.output and "evaluador" in result.output
     unknown = CliRunner().invoke(cli.app, ["cost", "--data", str(tmp_path), "--run", "x"])
     assert unknown.exit_code == 1
+
+
+def test_every_variant_model_has_a_price():
+    """Editions without their own cost estimate price the turn with the variant's model."""
+    models = {m.model for m in MUTATIONS.values()}
+    assert TARGET_DOWNGRADED_MODEL in models
+    assert models <= set(PRICE_TABLE)
