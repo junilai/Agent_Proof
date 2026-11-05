@@ -77,6 +77,15 @@ def test_core_does_not_import_case_study_or_experiments():
     assert forbidden_imports(OFF_LIMITS_PROJECT_PACKAGES) == {}
 
 
+def test_adapters_do_not_import_case_study_or_experiments():
+    found = {
+        str(p.relative_to(SRC)): imported_top_level_modules(p.read_text())
+        & OFF_LIMITS_PROJECT_PACKAGES
+        for p in (CORE / "adapters").rglob("*.py")
+    }
+    assert {k: v for k, v in found.items() if v} == {}
+
+
 def test_detects_full_module_names():
     source = (
         "from agentproof.models import X\nimport agentproof.store\nfrom agentproof import schema\n"

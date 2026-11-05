@@ -1,10 +1,22 @@
+import asyncio
 import json
+from typing import Annotated, TypedDict
 
 import pytest
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, ToolMessage
+from langgraph.graph import END, START, StateGraph
+from langgraph.graph.message import add_messages
 
-from agentproof.adapters.langgraph import turn_from_messages
-from agentproof.models import TARGET_BASELINE_MODEL
+from agentproof.adapters.langgraph import (
+    TRACING_VARS,
+    LangGraphSession,
+    TracingEnabledError,
+    ensure_no_tracing,
+    session_factory,
+    turn_from_messages,
+)
+from agentproof.models import TARGET_BASELINE_MODEL, TARGET_DOWNGRADED_MODEL
+from tests.fakes_langchain import ScriptedChatModel, say
 
 LOOKUP_RESULT = {"pedido": "AT-1001", "estado": "entregado", "dias_desde_entrega": 10}
 USAGE = {"input_tokens": 100, "output_tokens": 20, "total_tokens": 120}
@@ -93,3 +105,96 @@ def test_an_unpriced_model_has_no_cost():
     assert turn.usage.input_tokens == 100
     assert turn.usage.cost_usd is None
     assert _turn(AIMessage("a", usage_metadata=USAGE), model=None).usage.cost_usd is None
+
+
+class _State(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
+    step_limit_reached: bool
+
+
+def _graph(model, cut=False):
+    """A one-node graph: enough to test the session without any edition."""
+
+    def call(state):
+        return {"messages": [model.invoke(state["messages"])], "step_limit_reached": cut}
+
+    graph = StateGraph(_State)
+    graph.add_node("model", call)
+    graph.add_edge(START, "model")
+    graph.add_edge("model", END)
+    return graph
+
+
+@pytest.fixture(autouse=True)
+def _no_tracing(monkeypatch):
+    for var in TRACING_VARS:
+        monkeypatch.delenv(var, raising=False)
+
+
+def _talk(graph, *messages):
+    async def run():
+        async with LangGraphSession(graph) as session:
+            return [await session.send(m) for m in messages]
+
+    return asyncio.run(run())
+
+
+@pytest.mark.parametrize("var", TRACING_VARS)
+@pytest.mark.parametrize("value", ["true", "1", "True"])
+def test_refuses_to_open_with_tracing_enabled(monkeypatch, var, value):
+    monkeypatch.setenv(var, value)
+    with pytest.raises(TracingEnabledError, match=var):
+        _talk(_graph(ScriptedChatModel(responses=[say("x")])), "hola")
+
+
+def test_tracing_explicitly_off_is_fine():
+    ensure_no_tracing({var: "false" for var in TRACING_VARS})
+
+
+def test_the_session_keeps_memory_between_turns():
+    model = ScriptedChatModel(responses=[say("Hola."), say("Sigo aquí.")])
+    first, second = _talk(_graph(model), "hola", "¿sigues?")
+    assert (first.reply, second.reply) == ("Hola.", "Sigo aquí.")
+    assert [m.content for m in model.calls[1]] == ["hola", "Hola.", "¿sigues?"]
+    assert [e.kind for e in second.events] == ["agent_message"]
+
+
+def test_the_cut_flag_becomes_step_limit():
+    [turn] = _talk(_graph(ScriptedChatModel(responses=[say("x")]), cut=True), "hola")
+    assert turn.stop_reason == "step_limit"
+
+
+def test_a_model_error_ends_the_turn_as_error():
+    model = ScriptedChatModel(responses=[RuntimeError("overloaded"), say("De nuevo.")])
+    failed, recovered = _talk(_graph(model), "hola", "otra vez")
+    assert failed.stop_reason == "error"
+    assert failed.reply == ""
+    assert [e.kind for e in failed.events] == ["error"]
+    assert "overloaded" in failed.events[0].text
+    assert recovered.stop_reason == "completed"
+    assert recovered.reply == "De nuevo."
+
+
+def test_each_session_has_its_own_thread():
+    model = ScriptedChatModel(responses=[say("a"), say("b")])
+    factory = session_factory(lambda variant: _graph(model), "baseline")
+
+    async def run():
+        for text in ("primera", "segunda"):
+            async with factory() as session:
+                await session.send(text)
+
+    asyncio.run(run())
+    assert [[m.content for m in call] for call in model.calls] == [["primera"], ["segunda"]]
+
+
+def test_the_factory_builds_the_graph_of_its_variant():
+    asked = []
+    session_factory(lambda variant: asked.append(variant) or _graph(None), "d4")()
+    assert asked == ["d4"]
+
+
+def test_the_session_prices_with_the_model_the_graph_requested():
+    model = ScriptedChatModel(model=TARGET_DOWNGRADED_MODEL, responses=[say("x")])
+    [turn] = _talk(_graph(model), "hola")
+    assert turn.usage.cost_usd == pytest.approx(100 * 1 / 1e6 + 20 * 5 / 1e6)
