@@ -399,6 +399,57 @@ La planificación (§5.5) y el pre-registro (§6) dicen que, dentro de cada estr
 - **Diversifica más que el tope por celda**, que permitiría que un mismo escenario aportara hasta 14 pares de un estrato.
 - **Se reporta.** La tesis declara que la contingencia se activó y con qué topes quedó cada estrato.
 
+## D-012 · Equivalencias entre las ediciones del agente
+
+- **Fecha:** 8 de noviembre de 2026
+- **Estado:** decidida e implementada para LangGraph; CrewAI y smolagents se agregan al construir sus ediciones
+- **Origen:** F4, portabilidad (§5.7, §5.8)
+
+### El problema
+
+Cada framework tiene su propia idea de paso, de memoria y de parámetros del modelo. Si las ediciones difieren en algo más que el framework, E4 no puede atribuir al framework lo que cambie respecto de E1. Esta decisión fija cómo cada edición reproduce lo que hace la edición Claude Agent SDK y declara lo que no puede reproducir.
+
+### LangGraph
+
+**Bucle y límite de pasos.** La edición (`casestudy/editions/langgraph.py`) es un bucle propio sobre `StateGraph`, sin el constructor prefabricado, con cuatro nodos: `start`, `model`, `tools` y `cut`.
+
+- Un paso es una llamada al modelo, como en `max_turns` del SDK. El contador vive en el estado y vuelve a cero en `start`, al comenzar cada turno del cliente.
+- La línea base tiene 10 pasos. D6 usa un límite propio de este framework, que se calibra como en D-003 y se registra en su adenda.
+- El corte se decide solo después del nodo de herramientas. Así toda llamada a herramienta del historial tiene su resultado, y la API acepta el turno siguiente.
+- Es lo mismo que hace el SDK. En los 26 cortes de D6 de E1, el último evento es una llamada a herramienta con su resultado, y ninguna llamada quedó sin resultado.
+- El corte deja la marca `step_limit_reached`, que el adaptador traduce a `step_limit`.
+
+**Memoria.** El checkpointer nativo de LangGraph, `InMemorySaver`, con un hilo por conversación. El adaptador compila el grafo, envía solo el mensaje nuevo y lee los mensajes que el turno agregó. Cada conversación empieza vacía. El prompt de sistema va al frente de cada llamada y no se guarda en el estado.
+
+**Herramientas.** Las tres del dominio, como `StructuredTool`, con las mismas descripciones y el mismo esquema de argumentos que la edición del SDK; se verificó el esquema que recibe la API. `ToolNode` las ejecuta, y si el modelo pide varias en un mismo mensaje, las ejecuta en paralelo.
+
+- Una herramienta que lanza una excepción no corta el turno: el modelo recibe el error como resultado y la conversación sigue.
+- LangGraph agrega a ese resultado la frase en inglés "Please fix your mistakes.".
+- Las herramientas del dominio devuelven sus errores como datos, sin lanzar excepciones, así que la frase no aparece en uso normal.
+
+**Modelo.** La integración propia del framework, `ChatAnthropic` de `langchain-anthropic` 1.7.5, con el modelo de la variante. Los parámetros que esa integración no fija como el SDK se fijan a mano:
+
+| Parámetro | Valor | Motivo |
+|---|---|---|
+| Tokens máximos de salida | 32 000, igual en todas las variantes | Por omisión `ChatAnthropic` usa el máximo de cada modelo (128 000 en Sonnet 5, 64 000 en Haiku 4.5), lo que daría topes distintos según la variante. El tope no restringe: en E1 la conversación más larga generó 5 000 tokens de salida en total |
+| Razonamiento extendido | desactivado | No se activa; la edición del SDK tampoco lo configura en `ClaudeAgentOptions` |
+| Temperatura | la del modelo por omisión | Sonnet 5 no admite fijarla (`agentproof.models`) |
+| Tiempo máximo por llamada | 600 s | `ChatAnthropic` crea el cliente sin tiempo máximo, y una llamada colgada detendría la tanda sin aviso. Es el valor por omisión del SDK de Anthropic para llamadas sin streaming |
+| Reintentos ante errores de la API | 2 | El valor por omisión de `ChatAnthropic` |
+
+**Lo que agrega el adaptador.**
+
+- Un tope de 100 supersteps por turno. LangGraph 1.2.12 corta recién a los 10 007. Un bucle que el contador de la edición no cortara terminaría como error tras 50 llamadas al modelo, con un costo acotado. La edición necesita como máximo 22 supersteps con el límite de 10 (`start`, diez llamadas al modelo, diez a las herramientas y `cut`), así que el tope no interviene en uso normal.
+- La negativa a correr con el envío de trazas de LangChain activo. Se comprueba al crear la fábrica de sesiones, de modo que `agentproof run` se detiene antes de la primera conversación.
+
+**Diferencias conocidas con Claude Agent SDK.**
+
+- **Caché de prompts.** El SDK la usa y esta edición no, así que cada llamada paga el prompt completo.
+- **Costo del agente.** En E4 se calcula con la tabla de precios (D-007) y el modelo pedido. En E1 se tomó de la consola, porque la caché impide calcularlo con la tabla.
+- **Petición al modelo.** Esta edición envía solo el prompt del dominio, las tres herramientas y los parámetros de la tabla. El SDK arma su petición dentro de su CLI, que no se inspeccionó, así que no se puede afirmar que sea idéntica.
+
+Ninguna de estas diferencias cambia la definición de las mutaciones, que se comprueba con la prueba de paridad de las dos ediciones. La versión de cada paquete queda en el lockfile. La enmienda 2 del pre-registro congela antes de E4 las herramientas, los límites, `MAX_TOKENS` y las versiones de esta edición.
+
 ## D-016 · Análisis de los desacuerdos entre el oráculo y AgentProof
 
 - **Fecha:** 20 de octubre de 2026; corregida el 21 de octubre de 2026
