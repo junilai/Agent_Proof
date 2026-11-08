@@ -259,3 +259,12 @@ def test_a_runaway_loop_is_stopped_as_an_error():
     assert turn.stop_reason == "error"
     assert "GraphRecursionError" in turn.events[-1].text
     assert len(model.calls) == RECURSION_LIMIT // 2
+
+
+def test_the_factory_refuses_before_any_conversation(monkeypatch):
+    """A batch must fail at once, not leave one error trace per conversation."""
+    monkeypatch.setenv("LANGSMITH_TRACING", "true")
+    built = []
+    with pytest.raises(TracingEnabledError, match="LANGSMITH_TRACING"):
+        session_factory(lambda variant: built.append(variant), "baseline")
+    assert built == []

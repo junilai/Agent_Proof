@@ -171,5 +171,9 @@ class LangGraphSession:
 
 
 def session_factory(agent: Callable[[str], StateGraph], variant: str) -> SessionFactory:
-    """The adapter convention: a fresh session, with an empty memory, per conversation."""
+    """The adapter convention: a fresh session, with an empty memory, per conversation.
+
+    Checks tracing here too, so a batch fails before its first conversation.
+    """
+    ensure_no_tracing()
     return lambda: LangGraphSession(agent(variant))
