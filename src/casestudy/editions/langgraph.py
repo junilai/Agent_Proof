@@ -1,0 +1,64 @@
+"""Case-study agent, LangGraph edition.
+
+A plain LangGraph application: the framework-free domain wrapped as LangChain
+tools, with its own loop on ``StateGraph``. It knows nothing about AgentProof.
+Each variant applies one mutation from the shared domain definition (D1–D6);
+a step is one model call, as with ``max_turns`` in the Claude Agent SDK edition.
+"""
+
+from typing import Annotated, Any, TypedDict
+
+from langchain_anthropic import ChatAnthropic
+from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import AnyMessage
+from langchain_core.tools import BaseTool, StructuredTool
+from langgraph.graph.message import add_messages
+
+from casestudy.domain.mutations import MUTATIONS, Mutation
+from casestudy.domain.tools import TOOL_DESCRIPTIONS, create_ticket, get_refund_policy, lookup_order
+
+VARIANTS = tuple(MUTATIONS)
+STEP_LIMIT = 10
+D6_STEP_LIMIT = 2
+"""Model calls per turn under D6, calibrated for this framework as in D-003."""
+MAX_TOKENS = 32000
+"""Output tokens per model call, the same for every variant (D-012)."""
+
+
+class AgentState(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
+    model_calls: int
+    step_limit_reached: bool
+
+
+def step_limit(mutation: Mutation) -> int:
+    return D6_STEP_LIMIT if mutation.step_limit is not None else STEP_LIMIT
+
+
+def tools_for(mutation: Mutation) -> list[BaseTool]:
+    """The agent's tools under a mutation: D1 removes one, D4 changes what one returns."""
+
+    def lookup(order_id: str) -> dict[str, Any]:
+        return lookup_order(order_id)
+
+    def refund_policy() -> str:
+        return get_refund_policy(mutation.policy)
+
+    def ticket(summary: str, order_id: str) -> dict[str, str]:
+        return create_ticket(summary, order_id)
+
+    functions = {
+        "lookup_order": lookup,
+        "get_refund_policy": refund_policy,
+        "create_ticket": ticket,
+    }
+    return [
+        StructuredTool.from_function(function, name=name, description=TOOL_DESCRIPTIONS[name])
+        for name, function in functions.items()
+        if name not in mutation.removed_tools
+    ]
+
+
+def default_model(mutation: Mutation) -> BaseChatModel:
+    """The variant's model, without extended thinking and with the default temperature."""
+    return ChatAnthropic(model=mutation.model, max_tokens=MAX_TOKENS)
