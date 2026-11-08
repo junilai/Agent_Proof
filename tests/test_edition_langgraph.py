@@ -240,6 +240,19 @@ def test_a_failing_tool_keeps_the_conversation_going():
     assert (turn.stop_reason, turn.reply) == ("completed", "No encontré tu pedido.")
 
 
+def test_a_tool_that_raises_is_an_error_result_not_a_crash(monkeypatch):
+    def down(summary, order_id):
+        raise RuntimeError("sistema de tickets caído")
+
+    monkeypatch.setattr("casestudy.editions.langgraph.create_ticket", down)
+    ticket = ask_tools(("create_ticket", {"summary": "Laptop", "order_id": "AT-1002"}))
+    model = _model("baseline", ticket, say("No pude crear el ticket."))
+    [turn] = _talk("baseline", model, "Quiero escalar mi caso.")
+    assert turn.events[0].is_error is True
+    assert "sistema de tickets caído" in str(turn.events[0].result)
+    assert (turn.stop_reason, turn.reply) == ("completed", "No pude crear el ticket.")
+
+
 # Rule 8: end to end without the API, read by the oracle.
 
 

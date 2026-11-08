@@ -75,6 +75,7 @@ def builder(variant: str = "baseline", model: BaseChatModel | None = None) -> St
     The step counter restarts in ``start`` on every customer turn. The cut is
     decided only after ``tools``, so every tool call in the history has its result.
     The system prompt goes in front of each call and is never stored in the state.
+    A tool that raises gives the model an error result, and the turn goes on.
     """
     if variant not in MUTATIONS:
         raise ValueError(f"unknown variant: {variant}")
@@ -103,7 +104,7 @@ def builder(variant: str = "baseline", model: BaseChatModel | None = None) -> St
     graph = StateGraph(AgentState)
     graph.add_node("start", start)
     graph.add_node("model", call_model)
-    graph.add_node("tools", ToolNode(tools))
+    graph.add_node("tools", ToolNode(tools, handle_tool_errors=True))
     graph.add_node("cut", cut)
     graph.add_edge(START, "start")
     graph.add_edge("start", "model")
