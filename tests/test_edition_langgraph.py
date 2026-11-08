@@ -21,6 +21,7 @@ from casestudy.domain.tools import TOOL_DESCRIPTIONS, get_refund_policy, lookup_
 from casestudy.editions.langgraph import (
     D6_STEP_LIMIT,
     MAX_TOKENS,
+    REQUEST_TIMEOUT,
     STEP_LIMIT,
     VARIANTS,
     builder,
@@ -155,6 +156,12 @@ def test_every_variant_requests_its_mutation_model(variant):
     model = default_model(MUTATIONS[variant])
     assert model.model == MUTATIONS[variant].model
     assert model.max_tokens == MAX_TOKENS
+
+
+def test_every_call_has_a_timeout():
+    """ChatAnthropic leaves the client without one, and a hung call would stall a batch."""
+    assert 0 < REQUEST_TIMEOUT <= 600
+    assert default_model(BASELINE).default_request_timeout == REQUEST_TIMEOUT
 
 
 def test_step_limits():

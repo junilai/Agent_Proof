@@ -26,6 +26,8 @@ D6_STEP_LIMIT = 2
 """Model calls per turn under D6, calibrated for this framework as in D-003."""
 MAX_TOKENS = 32000
 """Output tokens per model call, the same for every variant (D-012)."""
+REQUEST_TIMEOUT = 600.0
+"""Seconds per model call; without it ChatAnthropic would wait forever on a hung call."""
 
 
 class AgentState(TypedDict):
@@ -64,7 +66,7 @@ def tools_for(mutation: Mutation) -> list[BaseTool]:
 
 def default_model(mutation: Mutation) -> BaseChatModel:
     """The variant's model, without extended thinking and with the default temperature."""
-    return ChatAnthropic(model=mutation.model, max_tokens=MAX_TOKENS)
+    return ChatAnthropic(model=mutation.model, max_tokens=MAX_TOKENS, timeout=REQUEST_TIMEOUT)
 
 
 def builder(variant: str = "baseline", model: BaseChatModel | None = None) -> StateGraph:
