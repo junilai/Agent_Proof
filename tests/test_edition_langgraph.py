@@ -10,9 +10,11 @@ import json
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
-from agentproof.adapters.langgraph import LangGraphSession
+from agentproof.adapters.langgraph import LangGraphSession, session_factory
+from agentproof.conversation import converse
 from agentproof.models import TARGET_DOWNGRADED_MODEL
-from casestudy.domain.mutations import CORRUPT_POLICY, MUTATIONS
+from casestudy.domain.mutations import BASELINE, CORRUPT_POLICY, MUTATIONS
+from casestudy.domain.policy import Decision
 from casestudy.domain.policy_text import policy_text
 from casestudy.domain.prompt import system_prompt
 from casestudy.domain.tools import TOOL_DESCRIPTIONS, get_refund_policy, lookup_order
@@ -26,6 +28,8 @@ from casestudy.editions.langgraph import (
     step_limit,
     tools_for,
 )
+from experiments.oracle.outcome import communicated_decision
+from tests.fakes import SEED, ScriptedUser
 from tests.fakes_langchain import ScriptedChatModel, ask_tools, say
 
 POLICY_FOREVER = ask_tools(("get_refund_policy", {}))
@@ -192,3 +196,53 @@ def test_history_is_valid_after_a_cut():
     assert (after.stop_reason, after.reply) == ("completed", "Sigo aquí.")
     for call in model.calls:
         assert _unanswered(call) == set()
+
+
+# Rule 5: memory between turns, and none between conversations.
+
+
+def test_system_prompt_is_sent_once_per_call():
+    lookup = ask_tools(("lookup_order", {"order_id": "AT-1001"}))
+    model = _model("baseline", lookup, say("Entregado."), say("De nada."))
+    _talk("baseline", model, "¿Y mi pedido?", "Gracias")
+    for call in model.calls:
+        assert [type(m) for m in call].count(SystemMessage) == 1
+        assert call[0] == SystemMessage(system_prompt(BASELINE))
+    assert "¿Y mi pedido?" in [m.content for m in model.calls[-1]]
+    assert "Entregado." in [m.content for m in model.calls[-1]]
+
+
+def test_a_new_conversation_starts_empty():
+    model = _model("baseline", say("a"), say("b"))
+    _talk("baseline", model, "primera")
+    _talk("baseline", model, "segunda")
+    assert [m.content for m in model.calls[1]] == [system_prompt(BASELINE), "segunda"]
+
+
+# Rule 6: a failing tool keeps the conversation going.
+
+
+def test_a_failing_tool_keeps_the_conversation_going():
+    unknown = ask_tools(("lookup_order", {"order_id": "AT-9999"}))
+    broken = ask_tools(("create_ticket", {"summary": "sin pedido"}))
+    model = _model("baseline", unknown, broken, say("No encontré tu pedido."))
+    [turn] = _talk("baseline", model, "¿Y mi pedido AT-9999?")
+    missing, failed = turn.events[0], turn.events[1]
+    assert missing.result == lookup_order("AT-9999") and missing.is_error is False
+    assert failed.tool == "create_ticket" and failed.is_error is True
+    assert (turn.stop_reason, turn.reply) == ("completed", "No encontré tu pedido.")
+
+
+# Rule 8: end to end without the API, read by the oracle.
+
+
+def test_converse_end_to_end_and_the_oracle_reads_it():
+    lookup = ask_tools(("lookup_order", {"order_id": "AT-1001"}), ("get_refund_policy", {}))
+    model = _model("baseline", lookup, say("Tu solicitud de reembolso fue aprobada."))
+    factory = session_factory(lambda variant: builder(variant, model=model), "baseline")
+    user = ScriptedUser("Quiero devolver el pedido AT-1001.")
+    trace = asyncio.run(converse(factory, user, SEED))
+    assert trace.termination == "user_ended"
+    tools = [e.tool for e in trace.events if e.kind == "tool_call"]
+    assert tools == ["lookup_order", "get_refund_policy"]
+    assert communicated_decision(trace) == Decision.APPROVED
