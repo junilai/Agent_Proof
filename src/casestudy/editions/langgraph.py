@@ -23,7 +23,7 @@ from casestudy.domain.tools import TOOL_DESCRIPTIONS, create_ticket, get_refund_
 VARIANTS = tuple(MUTATIONS)
 STEP_LIMIT = 10
 D6_STEP_LIMIT = 2
-"""Model calls per turn under D6, calibrated for this framework as in D-003."""
+"""Model calls per turn under D6, calibrated for this framework (D-003, LangGraph addendum)."""
 MAX_TOKENS = 32000
 """Output tokens per model call, the same for every variant (D-012)."""
 REQUEST_TIMEOUT = 600.0

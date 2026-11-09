@@ -82,6 +82,16 @@ La §5.4 define D6 como "el límite de pasos se reduce a dos" y su conjunto expu
 
 Con 2, el agente consulta el pedido y la política en paralelo en el primer paso y responde en el segundo; cuando además debe crear un ticket, se queda sin pasos para responder. Eso es exactamente el conjunto expuesto de la §5.4, así que en esta edición D6 usa un límite de 2. La sonda costó USD 0.095. En F4 se repite la calibración en cada framework y se registra su valor.
 
+**Adenda, LangGraph (9 de noviembre de 2026).** Se repitió la sonda con la edición LangGraph (D-012), un turno por celda. Los casos fueron "¿en qué estado está mi pedido AT-1006?" (solo consultar el pedido), el reembolso de AT-1001 (pedido y política) y la garantía de AT-1003 (pedido, política y ticket):
+
+| Límite | Una llamada | Dos llamadas | Tres llamadas |
+|---|---|---|---|
+| 2 | completa | completa | se trunca |
+| 3 | completa | completa | completa |
+| 4 | completa | completa | completa |
+
+La tabla es la misma que en Claude Agent SDK, y por la misma razón: el agente pide el pedido y la política en paralelo en la primera llamada. Con 2, en el caso de garantía el agente explica la situación y pide el ticket en la misma llamada. El ticket se crea, pero el agente se queda sin pasos para comunicar su número, igual que en los cortes de D6 de E1. En esta edición D6 también usa un límite de 2. La sonda costó USD 0.083, y las pruebas en vivo de la edición, que pasaron las 8, USD 0.062, según la herramienta. La consola de Anthropic marcó USD 0.15 ese día UTC, sin otro gasto, así que sin caché de prompts la tabla de precios coincide con lo facturado.
+
 ## D-004 · Política corrupta de D4
 
 - **Fecha:** 13 de octubre de 2026
