@@ -1,4 +1,6 @@
 import asyncio
+import sys
+import types
 
 import pytest
 from smolagents import Tool, ToolCallingAgent
@@ -7,7 +9,14 @@ from smolagents.memory import ActionStep, FinalAnswerStep, TaskStep, ToolCall
 from smolagents.monitoring import AgentLogger, LogLevel, Timing, TokenUsage
 from smolagents.utils import AgentExecutionError, AgentMaxStepsError
 
-from agentproof.adapters.smolagents import SmolagentsSession, session_factory, turn_from_run
+from agentproof.adapters.smolagents import (
+    COST_MAP_VAR,
+    SmolagentsSession,
+    TelemetryEnabledError,
+    ensure_no_telemetry,
+    session_factory,
+    turn_from_run,
+)
 from agentproof.models import TARGET_BASELINE_MODEL, TARGET_DOWNGRADED_MODEL
 from tests.fakes_smolagents import ScriptedModel, ask_tools, say, text_of
 
@@ -243,3 +252,52 @@ def test_the_factory_builds_the_agent_of_its_variant():
     asked = []
     session_factory(lambda variant: asked.append(variant) or _agent(ScriptedModel([])), "d4")()
     assert asked == ["d4"]
+
+
+@pytest.mark.parametrize("value", [None, "", "false", "1"])
+def test_refuses_to_open_unless_litellm_uses_its_local_cost_map(monkeypatch, value):
+    if value is None:
+        monkeypatch.delenv(COST_MAP_VAR, raising=False)
+    else:
+        monkeypatch.setenv(COST_MAP_VAR, value)
+    with pytest.raises(TelemetryEnabledError, match=COST_MAP_VAR):
+        _talk(_agent(ScriptedModel(responses=[say("x")])), "hola")
+
+
+@pytest.mark.parametrize("value", ["True", "true", " TRUE "])
+def test_the_local_cost_map_is_fine(value):
+    ensure_no_telemetry({COST_MAP_VAR: value})
+
+
+def test_refuses_when_litellm_would_send_data_to_a_callback(monkeypatch):
+    import litellm
+
+    monkeypatch.setattr(litellm, "success_callback", ["langfuse"])
+    with pytest.raises(TelemetryEnabledError, match="success_callback"):
+        ensure_no_telemetry({COST_MAP_VAR: "True"})
+
+
+def test_refuses_when_litellm_already_fetched_its_cost_map(monkeypatch):
+    import litellm.litellm_core_utils.get_model_cost_map as cost_map
+
+    monkeypatch.setattr(
+        cost_map, "get_model_cost_map_source_info", lambda: {"is_env_forced": False}
+    )
+    with pytest.raises(TelemetryEnabledError, match=COST_MAP_VAR):
+        ensure_no_telemetry({COST_MAP_VAR: "True"})
+
+
+def test_refuses_when_the_opentelemetry_instrumentation_is_loaded(monkeypatch):
+    name = "openinference.instrumentation.smolagents"
+    monkeypatch.setitem(sys.modules, name, types.ModuleType(name))
+    with pytest.raises(TelemetryEnabledError, match="OpenTelemetry"):
+        ensure_no_telemetry({COST_MAP_VAR: "True"})
+
+
+def test_the_factory_refuses_before_any_conversation(monkeypatch):
+    """A batch must fail at once, not leave one error trace per conversation."""
+    monkeypatch.delenv(COST_MAP_VAR, raising=False)
+    built = []
+    with pytest.raises(TelemetryEnabledError, match=COST_MAP_VAR):
+        session_factory(lambda variant: built.append(variant), "baseline")
+    assert built == []

@@ -12,13 +12,17 @@ the response carries. Hitting the step limit is a ``step_limit`` turn, not an
 error, and the answer smolagents forces then is the turn's reply.
 
 Each session runs its own agent, built for that conversation, so a conversation
-starts empty, and every turn keeps the agent's memory with ``reset=False``.
+starts empty, and every turn keeps the agent's memory with ``reset=False``. It
+refuses to open while litellm would reach a third-party service: its cost map
+download at import, a logging callback, or the OpenTelemetry instrumentation.
 """
 
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable, Sequence
+import os
+import sys
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 from smolagents import LogLevel, MultiStepAgent
@@ -30,9 +34,54 @@ from agentproof.pricing import PRICES
 from agentproof.schema import Usage
 from agentproof.session import AgentEvent, AgentTurn, SessionFactory
 
+COST_MAP_VAR = "LITELLM_LOCAL_MODEL_COST_MAP"
+LITELLM_HOOKS = (
+    "callbacks",
+    "input_callback",
+    "success_callback",
+    "failure_callback",
+    "service_callback",
+    "_async_input_callback",
+    "_async_success_callback",
+    "_async_failure_callback",
+)
+INSTRUMENTATION = "openinference.instrumentation"
 FINAL_ANSWER = "final_answer"
 FORCED_ANSWER_ERROR = "Error in generating final LLM output"
 """How smolagents words a model error during the forced answer, which it swallows."""
+
+
+class TelemetryEnabledError(RuntimeError):
+    pass
+
+
+def ensure_no_telemetry(env: Mapping[str, str] = os.environ) -> None:
+    """Checks without importing litellm, which would fetch its cost map on import."""
+    if env.get(COST_MAP_VAR, "").strip().lower() != "true":
+        raise TelemetryEnabledError(
+            f"litellm descargaría su mapa de costos de GitHub: defina {COST_MAP_VAR}=True "
+            "antes de correr"
+        )
+    if any(name.startswith(INSTRUMENTATION) for name in sys.modules):
+        raise TelemetryEnabledError(
+            "la instrumentación OpenTelemetry de smolagents está cargada: no la importe"
+        )
+    litellm = sys.modules.get("litellm")
+    if litellm is None:
+        return
+    hooks = [name for name in LITELLM_HOOKS if getattr(litellm, name, None)]
+    if hooks:
+        raise TelemetryEnabledError(
+            f"litellm enviaría los datos del agente a otro servicio ({', '.join(hooks)}): "
+            "quite esos callbacks antes de correr"
+        )
+    from litellm.litellm_core_utils.get_model_cost_map import get_model_cost_map_source_info
+
+    if not get_model_cost_map_source_info().get("is_env_forced"):
+        raise TelemetryEnabledError(
+            f"litellm se importó sin {COST_MAP_VAR}=True y ya buscó su mapa de costos: "
+            "defínala antes de arrancar"
+        )
 
 
 def _arguments(arguments: Any) -> dict[str, Any]:
@@ -114,6 +163,7 @@ class SmolagentsSession:
         self.agent = agent
 
     async def __aenter__(self) -> SmolagentsSession:
+        ensure_no_telemetry()
         self.agent.logger.level = LogLevel.OFF
         return self
 
@@ -143,5 +193,9 @@ class SmolagentsSession:
 
 
 def session_factory(agent: Callable[[str], MultiStepAgent], variant: str) -> SessionFactory:
-    """The adapter convention: a fresh agent, with an empty memory, per conversation."""
+    """The adapter convention: a fresh agent, with an empty memory, per conversation.
+
+    Checks telemetry here too, so a batch fails before its first conversation.
+    """
+    ensure_no_telemetry()
     return lambda: SmolagentsSession(agent(variant))
