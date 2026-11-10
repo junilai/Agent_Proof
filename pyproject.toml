@@ -25,6 +25,10 @@ langgraph = [
     "langchain-core<=1.6.6",
     "langgraph==1.2.12",
 ]
+smolagents = [
+    "litellm<=1.103.3",
+    "smolagents[litellm]==1.26.0",
+]
 
 [build-system]
 requires = ["uv_build>=0.11.7,<0.12.0"]
@@ -36,11 +40,15 @@ dev = [
     "langchain-anthropic==1.7.5",
     "langchain-core<=1.6.6",
     "langgraph==1.2.12",
+    "litellm<=1.103.3",
     "pytest>=9.1.1",
     "ruff>=0.16.8",
+    "smolagents[litellm]==1.26.0",
 ]
 studio = [
+    "gradio==6.29.1",
     "langgraph-cli[inmem]==0.4.32",
+    "smolagents[gradio]==1.26.0",
 ]
 
 [tool.ruff]
