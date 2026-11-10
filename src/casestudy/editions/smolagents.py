@@ -13,9 +13,10 @@ extra model call, without tools, that forces an answer once ``max_steps`` is spe
 
 from typing import Any
 
-from smolagents import Tool
+from smolagents import LiteLLMModel, Model, Tool, ToolCallingAgent
 
 from casestudy.domain.mutations import MUTATIONS, Mutation
+from casestudy.domain.prompt import system_prompt
 from casestudy.domain.tools import TOOL_DESCRIPTIONS, create_ticket, get_refund_policy, lookup_order
 
 VARIANTS = tuple(MUTATIONS)
@@ -69,3 +70,29 @@ def tools_for(mutation: Mutation) -> list[Tool]:
 
     tools = [LookupOrder(), GetRefundPolicy(), CreateTicket()]
     return [tool for tool in tools if tool.name not in mutation.removed_tools]
+
+
+def default_model(mutation: Mutation) -> Model:
+    """The variant's model, without extended thinking and with the default temperature."""
+    return LiteLLMModel(
+        model_id=f"anthropic/{mutation.model}",
+        max_tokens=MAX_TOKENS,
+        timeout=REQUEST_TIMEOUT,
+    )
+
+
+def builder(variant: str = "baseline", model: Model | None = None) -> ToolCallingAgent:
+    """A fresh agent for a variant, with empty memory: one per conversation.
+
+    Run each customer turn with ``run(message, reset=False)`` to keep the memory;
+    the step counter restarts on every run, so ``max_steps`` is per turn.
+    """
+    if variant not in MUTATIONS:
+        raise ValueError(f"unknown variant: {variant}")
+    mutation = MUTATIONS[variant]
+    return ToolCallingAgent(
+        tools=tools_for(mutation),
+        model=model or default_model(mutation),
+        instructions=system_prompt(mutation),
+        max_steps=step_limit(mutation),
+    )

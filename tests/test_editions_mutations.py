@@ -9,6 +9,7 @@ from casestudy.domain.mutations import MUTATIONS
 EDITIONS = {
     "casestudy.editions.claude_sdk": "build_options",
     "casestudy.editions.langgraph": "builder",
+    "casestudy.editions.smolagents": "builder",
 }
 
 
