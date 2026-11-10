@@ -9,9 +9,11 @@ import json
 
 import pytest
 
-from agentproof.adapters.crewai import CrewAISession
+from agentproof.adapters.crewai import CrewAISession, session_factory
+from agentproof.conversation import converse
 from agentproof.models import TARGET_DOWNGRADED_MODEL
 from casestudy.domain.mutations import BASELINE, CORRUPT_POLICY, MUTATIONS
+from casestudy.domain.policy import Decision
 from casestudy.domain.policy_text import policy_text
 from casestudy.domain.prompt import system_prompt
 from casestudy.domain.tools import TOOL_DESCRIPTIONS, get_refund_policy, lookup_order
@@ -28,6 +30,8 @@ from casestudy.editions.crewai import (
     step_limit,
     tools_for,
 )
+from experiments.oracle.outcome import communicated_decision
+from tests.fakes import SEED, ScriptedUser
 from tests.fakes_crewai import ScriptedLLM, ask_tools, offline, say
 
 
@@ -253,3 +257,78 @@ def test_history_is_valid_after_a_cut():
     for call in llm.calls:
         assert _unanswered(call["messages"]) == set()
     assert "Forzada." in [m.get("content") for m in llm.calls[-1]["messages"]]
+
+
+# Rule 5: memory between turns, and none between conversations.
+
+
+def test_system_prompt_is_sent_once_per_call():
+    lookup = ask_tools(("lookup_order", {"order_id": "AT-1001"}))
+    llm = _llm("baseline", lookup, say("Entregado."), say("De nada."))
+    _talk("baseline", llm, "¿Y mi pedido?", "Gracias")
+    for call in llm.calls:
+        assert [m["role"] for m in call["messages"]].count("system") == 1
+        assert system_prompt(BASELINE) in _system(call)
+    last = [m.get("content") or "" for m in llm.calls[-1]["messages"]]
+    assert any("¿Y mi pedido?" in content for content in last)
+    assert "Entregado." in last
+
+
+def test_a_new_conversation_starts_empty():
+    llm = _llm("baseline", say("a"), say("b"))
+    _talk("baseline", llm, "primera")
+    _talk("baseline", llm, "segunda")
+    assert [m["role"] for m in llm.calls[1]["messages"]] == ["system", "user"]
+    assert "primera" not in str(llm.calls[1]["messages"])
+
+
+# Rule 6: a failing tool keeps the conversation going.
+
+
+def test_a_failing_tool_keeps_the_conversation_going():
+    unknown = ask_tools(("lookup_order", {"order_id": "AT-9999"}))
+    broken = ask_tools(("create_ticket", {"summary": "sin pedido"}))
+    llm = _llm("baseline", unknown, broken, say("No encontré tu pedido."))
+    [turn] = _talk("baseline", llm, "¿Y mi pedido AT-9999?")
+    missing, failed = turn.events[0], turn.events[1]
+    assert missing.result == lookup_order("AT-9999") and missing.is_error is False
+    assert failed.tool == "create_ticket" and failed.is_error is True
+    assert (turn.stop_reason, turn.reply) == ("completed", "No encontré tu pedido.")
+
+
+def test_a_tool_that_raises_is_an_error_result_not_a_crash(monkeypatch):
+    def down(summary, order_id):
+        raise RuntimeError("sistema de tickets caído")
+
+    monkeypatch.setattr("casestudy.editions.crewai.create_ticket", down)
+    ticket = ask_tools(("create_ticket", {"summary": "Laptop", "order_id": "AT-1002"}))
+    llm = _llm("baseline", ticket, say("No pude crear el ticket."))
+    [turn] = _talk("baseline", llm, "Quiero escalar mi caso.")
+    assert turn.events[0].is_error is True
+    assert "sistema de tickets caído" in str(turn.events[0].result)
+    assert (turn.stop_reason, turn.reply) == ("completed", "No pude crear el ticket.")
+
+
+def test_identical_calls_run_the_tool_each_time():
+    """No tool cache: two tickets asked for in one turn are two tickets."""
+    ticket = ("create_ticket", {"summary": "Laptop", "order_id": "AT-1002"})
+    llm = _llm("baseline", ask_tools(ticket, ticket), say("Listo."))
+    [turn] = _talk("baseline", llm, "Escala dos veces.")
+    tickets = [e.result["ticket"] for e in turn.events if e.kind == "tool_call"]
+    assert len(tickets) == 2 and tickets[0] != tickets[1]
+
+
+# Rule 8: end to end without the API, read by the oracle.
+
+
+def test_converse_end_to_end_and_the_oracle_reads_it(network):
+    lookup = ask_tools(("lookup_order", {"order_id": "AT-1001"}), ("get_refund_policy", {}))
+    llm = _llm("baseline", lookup, say("Tu solicitud de reembolso fue aprobada."))
+    factory = session_factory(lambda variant: builder(variant, model=llm), "baseline")
+    user = ScriptedUser("Quiero devolver el pedido AT-1001.")
+    trace = asyncio.run(converse(factory, user, SEED))
+    assert trace.termination == "user_ended"
+    tools = [e.tool for e in trace.events if e.kind == "tool_call"]
+    assert tools == ["lookup_order", "get_refund_policy"]
+    assert communicated_decision(trace) == Decision.APPROVED
+    assert network == []
