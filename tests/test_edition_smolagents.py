@@ -9,10 +9,12 @@ import asyncio
 import pytest
 from smolagents.models import get_clean_message_list, tool_role_conversions
 
-from agentproof.adapters.smolagents import SmolagentsSession
+from agentproof.adapters.smolagents import SmolagentsSession, session_factory
+from agentproof.conversation import converse
 from agentproof.models import TARGET_DOWNGRADED_MODEL
 from agentproof.pricing import PRICES
 from casestudy.domain.mutations import BASELINE, CORRUPT_POLICY, MUTATIONS
+from casestudy.domain.policy import Decision
 from casestudy.domain.policy_text import policy_text
 from casestudy.domain.prompt import system_prompt
 from casestudy.domain.tools import TOOL_DESCRIPTIONS, get_refund_policy, lookup_order
@@ -27,6 +29,8 @@ from casestudy.editions.smolagents import (
     step_limit,
     tools_for,
 )
+from experiments.oracle.outcome import communicated_decision
+from tests.fakes import SEED, ScriptedUser
 from tests.fakes_smolagents import ScriptedModel, ask_tools, plain, say, text_of
 
 FINAL_ANSWER = "final_answer"
@@ -274,3 +278,93 @@ def test_a_new_conversation_starts_empty():
     _talk("baseline", model, "segunda")
     assert [m.role for m in model.calls[1]] == ["system", "user"]
     assert "segunda" in text_of(model.calls[1][1])
+
+
+# Rule 6: a failing tool keeps the conversation going.
+
+
+def test_a_failing_tool_keeps_the_conversation_going():
+    unknown = ask_tools(("lookup_order", {"order_id": "AT-9999"}))
+    broken = ask_tools(("create_ticket", {"summary": "sin pedido"}))
+    model = _model("baseline", unknown, broken, say("No encontré tu pedido."))
+    [turn] = _talk("baseline", model, "¿Y mi pedido AT-9999?")
+    missing, failed = turn.events[0], turn.events[1]
+    assert missing.result == lookup_order("AT-9999") and missing.is_error is False
+    assert failed.tool == "create_ticket" and failed.is_error is True
+    assert (turn.stop_reason, turn.reply) == ("completed", "No encontré tu pedido.")
+
+
+def test_a_tool_that_raises_is_an_error_result_not_a_crash(monkeypatch):
+    def down(summary, order_id):
+        raise RuntimeError("sistema de tickets caído")
+
+    monkeypatch.setattr("casestudy.editions.smolagents.create_ticket", down)
+    ticket = ask_tools(("create_ticket", {"summary": "Laptop", "order_id": "AT-1002"}))
+    model = _model("baseline", ticket, say("No pude crear el ticket."))
+    [turn] = _talk("baseline", model, "Quiero escalar mi caso.")
+    assert turn.events[0].is_error is True
+    assert "sistema de tickets caído" in str(turn.events[0].result)
+    assert (turn.stop_reason, turn.reply) == ("completed", "No pude crear el ticket.")
+
+
+def test_a_tool_that_ran_alongside_a_failing_one_stays_in_the_trace(monkeypatch):
+    """smolagents fails the whole step, so the model sees no result of either call."""
+
+    def down(summary, order_id):
+        raise RuntimeError("sistema de tickets caído")
+
+    monkeypatch.setattr("casestudy.editions.smolagents.create_ticket", down)
+    both = ask_tools(
+        ("lookup_order", {"order_id": "AT-1001"}),
+        ("create_ticket", {"summary": "Laptop", "order_id": "AT-1001"}),
+    )
+    model = _model("baseline", both, say("Hubo un problema."))
+    [turn] = _talk("baseline", model, "Quiero escalar mi caso.")
+    assert [(e.kind, e.tool, e.is_error) for e in turn.events] == [
+        ("tool_call", "lookup_order", True),
+        ("tool_call", "create_ticket", True),
+        ("agent_message", None, False),
+    ]
+    assert (turn.stop_reason, turn.reply) == ("completed", "Hubo un problema.")
+
+
+# final_answer is how the agent replies, never a tool call of the domain.
+
+
+def test_final_answer_is_the_reply_and_never_a_tool_call():
+    model = _model("baseline", say("Hola, ¿en qué te ayudo?"))
+    [turn] = _talk("baseline", model, "hola")
+    assert [(e.kind, e.text) for e in turn.events] == [("agent_message", "Hola, ¿en qué te ayudo?")]
+    assert turn.reply == "Hola, ¿en qué te ayudo?"
+
+
+def test_a_tool_called_with_final_answer_runs_and_stays_in_the_trace():
+    """smolagents rejects the step, but the ticket was already created (D-012)."""
+    ticket_and_answer = ask_tools(
+        ("create_ticket", {"summary": "Laptop", "order_id": "AT-1002"}),
+        ("final_answer", {"answer": "Escalé tu caso."}),
+    )
+    model = _model("baseline", ticket_and_answer, say("Escalé tu caso con un ticket."))
+    [turn] = _talk("baseline", model, "Quiero escalar mi caso.")
+    assert [(e.kind, e.tool) for e in turn.events] == [
+        ("tool_call", "create_ticket"),
+        ("agent_message", None),
+    ]
+    assert turn.events[0].is_error is True
+    assert (turn.stop_reason, turn.reply) == ("completed", "Escalé tu caso con un ticket.")
+    assert len(model.calls) == 2
+
+
+# Rule 8: end to end without the API, read by the oracle.
+
+
+def test_converse_end_to_end_and_the_oracle_reads_it():
+    lookup = ask_tools(("lookup_order", {"order_id": "AT-1001"}), ("get_refund_policy", {}))
+    model = _model("baseline", lookup, say("Tu solicitud de reembolso fue aprobada."))
+    factory = session_factory(lambda variant: builder(variant, model=model), "baseline")
+    user = ScriptedUser("Quiero devolver el pedido AT-1001.")
+    trace = asyncio.run(converse(factory, user, SEED))
+    assert trace.termination == "user_ended"
+    tools = [e.tool for e in trace.events if e.kind == "tool_call"]
+    assert tools == ["lookup_order", "get_refund_policy"]
+    assert communicated_decision(trace) == Decision.APPROVED
