@@ -1,11 +1,15 @@
+import asyncio
+
 import pytest
+from smolagents import Tool, ToolCallingAgent
 from smolagents.agents import ActionOutput, ToolOutput
 from smolagents.memory import ActionStep, FinalAnswerStep, TaskStep, ToolCall
 from smolagents.monitoring import AgentLogger, LogLevel, Timing, TokenUsage
 from smolagents.utils import AgentExecutionError, AgentMaxStepsError
 
-from agentproof.adapters.smolagents import turn_from_run
-from agentproof.models import TARGET_BASELINE_MODEL
+from agentproof.adapters.smolagents import SmolagentsSession, session_factory, turn_from_run
+from agentproof.models import TARGET_BASELINE_MODEL, TARGET_DOWNGRADED_MODEL
+from tests.fakes_smolagents import ScriptedModel, ask_tools, say, text_of
 
 LOOKUP_RESULT = {"pedido": "AT-1001", "estado": "entregado", "dias_desde_entrega": 10}
 QUIET = AgentLogger(LogLevel.OFF)
@@ -136,3 +140,106 @@ def test_an_unpriced_model_has_no_cost():
     assert turn.usage.input_tokens == 100
     assert turn.usage.cost_usd is None
     assert _turn([], steps=[_step(1)], model=None).usage.cost_usd is None
+
+
+class CreateTicket(Tool):
+    name = "create_ticket"
+    description = "Escalates a case."
+    inputs = {
+        "summary": {"type": "string", "description": ""},
+        "order_id": {"type": "string", "description": ""},
+    }
+    output_type = "object"
+
+    def forward(self, summary: str, order_id: str) -> dict:
+        return {"ticket": "TCK-1", "pedido": order_id}
+
+
+def _agent(model, max_steps=5):
+    """A bare agent: enough to test the session without any edition."""
+    return ToolCallingAgent(tools=[CreateTicket()], model=model, max_steps=max_steps)
+
+
+def _talk(agent, *messages):
+    async def run():
+        async with SmolagentsSession(agent) as session:
+            return [await session.send(m) for m in messages]
+
+    return asyncio.run(run())
+
+
+def _history(call):
+    """Everything the model was sent but the system prompt."""
+    return "\n".join(text_of(m) for m in call if m.role != "system")
+
+
+def test_the_session_keeps_memory_between_turns():
+    model = ScriptedModel(responses=[say("Hola."), say("Sigo aquí.")])
+    first, second = _talk(_agent(model), "hola", "¿sigues?")
+    assert (first.reply, second.reply) == ("Hola.", "Sigo aquí.")
+    seen = _history(model.calls[1])
+    assert "hola" in seen and "¿sigues?" in seen and "Hola." in seen
+    assert [e.kind for e in second.events] == ["agent_message"]
+
+
+def test_usage_is_per_turn_not_cumulative():
+    model = ScriptedModel(responses=[say("a"), say("b")])
+    first, second = _talk(_agent(model), "hola", "otra")
+    assert (first.usage.input_tokens, second.usage.input_tokens) == (100, 100)
+
+
+def test_the_session_prices_with_the_model_the_agent_requested():
+    model = ScriptedModel(model_id=f"anthropic/{TARGET_DOWNGRADED_MODEL}", responses=[say("x")])
+    [turn] = _talk(_agent(model), "hola")
+    assert turn.usage.cost_usd == pytest.approx(100 * 1 / 1e6 + 20 * 5 / 1e6)
+
+
+def test_a_model_error_ends_the_turn_as_error():
+    model = ScriptedModel(responses=[RuntimeError("overloaded"), say("De nuevo.")])
+    failed, recovered = _talk(_agent(model), "hola", "otra vez")
+    assert failed.stop_reason == "error"
+    assert failed.reply == ""
+    assert [e.kind for e in failed.events] == ["error"]
+    assert "overloaded" in failed.events[0].text
+    assert (recovered.stop_reason, recovered.reply) == ("completed", "De nuevo.")
+
+
+def test_an_error_keeps_what_the_agent_already_did_in_the_turn():
+    ticket = ask_tools(("create_ticket", {"summary": "s", "order_id": "AT-1"}))
+    model = ScriptedModel(responses=[ticket, RuntimeError("overloaded")])
+    [turn] = _talk(_agent(model), "crea un ticket")
+    assert turn.stop_reason == "error"
+    assert [(e.kind, e.tool) for e in turn.events] == [
+        ("tool_call", "create_ticket"),
+        ("error", None),
+    ]
+    assert turn.events[0].result["ticket"] == "TCK-1"
+    assert "overloaded" in turn.events[1].text
+    assert turn.usage.input_tokens == 100
+    assert turn.usage.cost_usd == pytest.approx(100 * 2 / 1e6 + 20 * 10 / 1e6)
+
+
+def test_the_session_silences_the_framework_console():
+    agent = _agent(ScriptedModel(responses=[say("x")]))
+    _talk(agent, "hola")
+    assert agent.logger.level == LogLevel.OFF
+
+
+def test_each_session_has_its_own_memory():
+    model = ScriptedModel(responses=[say("a"), say("b")])
+    factory = session_factory(lambda variant: _agent(model), "baseline")
+
+    async def run():
+        for text in ("primera", "segunda"):
+            async with factory() as session:
+                await session.send(text)
+
+    asyncio.run(run())
+    assert "primera" in _history(model.calls[0])
+    assert "primera" not in _history(model.calls[1])
+
+
+def test_the_factory_builds_the_agent_of_its_variant():
+    asked = []
+    session_factory(lambda variant: asked.append(variant) or _agent(ScriptedModel([])), "d4")()
+    assert asked == ["d4"]

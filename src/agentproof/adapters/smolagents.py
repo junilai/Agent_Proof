@@ -10,20 +10,25 @@ smolagents reports tokens but not cost, so the turn is priced with the dated
 table in ``agentproof.pricing``, using the model the agent requests, never the id
 the response carries. Hitting the step limit is a ``step_limit`` turn, not an
 error, and the answer smolagents forces then is the turn's reply.
+
+Each session runs its own agent, built for that conversation, so a conversation
+starts empty, and every turn keeps the agent's memory with ``reset=False``.
 """
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+import asyncio
+from collections.abc import Callable, Sequence
 from typing import Any
 
+from smolagents import LogLevel, MultiStepAgent
 from smolagents.agents import ToolOutput
 from smolagents.memory import ActionStep, FinalAnswerStep, ToolCall
 from smolagents.utils import AgentMaxStepsError
 
 from agentproof.pricing import PRICES
 from agentproof.schema import Usage
-from agentproof.session import AgentEvent, AgentTurn
+from agentproof.session import AgentEvent, AgentTurn, SessionFactory
 
 FINAL_ANSWER = "final_answer"
 FORCED_ANSWER_ERROR = "Error in generating final LLM output"
@@ -100,3 +105,43 @@ def turn_from_run(events: Sequence[Any], steps: Sequence[Any], *, model: str | N
     return AgentTurn(
         reply=text, events=out, stop_reason="step_limit" if cut else "completed", usage=usage
     )
+
+
+class SmolagentsSession:
+    """One conversation with a smolagents agent, which keeps the memory itself."""
+
+    def __init__(self, agent: MultiStepAgent) -> None:
+        self.agent = agent
+
+    async def __aenter__(self) -> SmolagentsSession:
+        self.agent.logger.level = LogLevel.OFF
+        return self
+
+    async def send(self, message: str) -> AgentTurn:
+        events, steps, error = await asyncio.to_thread(self._run, message)
+        model = getattr(self.agent.model, "model_id", None)
+        requested = model.removeprefix("anthropic/") if model else None
+        turn = turn_from_run(events, steps, model=requested)
+        if error is None:
+            return turn
+        failure = AgentEvent(kind="error", text=f"{type(error).__name__}: {error}")
+        return turn.model_copy(update={"events": [*turn.events, failure], "stop_reason": "error"})
+
+    def _run(self, message: str) -> tuple[list[Any], list[Any], Exception | None]:
+        before = len(self.agent.memory.steps)
+        events: list[Any] = []
+        error: Exception | None = None
+        try:
+            for event in self.agent.run(message, stream=True, reset=False):
+                events.append(event)
+        except Exception as exc:  # a failed model call ends the run
+            error = exc
+        return events, self.agent.memory.steps[before:], error
+
+    async def __aexit__(self, *exc_info: object) -> None:
+        return None
+
+
+def session_factory(agent: Callable[[str], MultiStepAgent], variant: str) -> SessionFactory:
+    """The adapter convention: a fresh agent, with an empty memory, per conversation."""
+    return lambda: SmolagentsSession(agent(variant))
