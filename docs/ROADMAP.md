@@ -70,10 +70,11 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 ## F4 Portabilidad — objetivo: 26 oct – 8 nov
 
-- [ ] Edición LangGraph con el bucle sobre `StateGraph` y su adaptador (§5.7)
+- [x] Edición LangGraph con el bucle sobre `StateGraph` y su adaptador (§5.7). Evidencia: [D-012](decisiones.md), `src/casestudy/editions/langgraph.py`, `src/agentproof/adapters/langgraph.py` y [`studio/langgraph/`](../studio/langgraph/) para abrirla en LangGraph Studio, 8–10-nov-2026
 - [ ] Edición CrewAI y su adaptador, con una corrida de punta a punta (§5.7)
 - [ ] Edición smolagents y su adaptador, con una corrida de punta a punta (§5.7)
 - [ ] En cada framework, el adaptador traduce el corte por límite de pasos a `step_limit`; si no, D6 nunca se manifiesta. Se recalibran D6 ([D-003](decisiones.md)) y las reglas del oráculo, con respuestas de los agentes degradados de ese framework, como en [D-005](decisiones.md)
+  - [x] LangGraph: D6 queda en 2 (adenda de D-003); la calibración del oráculo encontró dos reglas, corregidas con doble anotación ciega (adenda de D-005); piloto en [`docs/piloto-langgraph.md`](piloto-langgraph.md); **enmienda 2, `preregistro-v3`**, 10-nov-2026
 - [ ] Medición del costo de incorporación por adaptador (§5.7)
 - [ ] Mapeo del esquema a las convenciones GenAI de OpenTelemetry (§5)
 - [ ] *(opcional)* Edición sin framework y su adaptador

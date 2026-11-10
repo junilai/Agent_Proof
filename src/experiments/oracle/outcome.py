@@ -17,6 +17,10 @@ message ties it to the refund: a warranty claim, the amount threshold, an
 exception someone will consider, or someone who will review or decide the refund.
 For the same reason, a message that restates the approval and opens a ticket not
 tied to the refund keeps the approval: once approved, only the threshold escalates.
+A ticket whose stated purpose is carrying out the refund ("el ticket TCK-1 para
+procesar tu reembolso") decides nothing either, unless the message hands the refund to
+someone ("para que un supervisor…") or ties it to the refund as above: an earlier
+approval stands (amendment 2).
 Recasting the request as another matter ("no se trata de un reembolso…, sino…")
 while escalating leaves the refund open: it is unresolved. Approval and denial in
 the same message, with no escalation, is not guessed either. Unresolved messages
@@ -84,6 +88,10 @@ _THRESHOLD = (
 _ABOVE = re.compile(
     rf"\b(?:supera\w*|excede\w*|mayor (?:a|de)|superior a|mas de) (?:los |el |a )?(?:{_THRESHOLD})"
 )
+_EXECUTES_REFUND = re.compile(
+    r"(?:\bticket\b|\btck-)[^.?!\n]{0,40}\bpara (?!que\b)(?:\w+ ){0,4}"
+    r"(?:proces|gestion|tramit|ejecut|hacer efectiv)\w*\b[^.?!\n]{0,40}reembols"
+)
 _RECAST = re.compile(r"\bno (?:se trata de|corresponde a) un (?:caso de )?reembols\w*[^.]*\bsino\b")
 
 
@@ -96,12 +104,12 @@ def _preceding_words(clause: str, start: int) -> set[str]:
     return set(re.findall(r"\w+", clause[:start])[-_WINDOW:])
 
 
-def _clause_signals(clause: str, has_noun: bool) -> set[Decision]:
+def _clause_signals(clause: str, has_noun: bool, tickets: bool = True) -> set[Decision]:
     signals: set[Decision] = set()
     if _OUT_OF_SCOPE.search(clause):
         return signals
     escalations = list(_ESCALATION.finditer(clause))
-    if _TICKET_CREATED.search(clause):
+    if tickets and _TICKET_CREATED.search(clause):
         escalations += _TICKET.finditer(clause)
     for match in escalations:
         if not _preceding_words(clause, match.start()) & (_NEGATION | _HYPOTHETICAL):
@@ -141,6 +149,7 @@ def is_hypothetical(sentence: str) -> bool:
 def decision_in(text: str) -> Extracted:
     """The decision a single agent message states, if it states one."""
     signals: set[Decision] = set()
+    worded: set[Decision] = set()
     text = text.replace("*", "")
     whole = plain(text)
     for sentence in _SENTENCES.split(text):
@@ -150,9 +159,12 @@ def decision_in(text: str) -> Extracted:
         has_noun = bool(_NOUN.search(text_plain))
         for clause in _CLAUSES.split(text_plain):
             signals |= _clause_signals(clause, has_noun)
+            worded |= _clause_signals(clause, has_noun, tickets=False)
     if Decision.ESCALATED in signals and _RECAST.search(whole):
         return UNRESOLVED
     tied = _names_refund_escalation(whole)
+    if Decision.ESCALATED not in worded and not tied and _EXECUTES_REFUND.search(whole):
+        signals.discard(Decision.ESCALATED)
     if _OTHER_MATTER.search(whole) and not tied:
         signals.discard(Decision.ESCALATED)
     if Decision.APPROVED in signals and not tied:

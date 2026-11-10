@@ -1,3 +1,4 @@
+import hashlib
 import json
 import random
 from functools import cache
@@ -121,12 +122,37 @@ def in_e1(operator, scenario_id):
     )
 
 
-def test_the_published_sample_is_the_one_the_seed_draws():
+FROZEN_SHA256 = "1a9656e3481e93a418107aaea8ed4d088a5b5819de7ed08352ec2c98b42ce6bc"
+RESOLVED_BY_AMENDMENT_2 = {("d2", "sc-tr-69b396c04669")}
+"""Read the wrong way by the oracle of preregistro-v2 (LangGraph calibration, D-005)."""
+
+
+def test_the_published_sample_is_frozen_on_the_original_scoring_of_e1():
+    """Drawn with the seed and the oracle of preregistro-v2; amendment 2 does not redraw it.
+
+    The draw goes through the disagreements in order, so removing one would change the
+    traces drawn for later ones. With the code at that tag, the seed reproduces the file.
+    """
+    assert hashlib.sha256(PUBLISHED.read_bytes()).hexdigest() == FROZEN_SHA256
+    assert published()["seed"] == SEED
+
+
+def _without_draws(found):
+    return {
+        **found,
+        "cells": [{k: v for k, v in c.items() if k != "trace_id"} for c in found["cells"]],
+    }
+
+
+def test_amendment_2_only_removes_the_disagreement_it_resolved():
     sample = published()
     found = disagreements(Store(ROOT), sample["reference"], sample["candidates"])
-    assert sample["seed"] == SEED
-    assert sample["disagreements"] == [d.model_dump() for d in found]
-    assert sample["to_annotate"] == [t.model_dump() for t in to_annotate(found)]
+    expected = [
+        _without_draws(d)
+        for d in sample["disagreements"]
+        if (d["operator"], d["scenario_id"]) not in RESOLVED_BY_AMENDMENT_2
+    ]
+    assert [_without_draws(d.model_dump()) for d in found] == expected
 
 
 def test_d1_d707_has_discordant_repetitions_and_an_aggregation_origin():

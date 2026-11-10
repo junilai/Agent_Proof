@@ -2,7 +2,13 @@ import re
 
 from casestudy.domain.policy import RefundPolicy
 from casestudy.domain.policy_text import policy_text
-from casestudy.domain.tools import create_ticket, get_refund_policy, lookup_order
+from casestudy.domain.tools import (
+    TOOL_DESCRIPTIONS,
+    create_ticket,
+    get_refund_policy,
+    lookup_order,
+)
+from casestudy.editions import claude_sdk
 
 
 def test_lookup_returns_order_data_with_days_since_delivery():
@@ -40,3 +46,10 @@ def test_create_ticket_escalates_with_a_unique_id():
         "resumen": "Laptop sobre el umbral",
         "estado": "escalado",
     }
+
+
+def test_tool_descriptions_are_the_domain_ones():
+    assert list(TOOL_DESCRIPTIONS) == ["lookup_order", "get_refund_policy", "create_ticket"]
+    assert claude_sdk._LOOKUP == TOOL_DESCRIPTIONS["lookup_order"]
+    assert claude_sdk._POLICY == TOOL_DESCRIPTIONS["get_refund_policy"]
+    assert claude_sdk._TICKET == TOOL_DESCRIPTIONS["create_ticket"]

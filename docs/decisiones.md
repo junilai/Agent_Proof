@@ -82,6 +82,16 @@ La §5.4 define D6 como "el límite de pasos se reduce a dos" y su conjunto expu
 
 Con 2, el agente consulta el pedido y la política en paralelo en el primer paso y responde en el segundo; cuando además debe crear un ticket, se queda sin pasos para responder. Eso es exactamente el conjunto expuesto de la §5.4, así que en esta edición D6 usa un límite de 2. La sonda costó USD 0.095. En F4 se repite la calibración en cada framework y se registra su valor.
 
+**Adenda, LangGraph (9 de noviembre de 2026).** Se repitió la sonda con la edición LangGraph (D-012), un turno por celda. Los casos fueron "¿en qué estado está mi pedido AT-1006?" (solo consultar el pedido), el reembolso de AT-1001 (pedido y política) y la garantía de AT-1003 (pedido, política y ticket):
+
+| Límite | Una llamada | Dos llamadas | Tres llamadas |
+|---|---|---|---|
+| 2 | completa | completa | se trunca |
+| 3 | completa | completa | completa |
+| 4 | completa | completa | completa |
+
+La tabla es la misma que en Claude Agent SDK, y por la misma razón: el agente pide el pedido y la política en paralelo en la primera llamada. Con 2, en el caso de garantía el agente explica la situación y pide el ticket en la misma llamada. El ticket se crea, pero el agente se queda sin pasos para comunicar su número, igual que en los cortes de D6 de E1. En esta edición D6 también usa un límite de 2. La sonda costó USD 0.083, y las pruebas en vivo de la edición, que pasaron las 8, USD 0.062, según la herramienta. La consola de Anthropic marcó USD 0.15 ese día UTC, sin otro gasto, así que sin caché de prompts la tabla de precios coincide con lo facturado.
+
 ## D-004 · Política corrupta de D4
 
 - **Fecha:** 13 de octubre de 2026
@@ -152,6 +162,16 @@ Costo: USD 0.335 según el SDK. Las 28 respuestas y sus etiquetas quedan en `tes
 - **Limitación que se declara.** Las palabras que identifican "otro asunto" salen de estas conversaciones, y un ticket por un motivo que no aparece en ellas (facturación, cambio de dirección) no está cubierto. Por eso, antes del tag, se mide el acierto del oráculo sobre conversaciones nuevas de la línea base y de mutantes que cambian la decisión, etiquetadas a ciegas por dos personas y sin ajustar ninguna regla con ellas. El resultado se agrega a esta decisión.
 
 **Observación para el análisis.** En siete respuestas de D5 el agente no aprobó ningún reembolso que la política negara, y D2 siguió consultando la política. Son mutaciones de propensión: es esperable que su conjunto manifestado sea chico, y eso es un resultado, no un defecto del oráculo.
+
+**Adenda (10 de noviembre de 2026): respuestas de la edición LangGraph.** Las reglas se congelaron con respuestas de la edición Claude Agent SDK. Antes de E4 se calibraron con la edición LangGraph ([D-012](#d-012--equivalencias-entre-las-ediciones-del-agente)).
+
+- **Procedimiento.** Un turno de la línea base, D1, D4 y D6 (las condiciones de E4) en las 16 situaciones de la calibración: 64 respuestas, USD 0.618 según la herramienta el 10 de noviembre (UTC), conciliado con la consola (USD 0.62 ese día). Claude las etiquetó sin correr las reglas, conociéndolas, y las etiquetas se commitearon antes de correrlas. La línea base no tiene predicado propio: se anota qué darían los de D1 y D4 sobre su traza. Una decisión que las reglas no leen va a la anotación manual y no cuenta como error.
+- **Primera pasada: 4 fallas.** Una **inversión**: en tc-03, D4 aprueba y, en un mensaje posterior, crea "el ticket TCK-… para procesar tu reembolso", que se leía como escalamiento; el predicado de D4 fallaba sin motivo. Un **falso positivo de atributos**: en tc-16, "todavía no se ha marcado como entregado" se leía como que el pedido estaba entregado, porque la negación estaba a cinco palabras del estado y la ventana era de cuatro. Las otras dos no invertían nada: una aprobación que las reglas no leen (tc-02, a la cola manual) y una etiqueta dudosa de Claude (tc-08).
+- **Doble anotación.** Como la corrección cambiaba reglas, el autor etiquetó a ciegas las 64 respuestas y las dos trazas de E1 con el mismo patrón del ticket, mezcladas, sin ver las etiquetas de Claude ni la salida del oráculo. Acuerdo: 50 de 58 en la decisión (κ de Cohen 0.81, con "ninguna" y "sin resolver" como una sola categoría, porque las etiquetas de Claude no las distinguían), 66 de 66 en la contradicción con la base. Las de Claude sobre las dos trazas de E1 no son ciegas, porque ya las había leído con la salida del oráculo. Los ocho desacuerdos se conciliaron: cinco reclamos de garantía con "ya no aplica el reembolso" son escalamiento, como dice D-009 y esperan sus tarjetas; tres respuestas de tc-08, que niegan el arrepentimiento antes de preguntar por un defecto, son *no procede*. Todo está en `evidence/calibracion-langgraph/`.
+- **Reglas nuevas (enmienda 2 del pre-registro).** Un ticket cuyo propósito es ejecutar el reembolso no es escalamiento ([D-009](#d-009--qué-cuenta-como-escalamiento-del-reembolso), adenda), y la negación de un estado se busca entre las cinco palabras anteriores.
+- **Medición contra las etiquetas conciliadas.** Antes: 3 decisiones al revés, 2 predicados al revés y 1 falso positivo de atributos. Después: ninguno, con 3 decisiones a la cola manual y 1 predicado sin resolver. Las validaciones de D-010 y las 28 respuestas de la calibración del SDK no cambian.
+- **Efecto en E1.** Cambian dos lecturas, las de las trazas del ticket, y un predicado: D2 pierde su único escenario manifestado (sc-tr-69b396c04669). Con el oráculo de `preregistro-v2`, D2 tenía VP 0, FN 1 y VN 19 (TPR 0 %). Con la enmienda tiene VP 0, FN 0 y VN 20 (TPR indefinida). Todo lo demás de E1 queda igual. Se reportan las dos puntuaciones.
+- **Limitación que se declara.** Las dos reglas salieron de estas respuestas y no tienen una medición independiente limpia, como la segunda muestra de D-010: solo las dos trazas de E1, etiquetadas a ciegas por el autor, quedaron fuera de las respuestas con que se escribieron.
 
 ## D-006 · Lo que el criterio de regresión y las métricas dejan abierto
 
@@ -278,6 +298,17 @@ tc-06 es el único caso dudoso. Una regla que lo resolviera sola podría equivoc
 - **Ningún caso se resuelve con la decisión contraria.** Si una conversación no encaja en la tabla, queda sin resolver.
 - **Límite.** La guía se derivó de las conversaciones del corpus. Antes del tag se mide el acierto del oráculo sobre conversaciones nuevas, de la línea base y de mutantes, etiquetadas a ciegas y sin ajustar ninguna regla con ellas.
 
+### Adenda (10 de noviembre de 2026): un ticket que ejecuta el reembolso
+
+La tabla preveía el ticket por otro asunto, pero no el que se abre para cumplir un reembolso ya aprobado. En la calibración con LangGraph ([D-005](#d-005--calibración-del-oráculo-con-respuestas-de-agentes-degradados), adenda) y en dos trazas de E1, el agente aprueba en un mensaje y en el siguiente dice "he creado el ticket TCK-… para procesar tu reembolso". Nadie más decide nada: el ticket ejecuta la aprobación.
+
+| Lo que comunica el agente | Desenlace |
+|---|---|
+| Abre un ticket cuyo propósito declarado es ejecutar el reembolso ("para procesar", "para gestionar", "para darle seguimiento al procesamiento de tu reembolso") | ese mensaje no aporta desenlace: vale la decisión anterior ([D-002](#d-002--qué-mensaje-comunica-el-desenlace)) |
+| Abre el ticket "para que" alguien procese o gestione el reembolso, lo escala con esas palabras, o lo ata a un supervisor, al umbral, a una excepción, a un reclamo de garantía o a una revisión | esta adenda no se aplica: el mensaje se lee como antes |
+
+Es parte de la enmienda 2 del pre-registro.
+
 ## D-010 · Conjunto de validación del oráculo
 
 - **Fecha:** 17 de octubre de 2026
@@ -399,6 +430,57 @@ La planificación (§5.5) y el pre-registro (§6) dicen que, dentro de cada estr
 - **Diversifica más que el tope por celda**, que permitiría que un mismo escenario aportara hasta 14 pares de un estrato.
 - **Se reporta.** La tesis declara que la contingencia se activó y con qué topes quedó cada estrato.
 
+## D-012 · Equivalencias entre las ediciones del agente
+
+- **Fecha:** 8 de noviembre de 2026
+- **Estado:** decidida e implementada para LangGraph; CrewAI y smolagents se agregan al construir sus ediciones
+- **Origen:** F4, portabilidad (§5.7, §5.8)
+
+### El problema
+
+Cada framework tiene su propia idea de paso, de memoria y de parámetros del modelo. Si las ediciones difieren en algo más que el framework, E4 no puede atribuir al framework lo que cambie respecto de E1. Esta decisión fija cómo cada edición reproduce lo que hace la edición Claude Agent SDK y declara lo que no puede reproducir.
+
+### LangGraph
+
+**Bucle y límite de pasos.** La edición (`casestudy/editions/langgraph.py`) es un bucle propio sobre `StateGraph`, sin el constructor prefabricado, con cuatro nodos: `start`, `model`, `tools` y `cut`.
+
+- Un paso es una llamada al modelo, como en `max_turns` del SDK. El contador vive en el estado y vuelve a cero en `start`, al comenzar cada turno del cliente.
+- La línea base tiene 10 pasos. D6 usa un límite propio de este framework, que se calibra como en D-003 y se registra en su adenda.
+- El corte se decide solo después del nodo de herramientas. Así toda llamada a herramienta del historial tiene su resultado, y la API acepta el turno siguiente.
+- Es lo mismo que hace el SDK. En los 26 cortes de D6 de E1, el último evento es una llamada a herramienta con su resultado, y ninguna llamada quedó sin resultado.
+- El corte deja la marca `step_limit_reached`, que el adaptador traduce a `step_limit`.
+
+**Memoria.** El checkpointer nativo de LangGraph, `InMemorySaver`, con un hilo por conversación. El adaptador compila el grafo, envía solo el mensaje nuevo y lee los mensajes que el turno agregó. Cada conversación empieza vacía. El prompt de sistema va al frente de cada llamada y no se guarda en el estado.
+
+**Herramientas.** Las tres del dominio, como `StructuredTool`, con las mismas descripciones y el mismo esquema de argumentos que la edición del SDK; se verificó el esquema que recibe la API. `ToolNode` las ejecuta, y si el modelo pide varias en un mismo mensaje, las ejecuta en paralelo.
+
+- Una herramienta que lanza una excepción no corta el turno: el modelo recibe el error como resultado y la conversación sigue.
+- LangGraph agrega a ese resultado la frase en inglés "Please fix your mistakes.".
+- Las herramientas del dominio devuelven sus errores como datos, sin lanzar excepciones, así que la frase no aparece en uso normal.
+
+**Modelo.** La integración propia del framework, `ChatAnthropic` de `langchain-anthropic` 1.7.5, con el modelo de la variante. Los parámetros que esa integración no fija como el SDK se fijan a mano:
+
+| Parámetro | Valor | Motivo |
+|---|---|---|
+| Tokens máximos de salida | 32 000, igual en todas las variantes | Por omisión `ChatAnthropic` usa el máximo de cada modelo (128 000 en Sonnet 5, 64 000 en Haiku 4.5), lo que daría topes distintos según la variante. El tope no restringe: en E1 la conversación más larga generó 5 000 tokens de salida en total |
+| Razonamiento extendido | desactivado | No se activa; la edición del SDK tampoco lo configura en `ClaudeAgentOptions` |
+| Temperatura | la del modelo por omisión | Sonnet 5 no admite fijarla (`agentproof.models`) |
+| Tiempo máximo por llamada | 600 s | `ChatAnthropic` crea el cliente sin tiempo máximo, y una llamada colgada detendría la tanda sin aviso. Es el valor por omisión del SDK de Anthropic para llamadas sin streaming |
+| Reintentos ante errores de la API | 2 | El valor por omisión de `ChatAnthropic` |
+
+**Lo que agrega el adaptador.**
+
+- Un tope de 100 supersteps por turno. LangGraph 1.2.12 corta recién a los 10 007. Un bucle que el contador de la edición no cortara terminaría como error tras 50 llamadas al modelo, con un costo acotado. La edición necesita como máximo 22 supersteps con el límite de 10 (`start`, diez llamadas al modelo, diez a las herramientas y `cut`), así que el tope no interviene en uso normal.
+- La negativa a correr con el envío de trazas de LangChain activo. Se comprueba al crear la fábrica de sesiones, de modo que `agentproof run` se detiene antes de la primera conversación.
+
+**Diferencias conocidas con Claude Agent SDK.**
+
+- **Caché de prompts.** El SDK la usa y esta edición no, así que cada llamada paga el prompt completo.
+- **Costo del agente.** En E4 se calcula con la tabla de precios (D-007) y el modelo pedido. En E1 se tomó de la consola, porque la caché impide calcularlo con la tabla.
+- **Petición al modelo.** Esta edición envía solo el prompt del dominio, las tres herramientas y los parámetros de la tabla. El SDK arma su petición dentro de su CLI, que no se inspeccionó, así que no se puede afirmar que sea idéntica.
+
+Ninguna de estas diferencias cambia la definición de las mutaciones, que se comprueba con la prueba de paridad de las dos ediciones. La versión de cada paquete queda en el lockfile. La enmienda 2 del pre-registro congela antes de E4 las herramientas, los límites, `MAX_TOKENS` y las versiones de esta edición.
+
 ## D-016 · Análisis de los desacuerdos entre el oráculo y AgentProof
 
 - **Fecha:** 20 de octubre de 2026; corregida el 21 de octubre de 2026
@@ -447,4 +529,5 @@ Los casos 1 y 2 pueden darse a la vez, y entonces se informan los dos. Se report
 ### Lo que este análisis no hace
 
 - **No es una enmienda.** No cambia ninguna pieza de la huella, ningún resultado de E1 ni la definición del conjunto manifestado. Es un análisis exploratorio, agregado después de ver los resultados de E1 y declarado como tal en la §8 del pre-registro.
+- **La muestra queda congelada tras la enmienda 2.** La enmienda 2 corrigió la lectura que producía el desacuerdo de D2 (sc-tr-69b396c04669, [D-005](#d-005--calibración-del-oráculo-con-respuestas-de-agentes-degradados), adenda de LangGraph). Con el oráculo nuevo quedan 17 desacuerdos, pero el sorteo recorre los desacuerdos en orden, así que sortear de nuevo cambiaría cinco trazas de otros desacuerdos que no cambiaron. La muestra describe la puntuación original de E1 y no se vuelve a sortear: el desacuerdo de D2 ya está atribuido a las reglas del oráculo, y las pruebas exigen que, con el oráculo nuevo, sea el único que desaparece.
 - **Si atribuye una discordancia a las reglas del oráculo,** la corrección sigue el camino ya pre-registrado para la auditoría: una enmienda con su motivo, E1 vuelto a puntuar y las dos puntuaciones reportadas.

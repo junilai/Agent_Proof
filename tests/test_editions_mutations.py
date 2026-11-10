@@ -6,12 +6,15 @@ import pytest
 
 from casestudy.domain.mutations import MUTATIONS
 
-EDITIONS = ["casestudy.editions.claude_sdk"]
+EDITIONS = {
+    "casestudy.editions.claude_sdk": "build_options",
+    "casestudy.editions.langgraph": "builder",
+}
 
 
-@pytest.mark.parametrize("edition", EDITIONS)
-def test_every_edition_builds_every_mutation(edition):
+@pytest.mark.parametrize(("edition", "build"), EDITIONS.items())
+def test_every_edition_builds_every_mutation(edition, build):
     module = importlib.import_module(edition)
     assert set(MUTATIONS) <= set(module.VARIANTS)
     for variant in MUTATIONS:
-        assert module.build_options(variant) is not None
+        assert getattr(module, build)(variant) is not None

@@ -1,0 +1,464 @@
+[
+  {
+    "item": "c01",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c02",
+    "decision": null,
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c03",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c04",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c05",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c06",
+    "decision": null,
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c07",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c08",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c09",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c10",
+    "decision": null,
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c11",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": false
+  },
+  {
+    "item": "c12",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c13",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c14",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c15",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c16",
+    "decision": null,
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c17",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c18",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c19",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c20",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c21",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c22",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c23",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c24",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c25",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c26",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c27",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c28",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": false
+  },
+  {
+    "item": "c29",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c30",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c31",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c32",
+    "decision": null,
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c33",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c34",
+    "decision": null,
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c35",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c36",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c37",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c38",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c39",
+    "decision": null,
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c40",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c41",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c42",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c43",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c44",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c45",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c46",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c47",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c48",
+    "decision": null,
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c49",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c50",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c51",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c52",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c53",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c54",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c55",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c56",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c57",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c58",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c59",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c60",
+    "decision": "ninguna",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c61",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c62",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c63",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c64",
+    "decision": "escalamiento",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c65",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  },
+  {
+    "item": "c66",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": null,
+    "ciega": true
+  }
+]

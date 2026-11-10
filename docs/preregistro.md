@@ -62,7 +62,7 @@ Cada operador es un dato que declara qué cambia (`src/casestudy/domain/mutation
 |---|---|---|---|
 | D1 | A | herramientas disponibles | sin `lookup_order`; el prompt la sigue nombrando |
 | D4 | A | política que devuelve `get_refund_policy` | ventana de 90 días (verdadera: 30), umbral de supervisor de USD 5000 (verdadero: 500) y sin categorías excluidas |
-| D6 | A | límite de pasos por turno | 2 (línea base: 10) |
+| D6 | A | límite de pasos por turno | 2 (línea base: 10), en Claude Agent SDK y en LangGraph |
 | D2 | B | prompt de sistema | sin la instrucción de consultar la política antes de decidir |
 | D5 | B | prompt de sistema | con una instrucción añadida: aprobar todo reembolso, sin excepciones |
 | D3 | B | modelo del agente | `claude-haiku-4-5-20251001` en lugar de `claude-sonnet-5` |
@@ -71,7 +71,7 @@ Cada operador es un dato que declara qué cambia (`src/casestudy/domain/mutation
 
 - **D6** ([D-003](decisiones.md)): con un límite de 2, el agente completa las conversaciones de una y dos llamadas a herramientas y trunca las de tres o más, que es como la §5.4 define su conjunto expuesto.
 - **D4** ([D-004](decisiones.md)): la política corrupta cambia la decisión correcta en 7 de las 15 tarjetas con decisión (tc-06, 07, 08, 11, 12, 13 y 15) y deja intactas las otras ocho.
-- **Cambio de framework:** el sentido de "paso" difiere entre frameworks, así que el límite de D6 se recalibra en cada uno y se registra.
+- **Cambio de framework:** el sentido de "paso" difiere entre frameworks, así que el límite de D6 se recalibra en cada uno y se registra. En LangGraph, un paso es una llamada al modelo, y la sonda dio la misma tabla que en Claude Agent SDK: el límite queda en 2 ([D-003](decisiones.md), adenda de LangGraph; enmienda 2).
 
 ## 4. Verdad de referencia
 
@@ -253,6 +253,13 @@ Es un estudio de estimación: no se declaran umbrales de TPR, FPR ni concordanci
    - **Efecto esperado.** Menos falsos positivos de D1 en las tarjetas de pedidos sin entregar, y ninguno nuevo. Verificado sin cambios en las 70 conversaciones de validación, los 120 mensajes del corpus y las 28 respuestas de la calibración. Las cuatro trazas del piloto ya no contradicen la base.
    - **Momento.** Antes de E1: ningún dato del experimento se vio antes de esta enmienda.
 
+2. **Enmienda 2, `preregistro-v3` (10 de noviembre de 2026). La edición LangGraph para E4, y dos reglas del oráculo halladas al calibrarlo con ella.**
+   - **Edición LangGraph.** E4 corre el agente en LangGraph ([D-012](decisiones.md)), y la §3 ya preveía recalibrar D6 en cada framework. Se congela una pieza nueva, "Herramientas, límites y versiones de la edición LangGraph": las descripciones de las herramientas del dominio, el límite de pasos (10) y el de D6 (2, sin cambio), el máximo de tokens de salida, el tiempo máximo por llamada, el límite de recursión del adaptador y las versiones de `langgraph`, `langchain-anthropic` y `langchain-core`. No cambia ninguna pieza que use E1. El piloto de LangGraph ([piloto-langgraph.md](piloto-langgraph.md)) probó el camino completo y proyecta E4 en unos USD 25; la contingencia de costo no se activa.
+   - **Motivo de las reglas.** La calibración del oráculo con respuestas de la edición LangGraph ([D-005](decisiones.md), adenda) encontró dos lecturas equivocadas. Primera: cuando un mensaje aprueba el reembolso y otro posterior dice "he creado el ticket TCK-… para procesar tu reembolso", el oráculo leía escalamiento. D-009 ya cubría el ticket abierto en el mismo mensaje que aprueba, pero no en uno posterior. La misma lectura aparece en dos trazas de E1. Segunda: en "todavía no se ha marcado como entregado" la negación está a cinco palabras del estado, y el oráculo leía que el pedido estaba entregado. La doble anotación ciega del autor y de Claude (κ = 0.81 en la decisión, 66/66 en atributos, desacuerdos conciliados) confirmó las dos: el autor, a ciegas, etiquetó "procede" en los tres tickets y ninguna contradicción en el estado.
+   - **Cambio.** (a) Un ticket cuyo propósito declarado en la misma frase es ejecutar el reembolso ("para procesar", "para gestionar", "para darle seguimiento al procesamiento") no es escalamiento: ese mensaje no enuncia decisión, y vale la del mensaje anterior ([D-002](decisiones.md)). La regla no se aplica si el ticket deja el reembolso en manos de alguien ("para que un supervisor…"), si el mensaje lo escala con esas palabras o si lo ata al reembolso como ya preveía D-009 (umbral, reclamo de garantía, excepción o revisión). (b) La negación de un estado se busca entre las cinco palabras anteriores, no cuatro (enmienda 1). Cambia solo la pieza "Reglas del oráculo (código fuente)".
+   - **Efecto.** En la calibración de LangGraph desaparecen la inversión de tc-03 (D4) y el falso positivo de atributos de tc-16. En las validaciones del oráculo y en la calibración del SDK, nada. En E1 cambian dos lecturas, y una cambia un predicado: D2 pierde su único escenario manifestado (sc-tr-69b396c04669), que salía de esa traza; el resto de E1 queda igual. Se reportan las dos puntuaciones de E1.
+   - **Momento.** Después de E1, del piloto de LangGraph y antes de E4. La muestra de desacuerdos de [D-016](decisiones.md) se sorteó con el oráculo de `preregistro-v2` y queda congelada: describe la puntuación original de E1, y su desacuerdo de D2 queda atribuido a las reglas del oráculo.
+
 *Análisis agregados después de E1 (no son enmiendas):*
 
 - **Desacuerdos entre el oráculo y AgentProof (20 de octubre de 2026, corregido el 21, [D-016](decisiones.md)).** A pedido del tutor, los 18 falsos negativos y falsos positivos de E1 se describen con dos ejes, sobre las repeticiones de la línea base y de la candidata y en las dos direcciones: si tienen repeticiones discordantes (17 de 18) y si la diferencia de clasificación viene de la agregación (3) o de las trazas (15). De cada corrida y dirección con repeticiones discordantes se sortea una traza con la semilla `20261022`: 23 celdas y 22 trazas distintas, que los tres anotadores de F6 etiquetan a ciegas. La atribución al evaluador, a los criterios o a las reglas del oráculo se calcula a partir de sus etiquetas. Es exploratorio: no cambia ninguna pieza de la huella ni ningún resultado. La primera versión, que miraba solo la candidata y una dirección, se corrigió antes de que nadie la anotara.
@@ -320,11 +327,12 @@ La prueba `tests/test_preregistration.py` recalcula cada huella y la compara con
 | Rúbrica del evaluador | `5b097001dbc4f39a` |
 | Prompt del agente en cada variante | `880db4a48e7e8978` |
 | Herramientas y límite de pasos de la edición Claude Agent SDK | `5bb212bd5fe02e99` |
+| Herramientas, límites y versiones de la edición LangGraph | `7d2a6a2ec67d6111` |
 | Mutaciones | `066775c0b3e42b0c` |
 | Base de conocimiento | `603bf9873124a1b1` |
 | Tarjetas de situación | `d6a37a38d88afb97` |
 | Criterio de regresión y reintentos | `9aad2d0f4e567eb3` |
 | Umbrales y semilla del oráculo | `e9762d8f9b00c5ea` |
-| Reglas del oráculo (código fuente) | `56a5a54f87339ae4` |
+| Reglas del oráculo (código fuente) | `53f6a1c4ebc346f4` |
 | Corpus semilla | `29ac909479b12894` |
 | Escenarios inducidos | `abbff20458290502` |

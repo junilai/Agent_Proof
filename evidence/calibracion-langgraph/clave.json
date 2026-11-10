@@ -1,0 +1,266 @@
+{
+  "c01": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-05"
+  },
+  "c02": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-16"
+  },
+  "c03": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-09"
+  },
+  "c04": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-09"
+  },
+  "c05": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-02"
+  },
+  "c06": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-17"
+  },
+  "c07": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-08"
+  },
+  "c08": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-02"
+  },
+  "c09": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-07"
+  },
+  "c10": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-17"
+  },
+  "c11": {
+    "origen": "e1",
+    "id": "d2-20261018-053954/tr-5fcbe8e5b61b"
+  },
+  "c12": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-01"
+  },
+  "c13": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-15"
+  },
+  "c14": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-14"
+  },
+  "c15": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-11"
+  },
+  "c16": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-17"
+  },
+  "c17": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-13"
+  },
+  "c18": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-06"
+  },
+  "c19": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-10"
+  },
+  "c20": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-11"
+  },
+  "c21": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-14"
+  },
+  "c22": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-07"
+  },
+  "c23": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-05"
+  },
+  "c24": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-12"
+  },
+  "c25": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-15"
+  },
+  "c26": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-05"
+  },
+  "c27": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-01"
+  },
+  "c28": {
+    "origen": "e1",
+    "id": "d6-20261018-044847/tr-b2bf3dca4c48"
+  },
+  "c29": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-15"
+  },
+  "c30": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-13"
+  },
+  "c31": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-08"
+  },
+  "c32": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-16"
+  },
+  "c33": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-03"
+  },
+  "c34": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-16"
+  },
+  "c35": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-13"
+  },
+  "c36": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-10"
+  },
+  "c37": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-09"
+  },
+  "c38": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-13"
+  },
+  "c39": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-17"
+  },
+  "c40": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-15"
+  },
+  "c41": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-03"
+  },
+  "c42": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-10"
+  },
+  "c43": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-07"
+  },
+  "c44": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-01"
+  },
+  "c45": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-12"
+  },
+  "c46": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-05"
+  },
+  "c47": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-12"
+  },
+  "c48": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-16"
+  },
+  "c49": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-08"
+  },
+  "c50": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-06"
+  },
+  "c51": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-09"
+  },
+  "c52": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-03"
+  },
+  "c53": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-01"
+  },
+  "c54": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-08"
+  },
+  "c55": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-02"
+  },
+  "c56": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-14"
+  },
+  "c57": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-11"
+  },
+  "c58": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-02"
+  },
+  "c59": {
+    "origen": "fixture",
+    "id": "langgraph-baseline-tc-11"
+  },
+  "c60": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-03"
+  },
+  "c61": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-07"
+  },
+  "c62": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-10"
+  },
+  "c63": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-14"
+  },
+  "c64": {
+    "origen": "fixture",
+    "id": "langgraph-d6-tc-12"
+  },
+  "c65": {
+    "origen": "fixture",
+    "id": "langgraph-d1-tc-06"
+  },
+  "c66": {
+    "origen": "fixture",
+    "id": "langgraph-d4-tc-06"
+  }
+}
