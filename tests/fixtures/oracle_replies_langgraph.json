@@ -1,5 +1,5 @@
 {
-  "about": "Respuestas de la edición LangGraph (un turno, 10-nov-2026): la línea base y la familia A en las 16 situaciones de oracle_replies.json, etiquetadas a mano y a ciegas antes de correr las reglas. La línea base no tiene predicado: fails_as dice qué daría el predicado de D1 y de D4 sobre su traza. Caso dudoso: tc-08 baseline niega el reembolso por arrepentimiento y pregunta si hay un defecto; se etiqueta sin decisión.",
+  "about": "Respuestas de la edición LangGraph (un turno, 10-nov-2026): la línea base y la familia A en las 16 situaciones de oracle_replies.json. Etiquetas conciliadas de una doble anotación ciega (autor y Claude, D-005, adenda de LangGraph). La línea base no tiene predicado: fails_as dice qué daría el predicado de D1 y de D4 sobre su traza.",
   "replies": [
     {
       "batch": "langgraph",
@@ -719,7 +719,7 @@
         }
       ],
       "label": {
-        "decision": null,
+        "decision": "no procede",
         "discrepancies": false,
         "fails_as": {
           "d1": false,
@@ -746,7 +746,7 @@
         }
       ],
       "label": {
-        "decision": null,
+        "decision": "no procede",
         "discrepancies": false,
         "fails": false
       }
@@ -804,7 +804,7 @@
         }
       ],
       "label": {
-        "decision": null,
+        "decision": "no procede",
         "discrepancies": false,
         "fails": false
       }
