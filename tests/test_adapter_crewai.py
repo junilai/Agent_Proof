@@ -3,6 +3,7 @@ import json
 
 import pytest
 from crewai import Agent
+from crewai.hooks import get_before_llm_call_hooks
 from crewai.tools import tool
 from crewai.types.usage_metrics import UsageMetrics
 
@@ -239,6 +240,23 @@ def test_an_empty_final_answer_is_an_error():
     assert turn.stop_reason == "error"
 
 
+def test_an_error_keeps_what_the_agent_already_did_in_the_turn():
+    ticket = ask_tools(("create_ticket", {"summary": "s", "order_id": "AT-1"}))
+    llm = ScriptedLLM(responses=[ticket, RuntimeError("overloaded"), say("Listo.")])
+    failed, after = _talk(_agent(llm, tools=[create_ticket]), "crea un ticket", "¿y?")
+    assert failed.stop_reason == "error"
+    assert [(e.kind, e.tool) for e in failed.events] == [
+        ("tool_call", "create_ticket"),
+        ("error", None),
+    ]
+    assert failed.events[0].result["ticket"] == "TCK-1"
+    assert failed.usage.input_tokens == 100
+    assert failed.usage.cost_usd == pytest.approx(100 * 2 / 1e6 + 20 * 10 / 1e6)
+    roles = [m["role"] for m in llm.calls[2]["messages"]]
+    assert roles == ["system", "user", "assistant", "tool", "user"]
+    assert after.reply == "Listo."
+
+
 def test_usage_is_the_turn_s_own():
     lookup = ask_tools(("create_ticket", {"summary": "s", "order_id": "AT-1"}))
     llm = ScriptedLLM(responses=[lookup, say("a"), say("b")])
@@ -251,6 +269,12 @@ def test_the_session_prices_with_the_model_the_agent_requested():
     llm = ScriptedLLM(model=TARGET_DOWNGRADED_MODEL, responses=[say("x")])
     [turn] = _talk(_agent(llm), "hola")
     assert turn.usage.cost_usd == pytest.approx(100 * 1 / 1e6 + 20 * 5 / 1e6)
+
+
+def test_the_hook_is_removed_when_the_session_closes():
+    before = list(get_before_llm_call_hooks())
+    _talk(_agent(ScriptedLLM(responses=[say("x")])), "hola")
+    assert get_before_llm_call_hooks() == before
 
 
 def test_each_conversation_has_its_own_agent_and_history():

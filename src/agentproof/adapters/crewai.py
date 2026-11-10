@@ -25,6 +25,7 @@ from typing import Any
 
 from crewai import Agent
 from crewai.events.listeners.tracing.utils import should_enable_tracing
+from crewai.hooks import register_before_llm_call_hook, unregister_before_llm_call_hook
 from crewai.telemetry.telemetry import Telemetry
 from crewai.types.usage_metrics import UsageMetrics
 
@@ -139,19 +140,39 @@ def _without_system(messages: Sequence[Mapping[str, Any]]) -> list[dict[str, Any
     ]
 
 
+def _answered(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The longest prefix in which every tool call has its result, so the API accepts it."""
+    pending: set[str] = set()
+    end = 0
+    for index, message in enumerate(messages, start=1):
+        pending |= {c["id"] for c in message.get("tool_calls") or []}
+        if message["role"] == "tool":
+            pending.discard(message.get("tool_call_id"))
+        if not pending:
+            end = index
+    return messages[:end]
+
+
 class CrewAISession:
     """One conversation with a CrewAI agent: one kickoff per customer message.
 
     The session keeps the history (without the system message) and passes it on
-    every kickoff.
+    every kickoff. A before-LLM hook, filtered by agent, keeps a reference to the
+    executor's live messages, so a turn that fails keeps what the agent already did.
     """
 
     def __init__(self, agent: Agent) -> None:
         self.agent = agent
         self.history: list[dict[str, Any]] = []
+        self._live: list[dict[str, Any]] | None = None
+
+    def _capture(self, context: Any) -> None:
+        if context.agent is self.agent:
+            self._live = context.messages
 
     async def __aenter__(self) -> CrewAISession:
         ensure_no_telemetry()
+        register_before_llm_call_hook(self._capture)
         return self
 
     async def send(self, message: str) -> AgentTurn:
@@ -159,13 +180,16 @@ class CrewAISession:
         start = len(self.history) + 2  # system + history + this turn's request
         before = self.agent.llm.get_token_usage_summary()
         model = self.agent.llm.model
+        self._live = None
         try:
             output = await self.agent.kickoff_async(request)
         except Exception as exc:
-            self.history = request
+            live = _without_system(self._live or [])
+            new = _answered([m for m in live[start - 1 :] if m["role"] != "user"])
+            self.history = [*(live[: start - 1] or request), *new]
             metrics = self.agent.llm.get_token_usage_summary().delta_since(before)
             turn = turn_from_messages(
-                [], reply="", step_limit_reached=False, metrics=metrics, model=model
+                new, reply="", step_limit_reached=False, metrics=metrics, model=model
             )
             error = AgentEvent(kind="error", text=f"{type(exc).__name__}: {exc}")
             return turn.model_copy(update={"events": [*turn.events, error], "stop_reason": "error"})
@@ -181,7 +205,7 @@ class CrewAISession:
         )
 
     async def __aexit__(self, *exc_info: object) -> None:
-        return None
+        unregister_before_llm_call_hook(self._capture)
 
 
 def session_factory(agent: Callable[[str], Agent], variant: str) -> SessionFactory:
