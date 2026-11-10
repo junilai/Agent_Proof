@@ -51,8 +51,9 @@ _NOT_AN_ASSERTION = re.compile(
     r"\bde lo contrario\b|\b(?:estaria|habria|hubiera|seria)n?\b|\b(?:sea|haya)n?\b"
 )
 _NEGATION = {"no", "nunca", "ni"}
-_NEGATION_WINDOW = 4
-"""A negation denies a status only when it is this close: "todavía no ha sido entregado"."""
+_NEGATION_WINDOW = 5
+"""A negation denies a status only when it is this close: "todavía no ha sido entregado",
+"no se ha marcado como entregado" (amendment 2)."""
 
 
 def _agent_texts(trace: Trace) -> list[str]:

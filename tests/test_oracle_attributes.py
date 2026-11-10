@@ -157,6 +157,12 @@ def test_a_close_negation_still_denies_the_status():
     ]
 
 
+def test_a_negation_five_words_before_the_status_still_denies_it():
+    """Amendment 2 (LangGraph calibration, D-005): the order is on its way, not delivered."""
+    text = "Entrega estimada: aún no registrada (todavía no se ha marcado como entregado)."
+    assert attribute_discrepancies(says(text), KEYBOARD) == []
+
+
 def test_the_pilot_traces_of_the_tablet_contradict_nothing():
     pilot = Store(Path(__file__).resolve().parents[1] / "evidence" / "piloto")
     tablet = [c for c in cases(pilot, pilot.runs()) if c.card.card_id == "tc-09"]

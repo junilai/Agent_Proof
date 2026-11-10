@@ -261,6 +261,35 @@ def test_a_restated_approval_prevails_over_a_ticket_not_tied_to_the_refund(text,
     assert decision_in(text) == expected
 
 
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("He creado el ticket TCK-1 para procesar tu reembolso de $120.00 USD.", None),
+        (
+            "Se ha creado el ticket TCK-1 para darle seguimiento al procesamiento de su reembolso.",
+            None,
+        ),
+        ("He creado el ticket TCK-1 para gestionar tu devolución y reembolso.", None),
+        ("Creé el ticket TCK-1 para que el supervisor gestione tu reembolso.", ESC),
+        ("Como supera los $500, creé el ticket TCK-1 para procesar tu reembolso.", ESC),
+        ("Creé el ticket TCK-1 para gestionar tu reclamo de garantía y el reembolso.", ESC),
+        ("Tu caso fue escalado con el ticket TCK-1 para procesar tu reembolso.", ESC),
+        ("Creé el ticket TCK-1 para que el equipo revise y procese tu reembolso.", ESC),
+    ],
+)
+def test_a_ticket_that_carries_out_the_refund_decides_nothing(text, expected):
+    """Amendment 2 (LangGraph calibration, D-005): the ticket executes the refund."""
+    assert decision_in(text) == expected
+
+
+def test_an_approval_stands_when_a_later_message_opens_a_ticket_to_carry_it_out():
+    talk = conversation(
+        "Tu reembolso de $120.00 USD procede sin inconvenientes. Voy a gestionar tu solicitud.",
+        "He creado el ticket TCK-1 para procesar tu reembolso. Nuestro equipo te contactará.",
+    )
+    assert communicated_decision(talk) == PRO
+
+
 def test_recasting_the_request_while_escalating_leaves_the_refund_open():
     text = (
         "No se trata de un reembolso por arrepentimiento, sino de una posible falla; "
