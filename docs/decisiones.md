@@ -510,6 +510,40 @@ La planificación de smolagents y la salida en streaming quedan desactivadas, co
 
 **Interfaz.** La edición se abre en la interfaz de Gradio de smolagents (`studio/smolagents/`), solo en `127.0.0.1`, con el enlace público (`share`) forzado a desactivado y la analítica de Gradio apagada. smolagents no está en E4 ni en la huella del pre-registro: su corrida de punta a punta demuestra la portabilidad.
 
+## D-013 · Conversación de varios turnos y equivalencias de la edición CrewAI
+
+- **Fecha:** 10 de noviembre de 2026
+- **Estado:** decidida e implementada; el límite de D6 y dos comportamientos con Sonnet 5 se verifican en vivo
+- **Origen:** F4, portabilidad (§5.7); el spec de F4 dejaba la conversación de varios turnos para después de leer el código de CrewAI 1.15.23
+
+### El problema
+
+CrewAI está pensado para tareas, no para conversar. El spec admitía dos caminos: `Agent.kickoff(messages=...)` con el historial completo, o un `Crew` con una `Task` por turno. Había que elegir cómo se ven las llamadas a herramientas y cómo se reconoce que se alcanzó el límite de pasos.
+
+### La decisión
+
+- **`Agent.kickoff` con el historial de la sesión.** Un agente por conversación. En cada turno, la sesión del adaptador le pasa el historial completo que ella misma guarda y agrega lo que el turno produjo. CrewAI no guarda memoria entre llamadas, así que cada conversación empieza vacía. Memoria, conocimiento, caché de herramientas, planificación, delegación y resúmenes de historial quedan desactivados.
+- **Las herramientas se leen de los mensajes que devuelve el kickoff** (`LiteAgentOutput.messages`), no del bus de eventos de CrewAI. El bus es global, corre en otros hilos y no trae el identificador de cada llamada, así que podría mezclar sesiones o desordenarlas.
+- **Un turno que falla conserva lo hecho.** Un gancho antes de cada llamada al modelo registra lo que el turno ya produjo; si una llamada falla, el turno termina como error con sus herramientas ya ejecutadas, como en las otras ediciones.
+
+### Equivalencias
+
+**Límite de pasos.** `max_iter` cuenta rondas de herramientas: un turno que necesita más llamadas al modelo que las permitidas se corta, como con `max_turns` del SDK. Al cortarse, CrewAI hace **una llamada más**, sin herramientas, que obliga al modelo a responder. Esa respuesta es la que recibe el cliente, cuenta como comunicada y el turno queda como `step_limit`. CrewAI no la guarda en el historial, así que el adaptador la agrega para que el turno siguiente la vea. La línea base tiene 10. D6 empieza en 2 y se calibra en vivo con la sonda de D-003; por la respuesta forzada, es posible que el caso "creó el ticket pero no comunicó el número" no se repita en este framework.
+
+**Prompt.** El prompt del dominio va sin cambios como `backstory`. CrewAI exige además un rol y un objetivo, que son dos frases cortas tomadas del mismo prompt, y lo envuelve todo en su propio texto en inglés ("You are…", "Current Task:"). Es el uso nativo y no se reescribe.
+
+**Herramientas.** Las tres del dominio, con las mismas descripciones; devuelven el resultado del dominio como JSON. CrewAI las envía con esquema estricto (`strict: true`) y una secuencia de parada (`\nObservation:`). Si el modelo escribe texto junto a una llamada a herramienta, CrewAI lo descarta. Una herramienta que falla no corta el turno: el modelo recibe el error.
+
+**Modelo.** El proveedor nativo de Anthropic de CrewAI, con el modelo de la variante y los parámetros de D-012: 32 000 tokens de salida, sin razonamiento extendido, temperatura por omisión y 600 s por llamada (CrewAI usaría 128 000 tokens y ningún tiempo máximo). Reintentos: 2, los del SDK de Anthropic, más el reintento propio de CrewAI ante el límite de tasa.
+
+**Costo.** El proveedor de CrewAI marca siempre puntos de caché de prompts, y la tabla de precios no los distingue. El costo del agente de esta edición se toma de la consola de facturación, como el del Agent SDK en E1 (D-007), y su corrida de punta a punta va en un día UTC propio para poder leerlo.
+
+**Lo que agrega el adaptador.** La negativa a correr si CrewAI enviaría telemetría o trazas: sin `CREWAI_DISABLE_TELEMETRY=true` (u `OTEL_SDK_DISABLED`, `CREWAI_DISABLE_TRACKING`), el primer kickoff intentó conectarse a `telemetry.crewai.com`; y con `CREWAI_TRACING_ENABLED` activo enviaría las trazas de ejecución.
+
+**Interfaz.** CrewAI no ofrece una interfaz como Studio para un agente individual: `crewai chat` es otra arquitectura, y el gráfico de flujos muestra el bucle genérico de CrewAI, no este agente. Se declara así, y `studio/crewai/` trae una consola local mínima para conversar con la edición viendo cada llamada a herramienta y el corte.
+
+**Dependencias.** CrewAI 1.15.23 exige `pydantic<2.13` y `mcp` 1.x. El proyecto pasó de pydantic 2.13.5 a 2.12.5 y de mcp 2.2.0 a 1.28.1, también para la edición Claude Agent SDK. Antes de integrarlo se verificó que las 800 trazas y los 800 veredictos de E1, el volcado del oráculo y el análisis de E1 salen idénticos. E1 se reproduce con el `uv.lock` de su tag (`preregistro-v2`) y E4 con el de `preregistro-v3`. La edición Claude Agent SDK se verifica en vivo con mcp 1.28.1. CrewAI no está en E4 ni en la huella del pre-registro: su corrida de punta a punta demuestra la portabilidad.
+
 ## D-016 · Análisis de los desacuerdos entre el oráculo y AgentProof
 
 - **Fecha:** 20 de octubre de 2026; corregida el 21 de octubre de 2026
