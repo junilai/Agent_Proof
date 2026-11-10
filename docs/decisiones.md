@@ -298,6 +298,17 @@ tc-06 es el único caso dudoso. Una regla que lo resolviera sola podría equivoc
 - **Ningún caso se resuelve con la decisión contraria.** Si una conversación no encaja en la tabla, queda sin resolver.
 - **Límite.** La guía se derivó de las conversaciones del corpus. Antes del tag se mide el acierto del oráculo sobre conversaciones nuevas, de la línea base y de mutantes, etiquetadas a ciegas y sin ajustar ninguna regla con ellas.
 
+### Adenda (10 de noviembre de 2026): un ticket que ejecuta el reembolso
+
+La tabla preveía el ticket por otro asunto, pero no el que se abre para cumplir un reembolso ya aprobado. En la calibración con LangGraph ([D-005](#d-005--calibración-del-oráculo-con-respuestas-de-agentes-degradados), adenda) y en dos trazas de E1, el agente aprueba en un mensaje y en el siguiente dice "he creado el ticket TCK-… para procesar tu reembolso". Nadie más decide nada: el ticket ejecuta la aprobación.
+
+| Lo que comunica el agente | Desenlace |
+|---|---|
+| Abre un ticket cuyo propósito declarado es ejecutar el reembolso ("para procesar", "para gestionar", "para darle seguimiento al procesamiento de tu reembolso") | ese mensaje no aporta desenlace: vale la decisión anterior ([D-002](#d-002--qué-mensaje-comunica-el-desenlace)) |
+| Abre el ticket "para que" alguien procese o gestione el reembolso, lo escala con esas palabras, o lo ata a un supervisor, al umbral, a una excepción, a un reclamo de garantía o a una revisión | esta adenda no se aplica: el mensaje se lee como antes |
+
+Es parte de la enmienda 2 del pre-registro.
+
 ## D-010 · Conjunto de validación del oráculo
 
 - **Fecha:** 17 de octubre de 2026
@@ -518,4 +529,5 @@ Los casos 1 y 2 pueden darse a la vez, y entonces se informan los dos. Se report
 ### Lo que este análisis no hace
 
 - **No es una enmienda.** No cambia ninguna pieza de la huella, ningún resultado de E1 ni la definición del conjunto manifestado. Es un análisis exploratorio, agregado después de ver los resultados de E1 y declarado como tal en la §8 del pre-registro.
+- **La muestra queda congelada tras la enmienda 2.** La enmienda 2 corrigió la lectura que producía el desacuerdo de D2 (sc-tr-69b396c04669, [D-005](#d-005--calibración-del-oráculo-con-respuestas-de-agentes-degradados), adenda de LangGraph). Con el oráculo nuevo quedan 17 desacuerdos, pero el sorteo recorre los desacuerdos en orden, así que sortear de nuevo cambiaría cinco trazas de otros desacuerdos que no cambiaron. La muestra describe la puntuación original de E1 y no se vuelve a sortear: el desacuerdo de D2 ya está atribuido a las reglas del oráculo, y las pruebas exigen que, con el oráculo nuevo, sea el único que desaparece.
 - **Si atribuye una discordancia a las reglas del oráculo,** la corrección sigue el camino ya pre-registrado para la auditoría: una enmienda con su motivo, E1 vuelto a puntuar y las dos puntuaciones reportadas.
