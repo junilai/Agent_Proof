@@ -15,11 +15,12 @@ import json
 from collections.abc import Callable
 from typing import Any
 
-from crewai import LLM
+from crewai import LLM, Agent
 from crewai.llms.base_llm import BaseLLM
 from crewai.tools import BaseTool, tool
 
 from casestudy.domain.mutations import MUTATIONS, Mutation
+from casestudy.domain.prompt import system_prompt
 from casestudy.domain.tools import TOOL_DESCRIPTIONS, create_ticket, get_refund_policy, lookup_order
 
 VARIANTS = tuple(MUTATIONS)
@@ -31,6 +32,10 @@ MAX_TOKENS = 32000
 """Output tokens per model call, the same for every variant (D-012)."""
 REQUEST_TIMEOUT = 600.0
 """Seconds per model call; CrewAI's default builds an Anthropic client with none."""
+# CrewAI requires a role and a goal: two short phrases taken from the domain prompt,
+# which goes verbatim as the backstory.
+ROLE = "agente de atención al cliente de Andina Tech"
+GOAL = "Ayudar a los clientes con consultas sobre sus pedidos y con solicitudes de reembolso"
 
 
 def step_limit(mutation: Mutation) -> int:
@@ -76,3 +81,27 @@ def tools_for(mutation: Mutation) -> list[BaseTool]:
 def default_model(mutation: Mutation) -> BaseLLM:
     """The variant's model through CrewAI's native Anthropic provider, without thinking."""
     return LLM(model=f"anthropic/{mutation.model}", max_tokens=MAX_TOKENS, timeout=REQUEST_TIMEOUT)
+
+
+def builder(variant: str = "baseline", model: BaseLLM | None = None) -> Agent:
+    """The agent for a variant; whoever runs it passes the history on every kickoff.
+
+    Everything that would change the loop stays off: tool cache, memory, knowledge,
+    planning, delegation, and the history summaries CrewAI makes when the context
+    overflows (an overflow is then an error, as in the other editions).
+    """
+    if variant not in MUTATIONS:
+        raise ValueError(f"unknown variant: {variant}")
+    mutation = MUTATIONS[variant]
+    return Agent(
+        role=ROLE,
+        goal=GOAL,
+        backstory=system_prompt(mutation),
+        llm=model or default_model(mutation),
+        tools=tools_for(mutation),
+        max_iter=step_limit(mutation),
+        cache=False,
+        allow_delegation=False,
+        respect_context_window=False,
+        verbose=False,
+    )

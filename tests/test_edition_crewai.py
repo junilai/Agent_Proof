@@ -11,6 +11,7 @@ import pytest
 from agentproof.models import TARGET_DOWNGRADED_MODEL
 from casestudy.domain.mutations import BASELINE, CORRUPT_POLICY, MUTATIONS
 from casestudy.domain.policy_text import policy_text
+from casestudy.domain.prompt import system_prompt
 from casestudy.domain.tools import TOOL_DESCRIPTIONS, get_refund_policy, lookup_order
 from casestudy.editions.crewai import (
     D6_STEP_LIMIT,
@@ -18,11 +19,12 @@ from casestudy.editions.crewai import (
     REQUEST_TIMEOUT,
     STEP_LIMIT,
     VARIANTS,
+    builder,
     default_model,
     step_limit,
     tools_for,
 )
-from tests.fakes_crewai import offline
+from tests.fakes_crewai import ScriptedLLM, offline
 
 
 @pytest.fixture(autouse=True)
@@ -57,6 +59,11 @@ def test_tools_wrap_the_domain_and_return_json():
     assert ticket["estado"] == "escalado" and ticket["pedido"] == "AT-1002"
 
 
+def test_the_agent_carries_the_variant_tools():
+    agent = builder("baseline", model=ScriptedLLM())
+    assert [t.name for t in agent.tools] == list(TOOL_DESCRIPTIONS)
+
+
 # Rule 2: the six mutations, with the same definition.
 
 
@@ -64,13 +71,29 @@ def test_every_mutation_is_a_variant():
     assert VARIANTS == tuple(MUTATIONS)
 
 
+def test_unknown_variants_are_rejected():
+    with pytest.raises(ValueError):
+        builder("d9")
+
+
 def test_d1_has_no_lookup_order():
     assert list(_tools("d1")) == ["get_refund_policy", "create_ticket"]
+    assert [t.name for t in builder("d1", model=ScriptedLLM()).tools] == [
+        "get_refund_policy",
+        "create_ticket",
+    ]
 
 
 def test_d4_returns_the_corrupt_policy():
     assert json.loads(_tools("d4")["get_refund_policy"].run()) == policy_text(CORRUPT_POLICY)
     assert json.loads(_tools("baseline")["get_refund_policy"].run()) == get_refund_policy()
+
+
+@pytest.mark.parametrize("variant", list(MUTATIONS))
+def test_the_backstory_is_the_domain_prompt_verbatim(variant):
+    agent = builder(variant, model=ScriptedLLM())
+    assert agent.backstory == system_prompt(MUTATIONS[variant])
+    assert agent.role and agent.goal
 
 
 def test_d3_uses_the_downgraded_model():
@@ -92,6 +115,10 @@ def test_every_call_has_a_timeout():
     assert default_model(BASELINE).timeout == REQUEST_TIMEOUT
 
 
+def test_the_builder_uses_the_variant_model_by_default():
+    assert builder("d3").llm.model == TARGET_DOWNGRADED_MODEL
+
+
 def test_step_limits():
     """``max_iter`` counts tool rounds; the cut adds one forced, tool-less answer."""
     assert STEP_LIMIT == 10
@@ -99,3 +126,20 @@ def test_step_limits():
     assert step_limit(MUTATIONS["d6"]) == D6_STEP_LIMIT
     for name in ("baseline", "d1", "d2", "d3", "d4", "d5"):
         assert step_limit(MUTATIONS[name]) == STEP_LIMIT
+    assert builder("d6", model=ScriptedLLM()).max_iter == D6_STEP_LIMIT
+    assert builder("baseline", model=ScriptedLLM()).max_iter == STEP_LIMIT
+
+
+def test_nothing_that_would_change_the_loop_is_on():
+    """No tool cache, usage cap, memory, planning, delegation or history summaries."""
+    agent = builder("baseline", model=ScriptedLLM())
+    assert agent.cache is False
+    assert agent.allow_delegation is False
+    assert agent.respect_context_window is False
+    assert agent.memory in (None, False)
+    assert not agent.knowledge_sources
+    assert not agent.planning
+    assert agent.guardrail is None
+    for tool in agent.tools:
+        assert tool.max_usage_count is None
+        assert tool.result_as_answer is False
