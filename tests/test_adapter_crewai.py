@@ -1,16 +1,21 @@
+import asyncio
 import json
 
 import pytest
+from crewai import Agent
+from crewai.tools import tool
 from crewai.types.usage_metrics import UsageMetrics
 
 from agentproof.adapters.crewai import (
     TELEMETRY_VARS,
+    CrewAISession,
     TelemetryEnabledError,
     ensure_no_telemetry,
+    session_factory,
     turn_from_messages,
 )
-from agentproof.models import TARGET_BASELINE_MODEL
-from tests.fakes_crewai import TELEMETRY_OFF, offline
+from agentproof.models import TARGET_BASELINE_MODEL, TARGET_DOWNGRADED_MODEL
+from tests.fakes_crewai import TELEMETRY_OFF, ScriptedLLM, ask_tools, offline, say
 
 LOOKUP_RESULT = {"pedido": "AT-1001", "estado": "entregado", "dias_desde_entrega": 10}
 ONE_CALL = UsageMetrics(prompt_tokens=100, completion_tokens=20, successful_requests=1)
@@ -160,3 +165,114 @@ def test_refuses_when_crewai_itself_reads_telemetry_on(monkeypatch):
 
 def test_telemetry_and_tracing_off_is_fine():
     ensure_no_telemetry(TELEMETRY_OFF)
+
+
+def _agent(llm, max_iter=10, tools=()):
+    """A bare CrewAI agent: enough to test the session without any edition."""
+    return Agent(role="r", goal="g", backstory="b", llm=llm, tools=list(tools), max_iter=max_iter)
+
+
+@tool("create_ticket")
+def create_ticket(summary: str, order_id: str) -> str:
+    """Escalates a case."""
+    return json.dumps({"ticket": "TCK-1", "pedido": order_id})
+
+
+def _talk(agent, *messages):
+    async def run():
+        async with CrewAISession(agent) as session:
+            return [await session.send(m) for m in messages]
+
+    return asyncio.run(run())
+
+
+def _contents(call):
+    return [m.get("content") for m in call["messages"]]
+
+
+def test_refuses_to_open_with_telemetry_on(monkeypatch):
+    monkeypatch.delenv("CREWAI_DISABLE_TELEMETRY")
+    monkeypatch.delenv("CREWAI_DISABLE_TRACKING")
+    monkeypatch.delenv("OTEL_SDK_DISABLED")
+    llm = ScriptedLLM(responses=[say("x")])
+    with pytest.raises(TelemetryEnabledError, match="CREWAI_DISABLE_TELEMETRY"):
+        _talk(_agent(llm), "hola")
+    assert llm.calls == []
+
+
+def test_the_session_keeps_memory_between_turns(network):
+    llm = ScriptedLLM(responses=[say("Hola."), say("Sigo aquí.")])
+    first, second = _talk(_agent(llm), "hola", "¿sigues?")
+    assert (first.reply, second.reply) == ("Hola.", "Sigo aquí.")
+    assert [e.kind for e in second.events] == ["agent_message"]
+    second_call = _contents(llm.calls[1])
+    assert "Hola." in second_call and "¿sigues?" in second_call[-1]
+    assert [m["role"] for m in llm.calls[1]["messages"]].count("system") == 1
+    assert network == []
+
+
+def test_the_cut_is_step_limit_and_the_next_turn_sees_the_forced_answer():
+    loop = ask_tools(("create_ticket", {"summary": "s", "order_id": "AT-1"}))
+    llm = ScriptedLLM(responses=[loop, say("Creé tu ticket."), say("De nada.")])
+    cut, after = _talk(_agent(llm, max_iter=1, tools=[create_ticket]), "ticket", "gracias")
+    assert cut.stop_reason == "step_limit"
+    assert cut.reply == "Creé tu ticket."
+    assert [e.kind for e in cut.events] == ["tool_call", "agent_message"]
+    assert llm.calls[1]["tools"] == []
+    assert "Creé tu ticket." in _contents(llm.calls[2])
+    assert (after.stop_reason, after.reply) == ("completed", "De nada.")
+
+
+def test_a_model_error_ends_the_turn_as_error():
+    llm = ScriptedLLM(responses=[RuntimeError("overloaded"), say("De nuevo.")])
+    failed, recovered = _talk(_agent(llm), "hola", "otra vez")
+    assert failed.stop_reason == "error"
+    assert failed.reply == ""
+    assert [e.kind for e in failed.events] == ["error"]
+    assert "overloaded" in failed.events[0].text
+    assert (recovered.stop_reason, recovered.reply) == ("completed", "De nuevo.")
+
+
+def test_an_empty_final_answer_is_an_error():
+    """CrewAI raises on an empty answer, where other frameworks return an empty reply."""
+    [turn] = _talk(_agent(ScriptedLLM(responses=[say("")])), "hola")
+    assert turn.stop_reason == "error"
+
+
+def test_usage_is_the_turn_s_own():
+    lookup = ask_tools(("create_ticket", {"summary": "s", "order_id": "AT-1"}))
+    llm = ScriptedLLM(responses=[lookup, say("a"), say("b")])
+    first, second = _talk(_agent(llm, tools=[create_ticket]), "uno", "dos")
+    assert (first.usage.input_tokens, first.usage.output_tokens) == (200, 40)
+    assert (second.usage.input_tokens, second.usage.output_tokens) == (100, 20)
+
+
+def test_the_session_prices_with_the_model_the_agent_requested():
+    llm = ScriptedLLM(model=TARGET_DOWNGRADED_MODEL, responses=[say("x")])
+    [turn] = _talk(_agent(llm), "hola")
+    assert turn.usage.cost_usd == pytest.approx(100 * 1 / 1e6 + 20 * 5 / 1e6)
+
+
+def test_each_conversation_has_its_own_agent_and_history():
+    llm = ScriptedLLM(responses=[say("a"), say("b")])
+    built = []
+    factory = session_factory(lambda variant: built.append(variant) or _agent(llm), "d4")
+
+    async def run():
+        for text in ("primera", "segunda"):
+            async with factory() as session:
+                await session.send(text)
+
+    asyncio.run(run())
+    assert built == ["d4", "d4"]
+    assert [m["role"] for m in llm.calls[1]["messages"]] == ["system", "user"]
+    assert "primera" not in str(llm.calls[1]["messages"])
+
+
+def test_the_factory_refuses_before_any_conversation(monkeypatch):
+    """A batch must fail at once, not leave one error trace per conversation."""
+    monkeypatch.setenv("CREWAI_TRACING_ENABLED", "true")
+    built = []
+    with pytest.raises(TelemetryEnabledError, match="CREWAI_TRACING_ENABLED"):
+        session_factory(lambda variant: built.append(variant), "baseline")
+    assert built == []
