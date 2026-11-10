@@ -4,10 +4,12 @@ Each test names the rule it checks. Those that converse drive the edition throug
 ``CrewAISession`` with a scripted LLM, the way AgentProof runs it.
 """
 
+import asyncio
 import json
 
 import pytest
 
+from agentproof.adapters.crewai import CrewAISession
 from agentproof.models import TARGET_DOWNGRADED_MODEL
 from casestudy.domain.mutations import BASELINE, CORRUPT_POLICY, MUTATIONS
 from casestudy.domain.policy_text import policy_text
@@ -15,8 +17,10 @@ from casestudy.domain.prompt import system_prompt
 from casestudy.domain.tools import TOOL_DESCRIPTIONS, get_refund_policy, lookup_order
 from casestudy.editions.crewai import (
     D6_STEP_LIMIT,
+    GOAL,
     MAX_TOKENS,
     REQUEST_TIMEOUT,
+    ROLE,
     STEP_LIMIT,
     VARIANTS,
     builder,
@@ -24,7 +28,7 @@ from casestudy.editions.crewai import (
     step_limit,
     tools_for,
 )
-from tests.fakes_crewai import ScriptedLLM, offline
+from tests.fakes_crewai import ScriptedLLM, ask_tools, offline, say
 
 
 @pytest.fixture(autouse=True)
@@ -143,3 +147,109 @@ def test_nothing_that_would_change_the_loop_is_on():
     for tool in agent.tools:
         assert tool.max_usage_count is None
         assert tool.result_as_answer is False
+
+
+POLICY = ask_tools(("get_refund_policy", {}))
+
+
+def _llm(variant="baseline", *responses):
+    return ScriptedLLM(model=MUTATIONS[variant].model, responses=list(responses))
+
+
+def _talk(variant, llm, *messages):
+    async def run():
+        async with CrewAISession(builder(variant, model=llm)) as session:
+            return [await session.send(m) for m in messages]
+
+    return asyncio.run(run())
+
+
+def _system(call):
+    [system] = [m["content"] for m in call["messages"] if m["role"] == "system"]
+    return system
+
+
+def _unanswered(messages):
+    """Tool calls without a result by the time the customer speaks again or the model is called."""
+    pending = set()
+    for message in messages:
+        if message["role"] == "user" and pending:
+            return pending
+        pending |= {call["id"] for call in message.get("tool_calls") or []}
+        if message["role"] == "tool":
+            pending.discard(message["tool_call_id"])
+    return pending
+
+
+# Rule 1, conversing: the model is offered the variant's tools, and a lookup is traced.
+
+
+@pytest.mark.parametrize("variant", ["baseline", "d1"])
+def test_the_model_is_offered_the_variant_tools(variant):
+    llm = _llm(variant, say("Hola."))
+    _talk(variant, llm, "hola")
+    assert llm.calls[0]["tools"] == list(_tools(variant))
+
+
+def test_a_lookup_reaches_the_trace():
+    lookup = ask_tools(("lookup_order", {"order_id": "AT-1001"}))
+    [turn] = _talk("baseline", _llm("baseline", lookup, say("Fue entregado.")), "¿Y mi pedido?")
+    call = turn.events[0]
+    assert (call.kind, call.tool, call.arguments) == (
+        "tool_call",
+        "lookup_order",
+        {"order_id": "AT-1001"},
+    )
+    assert call.result == lookup_order("AT-1001")
+    assert turn.reply == "Fue entregado."
+
+
+@pytest.mark.parametrize("variant", ["baseline", "d1", "d2", "d5"])
+def test_the_system_message_carries_the_domain_prompt_verbatim(variant):
+    """CrewAI wraps it in its own English frame, which is the framework's native use."""
+    llm = _llm(variant, say("Hola."))
+    _talk(variant, llm, "hola")
+    prompt = system_prompt(MUTATIONS[variant])
+    assert _system(llm.calls[0]) == f"You are {ROLE}. {prompt}\nYour personal goal is: {GOAL}"
+
+
+# Rule 3: the step limit cuts, it is not an error, and the forced answer is the reply.
+
+
+@pytest.mark.parametrize(("variant", "limit"), [("d6", D6_STEP_LIMIT), ("baseline", STEP_LIMIT)])
+def test_the_step_limit_cuts_and_is_not_an_error(variant, limit):
+    llm = _llm(variant, *[POLICY] * limit, say("Te cuento la política."))
+    [turn] = _talk(variant, llm, "¿Cuál es la política?")
+    assert turn.stop_reason == "step_limit"
+    assert len(llm.calls) == limit + 1
+    assert llm.calls[-1]["tools"] == []
+    assert all(e.kind != "error" for e in turn.events)
+    assert [e.result is not None for e in turn.events if e.kind == "tool_call"] == [True] * limit
+    assert turn.reply == turn.events[-1].text == "Te cuento la política."
+
+
+def test_the_counter_restarts_every_turn():
+    one_turn = [POLICY] * D6_STEP_LIMIT + [say("Listo.")]
+    llm = _llm("d6", *one_turn, *one_turn)
+    turns = _talk("d6", llm, "primera", "segunda")
+    assert [t.stop_reason for t in turns] == ["step_limit", "step_limit"]
+    assert len(llm.calls) == 2 * (D6_STEP_LIMIT + 1)
+
+
+def test_one_round_less_than_the_limit_completes():
+    llm = _llm("d6", *[POLICY] * (D6_STEP_LIMIT - 1), say("Listo."))
+    [turn] = _talk("d6", llm, "hola")
+    assert (turn.stop_reason, turn.reply) == ("completed", "Listo.")
+
+
+# Rule 4: the history stays valid after a cut, and keeps what the customer was told.
+
+
+def test_history_is_valid_after_a_cut():
+    llm = _llm("d6", *[POLICY] * D6_STEP_LIMIT, say("Forzada."), say("Sigo aquí."))
+    cut, after = _talk("d6", llm, "¿Cuál es la política?", "¿Sigues?")
+    assert cut.stop_reason == "step_limit"
+    assert (after.stop_reason, after.reply) == ("completed", "Sigo aquí.")
+    for call in llm.calls:
+        assert _unanswered(call["messages"]) == set()
+    assert "Forzada." in [m.get("content") for m in llm.calls[-1]["messages"]]
