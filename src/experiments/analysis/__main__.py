@@ -1,6 +1,6 @@
 """Detection metrics of one framework's runs.
 
-    python -m experiments.analysis --data . --reference <run> --control <run> \\
+    python -m experiments.analysis --data . --reference <run> [--control <run>] \\
         --candidate <run> [--candidate <run> ...]
 
 The operator of each candidate is read from its manifest. Nothing is computed
@@ -20,14 +20,14 @@ from experiments.oracle.annotation import pending
 app = typer.Typer(help="Métricas de detección de las corridas de un framework.")
 DATA = typer.Option(Path("."), "--data", help="Carpeta que contiene corpus/ y results/.")
 REFERENCE = typer.Option(..., "--reference", help="Corrida de baseline-a.")
-CONTROL = typer.Option(..., "--control", help="Corrida de baseline-b.")
+CONTROL = typer.Option(None, "--control", help="Corrida de baseline-b; E4 no tiene.")
 CANDIDATES = typer.Option(..., "--candidate", help="Corrida de una mutación; se repite.")
 
 
 @app.command()
 def main(
     reference: str = REFERENCE,
-    control: str = CONTROL,
+    control: str | None = CONTROL,
     candidate: list[str] = CANDIDATES,
     data: Path = DATA,
 ):

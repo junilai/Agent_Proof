@@ -55,9 +55,13 @@ def _detection(detections: list[Detection]) -> list[str]:
     return lines
 
 
-def render_analysis(store: Store, reference: str, control: str, candidates: list[str]) -> str:
+def render_analysis(
+    store: Store, reference: str, control: str | None, candidates: list[str]
+) -> str:
+    """The metrics of one framework; without a control run (E4) there is no negative control."""
     by_operator = {store.manifest(run_id).condition: run_id for run_id in candidates}
-    lines = [f"Análisis: referencia {reference} · control {control}"]
+    header = f"Análisis: referencia {reference}"
+    lines = [header + (f" · control {control}" if control else " · sin corrida de control")]
     sections = (
         ("Familia A (métricas principales)", FAMILY_A),
         ("Familia B (aparte, con tamaño de efecto)", tuple(op for op in FAMILY_B if op != "d3")),
@@ -79,15 +83,15 @@ def render_analysis(store: Store, reference: str, control: str, candidates: list
                         _effect("expuestos", effect_size(store, reference, run_id, exposed))
                     )
             lines.append(_effect("suite", effect_size(store, reference, run_id)))
-    control_result = negative_control(store, reference, control)
-    lines += [
-        "",
-        f"Control negativo: {len(control_result.flagged)} marcado(s) en "
-        f"{control_result.compared} escenario(s), FPR {_pct(control_result.fpr)}",
-        "",
-        "pass^k",
-    ]
-    for run_id in (reference, control, *candidates):
+    if control:
+        control_result = negative_control(store, reference, control)
+        lines += [
+            "",
+            f"Control negativo: {len(control_result.flagged)} marcado(s) en "
+            f"{control_result.compared} escenario(s), FPR {_pct(control_result.fpr)}",
+        ]
+    lines += ["", "pass^k"]
+    for run_id in (reference, *([control] if control else []), *candidates):
         values = " · ".join(f"k={k} {_pct(v)}" for k, v in pass_hat_k(store, run_id).items())
         lines.append(f"  {run_id}: {values}")
     return "\n".join(lines)

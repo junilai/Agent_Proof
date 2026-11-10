@@ -40,3 +40,11 @@ def test_the_joint_rates_are_written_for_the_operators_with_a_predicate(tmp_path
     rows = list(csv.DictReader(path.open()))
     assert len(rows) == 6 and {r["operator"] for r in rows} == {"d4"}
     assert rows[1]["candidate"] == "0.4000" and rows[1]["manifested"] == "True"
+
+
+def test_without_a_control_run_there_is_no_negative_control(tmp_path):
+    """E4 has the reference and family A only: the negative control belongs to E1."""
+    text = render_analysis(populated(tmp_path), REFERENCE, None, [CANDIDATE])
+    assert text.splitlines()[0] == f"Análisis: referencia {REFERENCE} · sin corrida de control"
+    assert "Control negativo" not in text
+    assert "D4 · " in text and "pass^k" in text and CONTROL not in text
