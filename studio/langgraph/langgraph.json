@@ -1,0 +1,11 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "agente": "./graph.py:graph"
+  },
+  "env": {
+    "LANGSMITH_TRACING": "false",
+    "LANGCHAIN_TRACING_V2": "false",
+    "LANGGRAPH_CLI_NO_ANALYTICS": "1"
+  }
+}

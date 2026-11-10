@@ -6,6 +6,8 @@ Each test names the rule it checks. Those that converse drive the edition throug
 
 import asyncio
 import json
+import runpy
+from pathlib import Path
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
@@ -266,3 +268,25 @@ def test_converse_end_to_end_and_the_oracle_reads_it():
     tools = [e.tool for e in trace.events if e.kind == "tool_call"]
     assert tools == ["lookup_order", "get_refund_policy"]
     assert communicated_decision(trace) == Decision.APPROVED
+
+
+# Studio opens the edition as it is, and never sends traces out.
+
+STUDIO = Path(__file__).resolve().parents[1] / "studio" / "langgraph"
+
+
+def test_studio_opens_the_edition_without_tracing(monkeypatch):
+    monkeypatch.delenv("VARIANT", raising=False)
+    graph = runpy.run_path(str(STUDIO / "graph.py"))["graph"]
+    assert set(graph.get_graph().nodes) == {
+        "__start__",
+        "start",
+        "model",
+        "tools",
+        "cut",
+        "__end__",
+    }
+    config = json.loads((STUDIO / "langgraph.json").read_text())
+    assert config["graphs"] == {"agente": "./graph.py:graph"}
+    assert config["env"]["LANGSMITH_TRACING"] == "false"
+    assert config["env"]["LANGCHAIN_TRACING_V2"] == "false"
