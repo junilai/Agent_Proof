@@ -5,6 +5,9 @@ Each test names the rule it checks. Those that converse drive the edition throug
 """
 
 import asyncio
+import os
+import runpy
+from pathlib import Path
 
 import pytest
 from smolagents.models import get_clean_message_list, tool_role_conversions
@@ -368,3 +371,39 @@ def test_converse_end_to_end_and_the_oracle_reads_it():
     tools = [e.tool for e in trace.events if e.kind == "tool_call"]
     assert tools == ["lookup_order", "get_refund_policy"]
     assert communicated_decision(trace) == Decision.APPROVED
+
+
+# The Gradio UI opens the edition as it is, locally, and never shares it.
+
+STUDIO = Path(__file__).resolve().parents[1] / "studio" / "smolagents"
+
+
+class _FakeGradioUI:
+    """Stands in for smolagents.GradioUI, so no server starts and gradio is not needed."""
+
+    launched: list[dict] = []
+
+    def __init__(self, agent):
+        self.agent = agent
+
+    def launch(self, **kwargs):
+        _FakeGradioUI.launched.append({"agent": self.agent, **kwargs})
+
+
+@pytest.mark.parametrize("variant", [None, "d6"])
+def test_the_gradio_ui_opens_the_edition_locally_and_never_shares(monkeypatch, variant):
+    monkeypatch.setattr("smolagents.GradioUI", _FakeGradioUI)
+    monkeypatch.setenv("GRADIO_ANALYTICS_ENABLED", "True")
+    monkeypatch.setenv("LITELLM_LOCAL_MODEL_COST_MAP", "True")
+    if variant:
+        monkeypatch.setenv("VARIANT", variant)
+    else:
+        monkeypatch.delenv("VARIANT", raising=False)
+    _FakeGradioUI.launched.clear()
+    runpy.run_path(str(STUDIO / "app.py"), run_name="__main__")
+    assert os.environ["GRADIO_ANALYTICS_ENABLED"] == "False"
+    [launch] = _FakeGradioUI.launched
+    agent = launch.pop("agent")
+    assert launch == {"share": False, "server_name": "127.0.0.1", "server_port": 7860}
+    assert agent.instructions == system_prompt(MUTATIONS[variant or "baseline"])
+    assert agent.max_steps == step_limit(MUTATIONS[variant or "baseline"])
