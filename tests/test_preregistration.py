@@ -11,6 +11,7 @@ change in section 8 and paste the table this module prints:
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
 import re
 from dataclasses import fields, is_dataclass
@@ -21,6 +22,7 @@ from pathlib import Path
 from typing import Any
 
 from agentproof import models, retries
+from agentproof.adapters import langgraph as langgraph_adapter
 from agentproof.induction import INDUCTION_SYSTEM
 from agentproof.judge import JUDGE_RUBRIC
 from agentproof.report import MIN_DROP
@@ -31,7 +33,9 @@ from casestudy.domain.mutations import MUTATIONS
 from casestudy.domain.orders import DOMAIN_TODAY
 from casestudy.domain.policy_text import policy_text
 from casestudy.domain.prompt import system_prompt
+from casestudy.domain.tools import TOOL_DESCRIPTIONS
 from casestudy.editions import claude_sdk
+from casestudy.editions import langgraph as langgraph_edition
 from experiments.cards import CARDS
 from experiments.oracle.annotation import QUEUE_SEED
 from experiments.oracle.manifested import SENSITIVITY, THRESHOLD
@@ -41,6 +45,8 @@ PREREGISTRATION = ROOT / "docs" / "preregistro.md"
 ORACLE = ROOT / "src" / "experiments" / "oracle"
 SEEDS = ROOT / "corpus" / "seeds"
 SCENARIOS = ROOT / "corpus" / "scenarios"
+TOOLS = ("lookup_order", "get_refund_policy", "create_ticket")
+LANGGRAPH_PACKAGES = ("langgraph", "langchain-anthropic", "langchain-core")
 ROW = re.compile(r"^\| (.+?) \| `([0-9a-f]{16})` \|$")
 
 
@@ -88,6 +94,17 @@ def protocol() -> dict[str, str]:
             {
                 "tools": [claude_sdk._LOOKUP, claude_sdk._POLICY, claude_sdk._TICKET],
                 "step_limit": claude_sdk.STEP_LIMIT,
+            }
+        ),
+        "Herramientas, límites y versiones de la edición LangGraph": _digest(
+            {
+                "tools": [TOOL_DESCRIPTIONS[n] for n in TOOLS],
+                "step_limit": langgraph_edition.STEP_LIMIT,
+                "d6_step_limit": langgraph_edition.D6_STEP_LIMIT,
+                "max_tokens": langgraph_edition.MAX_TOKENS,
+                "request_timeout": langgraph_edition.REQUEST_TIMEOUT,
+                "recursion_limit": langgraph_adapter.RECURSION_LIMIT,
+                "versions": {p: importlib.metadata.version(p) for p in LANGGRAPH_PACKAGES},
             }
         ),
         "Mutaciones": _digest(MUTATIONS),
