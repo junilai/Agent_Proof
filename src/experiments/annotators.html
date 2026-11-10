@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Anotación AgentProof</title>
+<style>
+  :root { --ink:#1d2330; --muted:#5b6475; --line:#d9dde5; --bg:#f6f7f9; --accent:#1f5fbf; --ok:#2e7d4f; --warn:#b26a00; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); }
+  header { position:sticky; top:0; z-index:2; background:#fff; border-bottom:1px solid var(--line); padding:10px 20px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:16px; margin:0; }
+  .progress { flex:1; min-width:160px; height:8px; background:var(--line); border-radius:4px; overflow:hidden; }
+  .progress div { height:100%; background:var(--ok); transition:width .2s; }
+  main { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:20px; max-width:1240px; margin:20px auto; padding:0 20px; }
+  @media (max-width:900px){ main { grid-template-columns:1fr; } }
+  .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:16px 18px; margin-bottom:16px; }
+  .meta { color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:.04em; margin:8px 0 4px; }
+  .order { font-family:ui-monospace, Menlo, monospace; font-size:13px; background:var(--bg); padding:8px 10px; border-radius:6px; }
+  .msg { padding:10px 12px; border-radius:8px; margin:10px 0; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .USUARIO { background:#eef0f4; margin-right:15%; }
+  .AGENTE { background:#e8f0fc; margin-left:8%; border:1px solid #cddcf5; }
+  .HERRAMIENTA { background:#fbf6e9; margin-left:8%; font-family:ui-monospace, Menlo, monospace; font-size:12.5px; border:1px dashed #e2cf98; }
+  .ERROR { background:#fdecec; margin-left:8%; }
+  .who { font-size:12px; font-weight:600; color:var(--muted); display:block; margin-bottom:2px; font-family:-apple-system, "Segoe UI", sans-serif; }
+  .panel { position:sticky; top:70px; align-self:start; max-height:calc(100vh - 90px); overflow:auto; }
+  .section { border-top:1px solid var(--line); padding-top:10px; margin-top:6px; }
+  .section h2 { font-size:14px; margin:0 0 6px; }
+  .field { margin-bottom:14px; }
+  .q { display:block; font-weight:600; margin-bottom:4px; font-size:14px; }
+  .help { font-size:13px; color:var(--muted); margin-bottom:6px; }
+  .opts { display:flex; flex-wrap:wrap; gap:6px; }
+  .opts button { border:1px solid var(--line); background:#fff; padding:6px 10px; border-radius:6px; cursor:pointer; font:inherit; font-size:14px; }
+  .opts button:hover { border-color:var(--accent); }
+  .opts button.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+  textarea { width:100%; min-height:50px; font:inherit; font-size:14px; border:1px solid var(--line); border-radius:6px; padding:6px 8px; }
+  .nav { display:flex; gap:8px; margin-top:8px; }
+  .nav button, .tools button, .tools label { flex:1; padding:9px; border-radius:6px; border:1px solid var(--line); background:#fff; cursor:pointer; font:inherit; text-align:center; font-size:14px; }
+  .nav button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .grid { display:grid; grid-template-columns:repeat(10,1fr); gap:4px; margin-top:10px; }
+  .grid button { padding:4px 0; font-size:11px; border:1px solid var(--line); border-radius:4px; background:#fff; cursor:pointer; }
+  .grid button.done { background:#dff0e5; border-color:#a9d4b6; }
+  .grid button.cur { outline:2px solid var(--accent); }
+  .tools { display:flex; gap:8px; margin-top:10px; }
+  .status { font-size:13px; color:var(--muted); }
+  details summary { cursor:pointer; font-weight:600; }
+  details li, details p { font-size:14px; }
+  ol.criteria { padding-left:20px; margin:4px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title"></h1>
+  <div class="progress"><div id="bar"></div></div>
+  <span class="status" id="count"></span>
+</header>
+<main>
+  <section>
+    <details class="card" id="guide"><summary>Instrucciones</summary><div id="guideBody"></div></details>
+    <div class="card" id="context"></div>
+    <div class="card" id="transcript"></div>
+  </section>
+  <aside class="panel">
+    <div class="card">
+      <div class="meta" id="pos"></div>
+      <div id="fields"></div>
+      <div class="field">
+        <label class="q">Nota (opcional)</label>
+        <textarea id="note" placeholder="Si dudaste, por qué"></textarea>
+      </div>
+      <div class="nav"><button id="prev">← Anterior</button><button id="next" class="primary">Siguiente →</button></div>
+      <div class="nav"><button id="nextMissing">Ir al siguiente sin terminar</button></div>
+      <div class="grid" id="grid"></div>
+      <div class="tools">
+        <button id="export">Descargar etiquetas</button>
+        <label>Cargar archivo<input type="file" id="import" accept=".json" hidden></label>
+      </div>
+      <p class="status">Se guarda solo en este navegador mientras avanza. Al terminar, descargue el archivo y envíelo de vuelta.</p>
+    </div>
+  </aside>
+</main>
+<script>
+const DATA = __DATA__;
+const KEY = `agentproof-f6-${DATA.annotator}-sesion-${DATA.session}`;
+const DECISIONS = ["procede", "no procede", "escalamiento", "sin resolver", "ninguna"];
+const FACTS = {
+  decision: ["¿Qué decisión sobre el reembolso comunicó el agente?", DECISIONS.map(d => [d, d])],
+  contradicts_base: ["¿Dio algún importe, fecha o estado del pedido que contradice el «Pedido en la base»?", [[true, "Sí"], [false, "No"]]],
+  answers_card: ["¿Le dio al cliente el estado del pedido?", [[true, "Sí"], [false, "No"]]],
+};
+let labels = JSON.parse(localStorage.getItem(KEY) || "{}");
+let cur = 0;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const fmt = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+const save = () => localStorage.setItem(KEY, JSON.stringify(labels));
+const one = DATA.session === 1;
+
+function needed(item) {
+  if (!one) return ["likert", "correction"];
+  return [...item.facts, ...item.criteria.map((_, i) => `criterion_${i + 1}`)];
+}
+const filled = (item, f) => labels[item.item] && labels[item.item][f] !== undefined && labels[item.item][f] !== null;
+const done = item => needed(item).every(f => filled(item, f));
+
+$("title").textContent = `Anotador ${DATA.annotator} · Sesión ${DATA.session}`;
+$("guideBody").innerHTML = one ? `
+  <p>Cada caso es una conversación entre un cliente y un agente de atención al cliente de una tienda. Algunos casos piden <b>los criterios</b>, otros <b>los hechos</b> y otros ambos. Responda solo lo que aparece a la derecha.</p>
+  <p><b>Criterios.</b> La misma rúbrica que se le dio al evaluador automático:</p>
+  <ul>${DATA.rubric.map(l => `<li>${esc(l.replace(/^- /, ""))}</li>`).join("")}</ul>
+  <p><b>Hechos.</b> Anote lo que el agente <b>comunicó</b>, aunque esté equivocado. Si varios mensajes enuncian una decisión, cuenta la del <b>último que la enuncia</b>; una despedida o un mensaje sin decisión no la reemplaza. Escalamiento es dejar la decisión del reembolso en manos de otro: un supervisor, el umbral de $500 o un reclamo de garantía; un ticket por otro asunto (logística, activación, soporte técnico) no es escalamiento. «Ninguna»: no comunicó ninguna decisión. «Sin resolver»: el último mensaje con decisión es ambiguo o contradictorio. Para la contradicción con la base solo cuentan el importe, las fechas y el estado del pedido, no las cifras de la política.</p>
+  <p><b>La política verdadera de la tienda</b>, contra la que se comparan los hechos:</p>
+  ${DATA.policy.map(l => `<p>${esc(l)}</p>`).join("")}
+  <p>No consulte ninguna otra fuente sobre estas conversaciones.</p>` : `
+  <p>Cada caso es una conversación entre una persona y el agente (la <b>conversación semilla</b>) y el <b>escenario</b> que se generó automáticamente a partir de ella para reproducirla: el objetivo del cliente, su primer mensaje y los criterios de éxito.</p>
+  <p>Califique cuán fiel es el escenario a la conversación, de 1 a 5:</p>
+  <ul>${Object.entries(DATA.likert).map(([k, v]) => `<li><b>${k}</b>: ${esc(v)}</li>`).join("")}</ul>
+  <p>2 y 4 son puntos intermedios. Además, indique si el escenario requeriría corrección antes de usarlo.</p>
+  <p>No consulte ninguna otra fuente sobre estas conversaciones.</p>`;
+$("guide").open = true;
+
+function set(field, value) {
+  const it = DATA.items[cur];
+  labels[it.item] = labels[it.item] || {};
+  labels[it.item][field] = labels[it.item][field] === value ? null : value;
+  save(); render();
+}
+
+function buttons(field, options, value) {
+  return `<div class="opts">${options.map(([v, t], i) =>
+    `<button data-f="${field}" data-v='${JSON.stringify(v)}' class="${value === v ? "on" : ""}">${esc(t)}</button>`).join("")}</div>`;
+}
+
+function render() {
+  const it = DATA.items[cur], l = labels[it.item] || {};
+  $("pos").textContent = `Caso ${it.item} · ${cur + 1} de ${DATA.items.length}`;
+  if (one) {
+    $("context").innerHTML = it.facts.length
+      ? `<div class="meta">Situación</div><div>${esc(it.situation)}</div><div class="meta">Pedido en la base</div><div class="order">${esc(it.order)}</div>`
+      : `<div class="status">Este caso solo pide los criterios.</div>`;
+  } else {
+    $("context").innerHTML = `<div class="meta">Escenario: objetivo del cliente</div><div>${esc(it.goal)}</div>
+      <div class="meta">Primer mensaje del cliente simulado</div><div>${esc(it.opening)}</div>
+      <div class="meta">Criterios de éxito</div><ol class="criteria">${it.criteria.map(c => `<li>${esc(c)}</li>`).join("")}</ol>`;
+  }
+  $("transcript").innerHTML = `<div class="meta">${one ? "Transcripción" : "Conversación semilla"}</div>` + it.messages.map(m =>
+    `<div class="msg ${m.who}"><span class="who">${{USUARIO: "Cliente", AGENTE: "Agente", HERRAMIENTA: "Herramienta", ERROR: "Error"}[m.who] || m.who}</span>${fmt(m.text)}</div>`).join("");
+  let html = "";
+  if (one) {
+    if (it.facts.length) {
+      html += `<div class="section"><h2>Hechos</h2>` + it.facts.map(f =>
+        `<div class="field"><label class="q">${FACTS[f][0]}</label>${buttons(f, FACTS[f][1], l[f])}</div>`).join("") + `</div>`;
+    }
+    if (it.criteria.length) {
+      html += `<div class="section"><h2>Criterios: ¿se cumple?</h2>` + it.criteria.map((c, i) =>
+        `<div class="field"><label class="q">${i + 1}. ${esc(c)}</label>${buttons(`criterion_${i + 1}`, [[true, "Se cumple"], [false, "No se cumple"]], l[`criterion_${i + 1}`])}</div>`).join("") + `</div>`;
+    }
+  } else {
+    html += `<div class="section"><h2>Fidelidad del escenario</h2>
+      <div class="field"><label class="q">Calificación de 1 a 5</label>${buttons("likert", [1,2,3,4,5].map(n => [n, String(n)]), l.likert)}</div>
+      <div class="field"><label class="q">¿Requeriría corrección antes de usarlo?</label>${buttons("correction", [[true, "Sí"], [false, "No"]], l.correction)}</div></div>`;
+  }
+  $("fields").innerHTML = html;
+  document.querySelectorAll("#fields .opts button").forEach(b => b.onclick = () => set(b.dataset.f, JSON.parse(b.dataset.v)));
+  $("note").value = l.nota || "";
+  const n = DATA.items.filter(done).length;
+  $("count").textContent = `Completos: ${n} de ${DATA.items.length}`;
+  $("bar").style.width = (100 * n / DATA.items.length) + "%";
+  $("grid").innerHTML = DATA.items.map((x, i) =>
+    `<button data-i="${i}" class="${done(x) ? "done" : ""} ${i === cur ? "cur" : ""}">${x.item.slice(1)}</button>`).join("");
+  document.querySelectorAll("#grid button").forEach(b => b.onclick = () => go(+b.dataset.i));
+}
+
+function go(i) { cur = Math.max(0, Math.min(DATA.items.length - 1, i)); render(); window.scrollTo(0, 0); }
+$("prev").onclick = () => go(cur - 1);
+$("next").onclick = () => go(cur + 1);
+$("nextMissing").onclick = () => {
+  for (let k = 1; k <= DATA.items.length; k++) {
+    const i = (cur + k) % DATA.items.length;
+    if (!done(DATA.items[i])) return go(i);
+  }
+  alert("Todos los casos están completos.");
+};
+$("note").oninput = e => {
+  const it = DATA.items[cur];
+  labels[it.item] = labels[it.item] || {};
+  labels[it.item].nota = e.target.value; save();
+};
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight") go(cur + 1);
+  if (e.key === "ArrowLeft") go(cur - 1);
+});
+
+$("export").onclick = () => {
+  const missing = DATA.items.filter(x => !done(x)).map(x => x.item);
+  if (missing.length && !confirm(`Faltan ${missing.length} casos (${missing.slice(0, 8).join(", ")}${missing.length > 8 ? "…" : ""}). ¿Descargar igual?`)) return;
+  const out = DATA.items.map(x => {
+    const l = labels[x.item] || {};
+    const row = { item: x.item };
+    if (one) {
+      ["decision", "contradicts_base", "answers_card"].forEach(f => { row[f] = x.facts.includes(f) ? (l[f] ?? null) : null; });
+      row.criteria = x.criteria.map((_, i) => l[`criterion_${i + 1}`] ?? null);
+    } else {
+      row.likert = l.likert ?? null;
+      row.correction = l.correction ?? null;
+    }
+    if (l.nota) row.nota = l.nota;
+    return row;
+  });
+  const blob = new Blob([JSON.stringify({ annotator: DATA.annotator, session: DATA.session, labels: out }, null, 2) + "\n"], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `etiquetas-${DATA.annotator}-sesion-${DATA.session}.json`;
+  a.click();
+};
+$("import").onchange = async e => {
+  const file = JSON.parse(await e.target.files[0].text());
+  file.labels.forEach(r => {
+    const l = {};
+    ["decision", "contradicts_base", "answers_card", "likert", "correction", "nota"].forEach(f => { if (r[f] !== undefined && r[f] !== null) l[f] = r[f]; });
+    (r.criteria || []).forEach((v, i) => { if (v !== null) l[`criterion_${i + 1}`] = v; });
+    labels[r.item] = l;
+  });
+  save(); render();
+};
+render();
+</script>
+</body>
+</html>
