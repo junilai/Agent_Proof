@@ -433,7 +433,7 @@ La planificación (§5.5) y el pre-registro (§6) dicen que, dentro de cada estr
 ## D-012 · Equivalencias entre las ediciones del agente
 
 - **Fecha:** 8 de noviembre de 2026
-- **Estado:** decidida e implementada para LangGraph; CrewAI y smolagents se agregan al construir sus ediciones
+- **Estado:** decidida e implementada para LangGraph y smolagents; CrewAI se agrega al construir su edición
 - **Origen:** F4, portabilidad (§5.7, §5.8)
 
 ### El problema
@@ -480,6 +480,35 @@ Cada framework tiene su propia idea de paso, de memoria y de parámetros del mod
 - **Petición al modelo.** Esta edición envía solo el prompt del dominio, las tres herramientas y los parámetros de la tabla. El SDK arma su petición dentro de su CLI, que no se inspeccionó, así que no se puede afirmar que sea idéntica.
 
 Ninguna de estas diferencias cambia la definición de las mutaciones, que se comprueba con la prueba de paridad de las dos ediciones. La versión de cada paquete queda en el lockfile. La enmienda 2 del pre-registro congela antes de E4 las herramientas, los límites, `MAX_TOKENS` y las versiones de esta edición.
+
+### smolagents
+
+**Agente y límite de pasos.** La edición (`casestudy/editions/smolagents.py`) es un `ToolCallingAgent`, el agente de smolagents que llama herramientas de forma nativa. Un paso es una llamada al modelo. La línea base tiene 10 (`max_steps`), D6 usa un límite propio, que se calibra como en D-003, y el contador vuelve a cero en cada turno del cliente.
+
+- Al agotar `max_steps`, smolagents hace **una llamada más**, sin herramientas y sin el prompt del dominio, que obliga al modelo a responder. Esa respuesta es la que recibe el cliente, cuenta como comunicada y el turno queda como `step_limit`. El turno siguiente no la ve en el historial.
+- Es distinto del SDK y de LangGraph, que cortan sin responder. Por eso el comportamiento de D6 puede no ser el mismo con el mismo número, y la sonda lo mide.
+
+**Respuesta y prompt.** smolagents no deja que el modelo responda con texto: cada respuesta al cliente pasa por su herramienta interna `final_answer`, y el modelo está obligado a llamar alguna herramienta en cada paso (`tool_choice: any`). El adaptador toma `final_answer` como la respuesta y nunca la registra como llamada del dominio. El prompt del dominio va, sin cambios, en el lugar nativo (`instructions`), pero dentro del prompt de smolagents en inglés, que describe ese formato. Es el uso nativo del framework y no se reescribe.
+
+**Memoria.** La del propio agente, con `run(mensaje, reset=False)` en cada turno y un agente nuevo por conversación. smolagents le devuelve al modelo las llamadas y sus resultados como texto, no como bloques nativos de herramienta, y presenta cada turno del cliente como una tarea nueva.
+
+**Herramientas.** Las tres del dominio, como subclases de `Tool`, con las mismas descripciones. smolagents exige una descripción por argumento; se deja vacía, porque las otras ediciones no la tienen. Una herramienta que falla no corta el turno: el modelo recibe el error. Si el modelo pide en una misma respuesta `final_answer` y otra herramienta, o varias herramientas y una falla, smolagents ejecuta las demás pero el modelo no ve sus resultados. El adaptador las registra igual, en orden, y marca como error las de un paso fallido; un ticket podría crearse dos veces, y eso queda en la traza.
+
+**Modelo.** `LiteLLMModel` con el modelo de la variante, porque smolagents no tiene una integración propia de Anthropic. Los parámetros son los de LangGraph, salvo los reintentos:
+
+| Parámetro | Valor |
+|---|---|
+| Tokens máximos de salida | 32 000 |
+| Razonamiento extendido | desactivado |
+| Temperatura | la del modelo por omisión |
+| Tiempo máximo por llamada | 600 s |
+| Reintentos | los de smolagents: solo ante el límite de tasa de la API |
+
+La planificación de smolagents y la salida en streaming quedan desactivadas, como vienen por omisión, así que no hay llamadas al modelo fuera de los pasos y la respuesta forzada. No hay caché de prompts, y el costo se calcula con la tabla de precios y el modelo pedido, sumando todos los pasos del turno, incluida la respuesta forzada.
+
+**Lo que agrega el adaptador.** La negativa a correr si litellm saldría a un servicio externo: sin `LITELLM_LOCAL_MODEL_COST_MAP=True` descarga al importarse su tabla de costos desde GitHub; tampoco corre con callbacks de litellm a otros servicios ni con la instrumentación OpenTelemetry de smolagents cargada.
+
+**Interfaz.** La edición se abre en la interfaz de Gradio de smolagents (`studio/smolagents/`), solo en `127.0.0.1`, con el enlace público (`share`) forzado a desactivado y la analítica de Gradio apagada. smolagents no está en E4 ni en la huella del pre-registro: su corrida de punta a punta demuestra la portabilidad.
 
 ## D-016 · Análisis de los desacuerdos entre el oráculo y AgentProof
 
