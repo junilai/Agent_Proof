@@ -1,10 +1,13 @@
 """Incorporation cost of each framework (spec F4, §8; counting rule D-014)."""
 
+import csv
+import io
 import subprocess
 from pathlib import Path
 from textwrap import dedent
 
 import pytest
+from typer.testing import CliRunner
 
 from experiments.portability import (
     FRAMEWORKS,
@@ -12,10 +15,14 @@ from experiments.portability import (
     HistoryUnavailable,
     Mentions,
     PullRequest,
+    Row,
+    app,
     core_files,
     logical_lines,
     measure,
     physical_lines,
+    render_csv,
+    render_markdown,
     studio_lines,
 )
 
@@ -241,6 +248,69 @@ def test_measuring_this_repository_gives_one_row_per_framework():
     rows = measure()
     assert [row.name for row in rows] == [f.name for f in FRAMEWORKS]
     assert all(row.adapter > 0 and row.edition > 0 and row.tests > 0 for row in rows)
+
+
+ROWS = [
+    Row("Claude Agent SDK", 120, 50, 140, 160, None, None, None),
+    Row("LangGraph", 130, 80, 400, 50, [], None, 15),
+    Row("CrewAI", 150, 70, 500, 0, ["src/agentproof/cost.py"], None, 40),
+    Row("smolagents", 140, 60, 450, 0, None, "clon superficial: falta la historia", 20),
+]
+
+
+def test_the_markdown_table_marks_the_reference_and_what_could_not_be_measured():
+    table = render_markdown(ROWS)
+    lines = table.splitlines()
+    assert lines[0].startswith("| Framework | Adaptador | Edición | Pruebas |")
+    assert lines[2] == "| Claude Agent SDK (referencia) | 120 | 50 | 140 | 160 | — | — |"
+    assert lines[3] == "| LangGraph | 130 | 80 | 400 | 50 | 0 | 15 |"
+    assert lines[4] == "| CrewAI | 150 | 70 | 500 | 0 | 1 (`cost.py`) | 40 |"
+    assert lines[5] == "| smolagents | 140 | 60 | 450 | 0 | n/d | 20 |"
+    assert "n/d (smolagents): clon superficial: falta la historia" in table
+
+
+def test_the_csv_has_one_row_per_framework_and_the_core_files_by_name():
+    rows = list(csv.DictReader(io.StringIO(render_csv(ROWS))))
+    assert [row["framework"] for row in rows] == [row.name for row in ROWS]
+    assert rows[0]["nucleo"] == "—" and rows[3]["nucleo"] == "n/d"
+    assert rows[2]["nucleo"] == "1" and rows[2]["nucleo_archivos"] == "src/agentproof/cost.py"
+    assert rows[1]["interfaz"] == "15" and rows[0]["interfaz"] == "—"
+
+
+def table_rows(output):
+    lines = [line for line in output.splitlines() if line.startswith("| ")][1:]
+    return {
+        cells[0]: cells[1:]
+        for cells in ([c.strip() for c in line.split("|")[1:-1]] for line in lines)
+    }
+
+
+def test_the_command_measures_the_four_frameworks_of_this_repository():
+    result = CliRunner().invoke(app, [])
+    assert result.exit_code == 0, result.output
+    rows = table_rows(result.output)
+    assert list(rows) == [
+        "Claude Agent SDK (referencia)",
+        "LangGraph",
+        "CrewAI",
+        "smolagents",
+    ]
+    for cells in rows.values():
+        adapter, edition, tests = (int(cell) for cell in cells[:3])
+        assert 50 < adapter < 500 and 20 < edition < 300 and tests > adapter
+    assert rows["Claude Agent SDK (referencia)"][4] == "—"
+    shallow = "clon superficial" in result.output
+    for name in ("LangGraph", "CrewAI", "smolagents"):
+        core, studio = rows[name][4:]
+        assert int(studio) > 0
+        assert core == "n/d" if shallow else core.split()[0].isdigit()
+
+
+def test_the_command_can_emit_csv():
+    result = CliRunner().invoke(app, ["--csv"])
+    assert result.exit_code == 0, result.output
+    rows = list(csv.DictReader(io.StringIO(result.output)))
+    assert len(rows) == 4 and all(int(row["adaptador"]) > 0 for row in rows)
 
 
 def test_the_repository_root_is_the_one_holding_the_package():

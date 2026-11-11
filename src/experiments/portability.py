@@ -15,12 +15,15 @@ string) do not count. Any other string counts, whatever its length.
 from __future__ import annotations
 
 import ast
+import csv
 import io
 import subprocess
 import tokenize
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
+
+import typer
 
 NON_CODE = {
     tokenize.COMMENT,
@@ -288,3 +291,76 @@ def measure(repo: Path = REPO) -> list[Row]:
             )
         )
     return rows
+
+
+def _core_count(row: Row) -> str:
+    if row.core is None:
+        return UNAVAILABLE if row.unavailable else NOT_APPLICABLE
+    return str(len(row.core))
+
+
+def _studio(row: Row) -> str:
+    return NOT_APPLICABLE if row.studio is None else str(row.studio)
+
+
+HEADER = (
+    "Framework",
+    "Adaptador",
+    "Edición",
+    "Pruebas",
+    "Pruebas en vivo",
+    "Archivos del núcleo modificados",
+    "Interfaz local (studio/)",
+)
+
+
+def render_markdown(rows: list[Row]) -> str:
+    lines = ["| " + " | ".join(HEADER) + " |", "|---|" + "---:|" * (len(HEADER) - 1)]
+    for index, row in enumerate(rows):
+        name = f"{row.name} (referencia)" if index == 0 else row.name
+        core = _core_count(row)
+        if row.core:
+            core += " (" + ", ".join(f"`{Path(f).name}`" for f in row.core) + ")"
+        cells = (name, row.adapter, row.edition, row.tests, row.live_tests, core, _studio(row))
+        lines.append("| " + " | ".join(str(cell) for cell in cells) + " |")
+    notes = [f"{UNAVAILABLE} ({row.name}): {row.unavailable}" for row in rows if row.unavailable]
+    return "\n".join(lines + ([""] + notes if notes else []))
+
+
+def render_csv(rows: list[Row]) -> str:
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\n")
+    writer.writerow(
+        (
+            "framework",
+            "adaptador",
+            "edicion",
+            "pruebas",
+            "pruebas_en_vivo",
+            "nucleo",
+            "nucleo_archivos",
+            "interfaz",
+        )
+    )
+    for row in rows:
+        files = " ".join(row.core or [])
+        writer.writerow(
+            (row.name, row.adapter, row.edition, row.tests, row.live_tests)
+            + (_core_count(row), files, _studio(row))
+        )
+    return out.getvalue()
+
+
+app = typer.Typer(help="Costo de incorporación de cada framework.", no_args_is_help=False)
+CSV = typer.Option(False, "--csv", help="CSV en lugar de la tabla en Markdown.")
+
+
+@app.command()
+def main(as_csv: bool = CSV):
+    """Imprime líneas de código, pruebas, archivos del núcleo e interfaz por framework."""
+    rows = measure()
+    typer.echo(render_csv(rows) if as_csv else render_markdown(rows), nl=not as_csv)
+
+
+if __name__ == "__main__":
+    app()
