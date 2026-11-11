@@ -92,6 +92,8 @@ Con 2, el agente consulta el pedido y la política en paralelo en el primer paso
 
 La tabla es la misma que en Claude Agent SDK, y por la misma razón: el agente pide el pedido y la política en paralelo en la primera llamada. Con 2, en el caso de garantía el agente explica la situación y pide el ticket en la misma llamada. El ticket se crea, pero el agente se queda sin pasos para comunicar su número, igual que en los cortes de D6 de E1. En esta edición D6 también usa un límite de 2. La sonda costó USD 0.083, y las pruebas en vivo de la edición, que pasaron las 8, USD 0.062, según la herramienta. La consola de Anthropic marcó USD 0.15 ese día UTC, sin otro gasto, así que sin caché de prompts la tabla de precios coincide con lo facturado.
 
+**Adenda, smolagents (11 de noviembre de 2026).** La misma sonda con la edición smolagents (D-012), con los mismos tres casos y un turno por celda, da la misma tabla: con 2 se completan los casos de una y dos llamadas y se trunca el de tres; con 3 y 4 se completan todos. Un paso es una llamada al modelo, y la respuesta pasa por `final_answer`, que cuenta como una llamada más. D6 usa un límite de 2. La diferencia está en lo que ve el cliente: al agotar los pasos, smolagents fuerza una respuesta, y en el caso de garantía el agente le comunicó el número del ticket que ya había creado. En esta edición, el corte de D6 no deja el ticket sin comunicar, como sí ocurrió en E1. La sonda costó USD 0.154 según la herramienta, conciliado con la consola del 11 de noviembre (UTC) junto con E4 ([`docs/e4.md`](e4.md) en la rama de E4). Las respuestas completas están en `evidence/sondas-d6/smolagents.json`.
+
 ## D-004 · Política corrupta de D4
 
 - **Fecha:** 13 de octubre de 2026
