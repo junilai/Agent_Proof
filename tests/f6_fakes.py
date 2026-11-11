@@ -111,3 +111,46 @@ def like_the_judge(inverted: frozenset[str] = frozenset(), **facts) -> Fill:
         return row
 
     return fill
+
+
+def trace_of(key: str):
+    run_id, trace_id = key.split("/")
+    return next(t for t in store().run_traces(run_id) if t.trace_id == trace_id)
+
+
+@cache
+def oracle_reading(key: str) -> dict:
+    """What the installed oracle's rules read in a trace, as an annotator would write it."""
+    from casestudy.domain.catalog import ORDERS_BY_ID
+    from experiments.oracle.annotation import seed_and_card
+    from experiments.oracle.attributes import attribute_discrepancies, states_status
+    from experiments.oracle.outcome import communicated_decision
+    from experiments.validation import _as_label
+
+    trace = trace_of(key)
+    seeds = {s.trace_id: s for s in store().seeds()}
+    _, card = seed_and_card(seeds, trace.scenario_id or "")
+    order = ORDERS_BY_ID[card.orders[0]] if card.orders else None
+    return {
+        "decision": _as_label(communicated_decision(trace)),
+        "contradicts_base": bool(order and attribute_discrepancies(trace, order)),
+        "answers_card": bool(order and states_status(trace, order)),
+    }
+
+
+def like_the_oracle(decisions: dict[str, str] | None = None, **overrides) -> Fill:
+    """The oracle's reading of every asked fact and the judge's criteria.
+
+    ``decisions`` gives an annotator a fixed decision; ``overrides`` maps an annotator
+    to fields it always answers the same way.
+    """
+    criteria = like_the_judge()
+
+    def fill(annotator: str, key: str, spec: dict) -> dict:
+        row = criteria(annotator, key, spec)
+        read = oracle_reading(key) | overrides.get(annotator, {})
+        if decisions and annotator in decisions:
+            read = read | {"decision": decisions[annotator]}
+        return row | {name: read[name] for name in spec["facts"]}
+
+    return fill
