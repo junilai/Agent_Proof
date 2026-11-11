@@ -26,11 +26,17 @@ from experiments.f6.agreement import fleiss_kappa, majority
 from experiments.f6.e2 import pairwise
 from experiments.f6.labels import FACTS, TraceLabel
 from experiments.oracle.annotation import Case, seed_and_card
+from experiments.oracle.predicates import OPERATORS_WITH_PREDICATE
 from experiments.validation import Label, tally
 
 SAMPLE = ("results", "samples", "auditoria.json")
 STRATA = ("con ticket", "sin ticket")
-GROUPS = ("decisión", "atributos", "estado", "predicados")
+GROUPS = (
+    "decisión",
+    "atributos",
+    "estado",
+    *(f"predicado {op}" for op in OPERATORS_WITH_PREDICATE),
+)
 
 Table = dict[str, dict[str, int]]
 
@@ -118,6 +124,9 @@ def _score(
 def _table(outcomes: list[tuple[str, str]]) -> Table:
     table: Table = {group: {} for group in GROUPS}
     for (group, key), n in sorted(Counter(outcomes).items()):
+        if group == "predicados":  # each operator apart: "d1 coincide" -> "predicado d1"
+            op, key = key.split(" ", 1)
+            group = f"predicado {op}"
         table[group][key] = n
     return table
 

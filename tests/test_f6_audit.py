@@ -25,7 +25,8 @@ def test_annotators_who_read_like_the_oracle_find_no_error(tmp_path):
     for group, bad in (("decisión", "al revés"), ("atributos", "FP"), ("atributos", "FN")):
         assert total(result, group, bad) == 0
     assert set(result.overall["decisión"]) <= {"exacta"}
-    assert not any(k.endswith("difiere") for k in result.overall["predicados"])
+    for op in ("d1", "d2", "d4", "d5", "d6"):
+        assert "difiere" not in result.overall[f"predicado {op}"]
     assert result.without_majority == []
 
 
@@ -84,3 +85,16 @@ def test_weighted_proportions_mix_the_strata_by_their_share():
 
 def test_a_group_missing_in_one_stratum_has_no_weighted_proportion():
     assert weighted({"estado": {"coincide": 2}}, {}, 0.5)["estado"] == {"coincide": None}
+
+
+def test_each_predicate_is_weighted_within_its_own_operator(tmp_path):
+    result = analysed(tmp_path, like_the_oracle())
+    assert "predicados" not in result.overall
+    in_both = [
+        op
+        for op in ("d1", "d2", "d4", "d5", "d6")
+        if all(s.table[f"predicado {op}"] for s in result.strata.values())
+    ]
+    assert in_both
+    for op in in_both:
+        assert sum(result.weighted[f"predicado {op}"].values()) == pytest.approx(1), op
