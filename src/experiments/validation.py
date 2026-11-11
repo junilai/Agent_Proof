@@ -192,43 +192,47 @@ def decision_outcome(label: str, found: str) -> str:
     return "a la cola" if found == "sin resolver" else "omitida"
 
 
+def tally(case: Case, label: Label) -> list[tuple[str, str]]:
+    """The oracle against one labelled case: a (group, outcome) for each thing it reads."""
+    trace, card = case.trace, case.card
+    found = []
+    if card.has_decision:
+        oracle = _as_label(communicated_decision(trace))
+        found.append(("decisión", decision_outcome(label.decision or "ninguna", oracle)))
+    if card.orders:
+        said = bool(attribute_discrepancies(trace, ORDERS_BY_ID[card.orders[0]]))
+        truth = {(True, True): "VP", (True, False): "FP", (False, True): "FN"}
+        found.append(("atributos", truth.get((said, bool(label.contradicts_base)), "VN")))
+        if asks_for_status(card):
+            agrees = states_status(trace, ORDERS_BY_ID[card.orders[0]]) == label.answers_card
+            found.append(("estado", "coincide" if agrees else "difiere"))
+    annotated = Evidence(
+        _as_extracted(label.decision),
+        bool(label.contradicts_base),
+        label.answers_card,
+        manual=True,
+    )
+    for op in operators_for(trace.condition or ""):
+        if is_exposed(op, card, case.seed):
+            oracle, truth_value = fails(op, card, trace), fails(op, card, trace, annotated)
+            key = (
+                "a la cola"
+                if oracle is None
+                else "coincide"
+                if oracle == truth_value
+                else "difiere"
+            )
+            found.append(("predicados", f"{op} {key}"))
+    return found
+
+
 def score(store: Store, labels: dict[str, Label]) -> dict[str, dict[str, int]]:
     """The oracle against the reconciled labels (D-010)."""
     table: dict[str, dict[str, int]] = {"decisión": {}, "atributos": {}, "estado": {}}
     table["predicados"] = {}
-
-    def count(group: str, key: str) -> None:
-        table[group][key] = table[group].get(key, 0) + 1
-
     for item, case in items(store).items():
-        label, trace, card = labels[item], case.trace, case.card
-        if card.has_decision:
-            found = _as_label(communicated_decision(trace))
-            count("decisión", decision_outcome(label.decision or "ninguna", found))
-        if card.orders:
-            said = bool(attribute_discrepancies(trace, ORDERS_BY_ID[card.orders[0]]))
-            truth = {(True, True): "VP", (True, False): "FP", (False, True): "FN"}
-            count("atributos", truth.get((said, bool(label.contradicts_base)), "VN"))
-            if asks_for_status(card):
-                agrees = states_status(trace, ORDERS_BY_ID[card.orders[0]]) == label.answers_card
-                count("estado", "coincide" if agrees else "difiere")
-        annotated = Evidence(
-            _as_extracted(label.decision),
-            bool(label.contradicts_base),
-            label.answers_card,
-            manual=True,
-        )
-        for op in operators_for(trace.condition or ""):
-            if is_exposed(op, card, case.seed):
-                oracle, truth_value = fails(op, card, trace), fails(op, card, trace, annotated)
-                key = (
-                    "a la cola"
-                    if oracle is None
-                    else "coincide"
-                    if oracle == truth_value
-                    else "difiere"
-                )
-                count("predicados", f"{op} {key}")
+        for group, key in tally(case, labels[item]):
+            table[group][key] = table[group].get(key, 0) + 1
     return table
 
 
