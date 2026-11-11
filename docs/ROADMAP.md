@@ -71,14 +71,16 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 ## F4 Portabilidad — objetivo: 26 oct – 8 nov
 
 - [x] Edición LangGraph con el bucle sobre `StateGraph` y su adaptador (§5.7). Evidencia: [D-012](decisiones.md), `src/casestudy/editions/langgraph.py`, `src/agentproof/adapters/langgraph.py` y [`studio/langgraph/`](../studio/langgraph/) para abrirla en LangGraph Studio, 8–10-nov-2026
-- [ ] Edición CrewAI y su adaptador, con una corrida de punta a punta (§5.7)
-- [ ] Edición smolagents y su adaptador, con una corrida de punta a punta (§5.7)
+- [ ] Edición CrewAI y su adaptador, con una corrida de punta a punta (§5.7). Hecho: [D-013](decisiones.md), `src/casestudy/editions/crewai.py`, `src/agentproof/adapters/crewai.py` y la consola mínima de [`studio/crewai/`](../studio/crewai/), 10–11-nov-2026. Falta la corrida de punta a punta
+- [x] Edición smolagents y su adaptador, con una corrida de punta a punta (§5.7). Evidencia: [D-012](decisiones.md), `src/casestudy/editions/smolagents.py`, `src/agentproof/adapters/smolagents.py`, [`studio/smolagents/`](../studio/smolagents/) para abrirla en Gradio y `evidence/punta-a-punta-smolagents/`, 11-nov-2026: 20 conversaciones y 20 juicios sin reintentos; D4 aprueba los reembolsos que la política verdadera niega en tc-06 y tc-15
 - [ ] En cada framework, el adaptador traduce el corte por límite de pasos a `step_limit`; si no, D6 nunca se manifiesta. Se recalibran D6 ([D-003](decisiones.md)) y las reglas del oráculo, con respuestas de los agentes degradados de ese framework, como en [D-005](decisiones.md)
   - [x] LangGraph: D6 queda en 2 (adenda de D-003); la calibración del oráculo encontró dos reglas, corregidas con doble anotación ciega (adenda de D-005); piloto en [`docs/piloto-langgraph.md`](piloto-langgraph.md); **enmienda 2, `preregistro-v3`**, 10-nov-2026
-- [ ] Medición del costo de incorporación por adaptador (§5.7)
-- [ ] Mapeo del esquema a las convenciones GenAI de OpenTelemetry (§5)
+  - [x] smolagents: D6 queda en 2 (adenda de D-003), pero la respuesta forzada comunica el número del ticket, 11-nov-2026. No está en E4, así que no lleva calibración del oráculo
+  - [ ] CrewAI: sonda de D6
+- [x] Medición del costo de incorporación por adaptador (§5.7). Evidencia: [D-014](decisiones.md) y `python -m experiments.portability`, 11-nov-2026: ningún framework modificó el núcleo; adaptadores de 130 a 150 líneas, frente a las 124 del de Claude Agent SDK
+- [x] Mapeo del esquema a las convenciones GenAI de OpenTelemetry (§5). Evidencia: [D-015](decisiones.md), [`docs/otel.md`](otel.md) y `src/agentproof/otel.py`, 11-nov-2026, sobre el commit `e6658f14` de las convenciones
 - [ ] *(opcional)* Edición sin framework y su adaptador
-- [ ] **Hito:** E4 ejecutable y tabla de costo de incorporación
+- [x] **Hito:** E4 ejecutable y tabla de costo de incorporación. E4 se ejecutó el 11-nov-2026 (rama `f5-e4`)
 
 ## F5 E1 y E4 — objetivo: noviembre
 
@@ -113,7 +115,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
   - [x] Borrador del capítulo, con sus seis secciones y las referencias de Benjamini-Hochberg, Fleiss y Hayes-Krippendorff verificadas en Crossref
   - [x] Cifras del corpus y conjuntos expuestos, al cerrar el corpus
 - [ ] T3 Desarrollo del prototipo — nov
-  - [x] Borrador del capítulo, adelantado para el segundo entregable del 25 de octubre: organización del código, núcleo, agente del caso de estudio, operadores de mutación, oráculo y pruebas. Falta la portabilidad, al cerrar F4
+  - [x] Borrador del capítulo, adelantado para el segundo entregable del 25 de octubre: organización del código, núcleo, agente del caso de estudio, operadores de mutación, oráculo y pruebas. La sección de portabilidad, con dos capturas de LangGraph Studio, y el anexo de OpenTelemetry se escribieron el 11-nov-2026; falta el resultado de CrewAI
 - [ ] T4 Resultados y conclusiones; al final, introducción, resumen y abstract — nov – dic
   - [x] Borrador de la introducción, adelantado para el primer entregable del 27 de septiembre
   - [x] Resultados preliminares de E1, para el segundo entregable: ejecución, detección por operador y lectura, sujetos a la auditoría del oráculo y a E2
