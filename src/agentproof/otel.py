@@ -6,6 +6,8 @@ the OpenTelemetry SDK. Attribute names follow the GenAI semantic conventions
 at the pinned commit below; whatever has no standard attribute goes under the
 ``agentproof.`` prefix. Ids derive from the trace id, so the output is
 reproducible.
+
+Usage: ``python -m agentproof.otel <trace.json>`` prints the OTLP/JSON document.
 """
 
 from __future__ import annotations
@@ -13,6 +15,8 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sys
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -277,3 +281,15 @@ def trace_to_otlp(trace: Trace) -> dict[str, Any]:
             }
         ]
     }
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    (path,) = sys.argv[1:] if argv is None else argv
+    with open(path, encoding="utf-8") as source:
+        trace = Trace.model_validate_json(source.read())
+    print(json.dumps(trace_to_otlp(trace), ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

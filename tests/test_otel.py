@@ -3,9 +3,12 @@
 import json
 import re
 from datetime import timedelta
+from pathlib import Path
+
+import pytest
 
 from agentproof import otel
-from agentproof.schema import Usage
+from agentproof.schema import Trace, Usage
 from tests.factories import T0, event, trace
 
 # Pinned source of the GenAI semantic conventions: every standard attribute the
@@ -382,3 +385,43 @@ def test_a_failed_tool_call_without_a_result_has_an_empty_message():
     ]
     (span,) = tools(otel.trace_to_otlp(run_trace(events=events)))
     assert span["status"] == {"code": STATUS_ERROR, "message": ""}
+
+
+ROOT = Path(__file__).resolve().parents[1]
+STORED = sorted(
+    [
+        *(ROOT / "results/runs/d6-20261018-044847/traces").glob("*.json"),
+        *(ROOT / "evidence/piloto-langgraph/results/runs").glob("*/traces/*.json"),
+    ]
+)
+
+
+def test_stored_traces_are_available():
+    assert len(STORED) > 100
+
+
+@pytest.mark.parametrize("path", STORED, ids=lambda p: p.stem)
+def test_a_stored_trace_converts_and_round_trips(path):
+    stored = Trace.model_validate_json(path.read_text())
+    document = otel.trace_to_otlp(stored)
+    assert json.loads(json.dumps(document, ensure_ascii=False)) == document
+    found = spans(document)
+    tool_calls = [e for e in stored.events if e.kind == "tool_call"]
+    assert len(tools(document)) == len(tool_calls)
+    user_messages = [e for e in stored.events if e.kind == "user_message"]
+    assert len(turns(document)) == len(user_messages)
+    by_id = {s["spanId"]: s for s in found}
+    for span in found:
+        assert re.fullmatch(r"[0-9a-f]{32}", span["traceId"])
+        assert re.fullmatch(r"[0-9a-f]{16}", span["spanId"])
+        assert span.get("parentSpanId") is None or span["parentSpanId"] in by_id
+        assert int(span["startTimeUnixNano"]) <= int(span["endTimeUnixNano"])
+        for key in attributes(span):
+            assert key.startswith("agentproof.") or key in STANDARD_ATTRIBUTES, key
+
+
+def test_module_entry_point_prints_the_document_of_a_trace_file(capsys):
+    path = STORED[0]
+    assert otel.main([str(path)]) == 0
+    printed = json.loads(capsys.readouterr().out)
+    assert printed == otel.trace_to_otlp(Trace.model_validate_json(path.read_text()))
