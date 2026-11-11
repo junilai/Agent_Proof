@@ -1,17 +1,22 @@
 """Incorporation cost of each framework (spec F4, §8; counting rule D-014)."""
 
 import subprocess
+from pathlib import Path
 from textwrap import dedent
 
 import pytest
 
 from experiments.portability import (
+    FRAMEWORKS,
+    REPO,
     HistoryUnavailable,
     Mentions,
     PullRequest,
     core_files,
     logical_lines,
+    measure,
     physical_lines,
+    studio_lines,
 )
 
 
@@ -189,3 +194,54 @@ def test_a_folder_that_is_not_a_repository_is_reported(tmp_path, monkeypatch):
     monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(tmp_path.parent))
     with pytest.raises(HistoryUnavailable, match="git"):
         core_files(tmp_path, PullRequest("a", "b"))
+
+
+# A test file whose name carries one of these words belongs to that framework.
+KEYWORDS = {
+    "Claude Agent SDK": ("claude_sdk",),
+    "LangGraph": ("langgraph", "langchain"),
+    "CrewAI": ("crewai",),
+    "smolagents": ("smolagents",),
+}
+
+
+def declared_files(framework):
+    return [framework.adapter, framework.edition, *framework.tests, *framework.live_tests]
+
+
+def test_the_four_frameworks_are_declared_in_order_with_files_that_exist():
+    assert [f.name for f in FRAMEWORKS] == list(KEYWORDS)
+    for framework in FRAMEWORKS:
+        for path in declared_files(framework):
+            assert (REPO / path).is_file(), path
+        assert framework.studio is None or (REPO / framework.studio).is_dir()
+
+
+def test_no_test_file_named_after_a_framework_is_left_out_or_counted_twice():
+    owners: dict[str, str] = {}
+    for framework in FRAMEWORKS:
+        for path in [*framework.tests, *framework.live_tests]:
+            assert path not in owners, path
+            owners[path] = framework.name
+    for path in sorted((REPO / "tests").glob("*.py")):
+        relative = str(path.relative_to(REPO))
+        for name, words in KEYWORDS.items():
+            if any(word in path.stem for word in words):
+                assert owners.get(relative) == name, relative
+
+
+def test_studio_counts_python_and_configuration_but_not_the_readme(tmp_path):
+    (tmp_path / "app.py").write_text('"""Docstring."""\n\nimport x\n\nx.run()\n')
+    (tmp_path / "config.json").write_text('{\n  "a": 1\n\n}\n')
+    (tmp_path / "README.md").write_text("# Uso\n\nuv run ...\n")
+    assert studio_lines(tmp_path) == 2 + 3
+
+
+def test_measuring_this_repository_gives_one_row_per_framework():
+    rows = measure()
+    assert [row.name for row in rows] == [f.name for f in FRAMEWORKS]
+    assert all(row.adapter > 0 and row.edition > 0 and row.tests > 0 for row in rows)
+
+
+def test_the_repository_root_is_the_one_holding_the_package():
+    assert REPO == Path(__file__).resolve().parents[1]

@@ -151,3 +151,140 @@ def core_files(repo: Path, history: PullRequest | Mentions) -> list[str]:
     """Files of the core (``src/agentproof`` outside ``adapters/``) a framework modified."""
     files = _changed_files(repo, history)
     return sorted({f for f in files if f.startswith(CORE) and not f.startswith(OUTSIDE_CORE)})
+
+
+REPO = Path(__file__).resolve().parents[2]
+# PR #29 (merge commit 012a7a8): its first parent is the base, its second the tip.
+LANGGRAPH_PR = PullRequest(
+    base="25aaf0875809436984538a9ece541cc3f754b034",
+    tip="6fca5127dba89ac5f9ac909a8857e2aba22fbc30",
+)
+AFTER_LANGGRAPH = "012a7a80c7d617540a86433731c4797f46719954"
+
+
+@dataclass(frozen=True)
+class Framework:
+    """What belongs to one framework. ``history`` is None for the reference."""
+
+    name: str
+    adapter: str
+    edition: str
+    tests: tuple[str, ...]
+    live_tests: tuple[str, ...]
+    studio: str | None
+    history: PullRequest | Mentions | None
+
+
+# Tests: the framework's own test files, its fake model and the tests of that fake
+# and of its studio. The core's fakes (tests/fakes.py) and the test every edition
+# shares (tests/test_editions_mutations.py) belong to no framework. Live tests call
+# the paid API and never run in CI, so they are counted apart.
+FRAMEWORKS = (
+    Framework(
+        name="Claude Agent SDK",
+        adapter="src/agentproof/adapters/claude_sdk.py",
+        edition="src/casestudy/editions/claude_sdk.py",
+        tests=("tests/test_adapter_claude_sdk.py", "tests/test_edition_claude_sdk.py"),
+        live_tests=("tests/test_live_agent.py", "tests/test_live_mutations.py"),
+        studio=None,
+        history=None,
+    ),
+    Framework(
+        name="LangGraph",
+        adapter="src/agentproof/adapters/langgraph.py",
+        edition="src/casestudy/editions/langgraph.py",
+        tests=(
+            "tests/test_adapter_langgraph.py",
+            "tests/test_edition_langgraph.py",
+            "tests/fakes_langchain.py",
+            "tests/test_fakes_langchain.py",
+        ),
+        live_tests=("tests/test_live_langgraph.py",),
+        studio="studio/langgraph",
+        history=LANGGRAPH_PR,
+    ),
+    Framework(
+        name="CrewAI",
+        adapter="src/agentproof/adapters/crewai.py",
+        edition="src/casestudy/editions/crewai.py",
+        tests=(
+            "tests/test_adapter_crewai.py",
+            "tests/test_edition_crewai.py",
+            "tests/test_edition_crewai_anthropic.py",
+            "tests/fakes_crewai.py",
+            "tests/test_fakes_crewai.py",
+            "tests/test_studio_crewai.py",
+        ),
+        live_tests=(),
+        studio="studio/crewai",
+        history=Mentions(since=AFTER_LANGGRAPH, word="crewai"),
+    ),
+    Framework(
+        name="smolagents",
+        adapter="src/agentproof/adapters/smolagents.py",
+        edition="src/casestudy/editions/smolagents.py",
+        tests=(
+            "tests/test_adapter_smolagents.py",
+            "tests/test_edition_smolagents.py",
+            "tests/fakes_smolagents.py",
+            "tests/test_fakes_smolagents.py",
+        ),
+        live_tests=(),
+        studio="studio/smolagents",
+        history=Mentions(since=AFTER_LANGGRAPH, word="smolagents"),
+    ),
+)
+NOT_APPLICABLE = "—"
+UNAVAILABLE = "n/d"
+
+
+def studio_lines(folder: Path) -> int:
+    """Logical lines of the Python files plus non-blank lines of the configuration."""
+    total = 0
+    for path in sorted(folder.rglob("*")):
+        if path.suffix == ".py":
+            total += logical_lines(path.read_text())
+        elif path.suffix == ".json":
+            total += sum(1 for line in path.read_text().splitlines() if line.strip())
+    return total
+
+
+@dataclass(frozen=True)
+class Row:
+    name: str
+    adapter: int
+    edition: int
+    tests: int
+    live_tests: int
+    core: list[str] | None
+    unavailable: str | None
+    studio: int | None
+
+
+def _lines(repo: Path, paths: tuple[str, ...]) -> int:
+    return sum(logical_lines((repo / path).read_text()) for path in paths)
+
+
+def measure(repo: Path = REPO) -> list[Row]:
+    rows = []
+    for framework in FRAMEWORKS:
+        core, unavailable = None, None
+        if framework.history is not None:
+            try:
+                core = core_files(repo, framework.history)
+            except HistoryUnavailable as error:
+                unavailable = str(error)
+        studio = None if framework.studio is None else studio_lines(repo / framework.studio)
+        rows.append(
+            Row(
+                name=framework.name,
+                adapter=_lines(repo, (framework.adapter,)),
+                edition=_lines(repo, (framework.edition,)),
+                tests=_lines(repo, framework.tests),
+                live_tests=_lines(repo, framework.live_tests),
+                core=core,
+                unavailable=unavailable,
+                studio=studio,
+            )
+        )
+    return rows
