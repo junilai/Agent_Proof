@@ -1,0 +1,41 @@
+% ------------------- ANEXO A: MAPEO A OPENTELEMETRY -------------------
+\clearpage
+\blank
+\tituloapa[Anexo A: Mapeo de las trazas a OpenTelemetry]{ANEXO A: MAPEO DE LAS TRAZAS A OPENTELEMETRY}
+\begingroup\dobleesp
+\vspace{6pt}
+AgentProof guarda cada conversación en su propio esquema de trazas. Un módulo de la herramienta la traduce a spans de OpenTelemetry que siguen las convenciones semánticas de IA generativa, en el formato OTLP/JSON que acepta cualquier colector. La traducción es una función pura: no modifica la traza, no lee nada fuera de ella, no depende del SDK de OpenTelemetry y da siempre el mismo documento, porque los identificadores de los spans se derivan del identificador de la traza.
+\par
+Las convenciones de IA generativa están en desarrollo, cambian con frecuencia y su repositorio no publica versiones. Por eso se fijó el commit \texttt{e6658f14} del repositorio \texttt{open-telemetry/semantic-conventions-genai}, del 6 de noviembre de 2026, que queda escrito en cada documento exportado. En ese commit, todos los spans y atributos \texttt{gen\_ai.*} que se usan tienen estabilidad \emph{development}; solo \texttt{error.type} y \texttt{service.name}, de las convenciones generales, son estables. Una prueba automática falla si el módulo emite un atributo estándar que no está en la tabla de ese commit.
+\par
+Cada conversación es una traza de OpenTelemetry con tres niveles de spans. La raíz, \texttt{agentproof.conversation}, es propia: la convención no define un span de conversación, y la conversación la conduce AgentProof, fuera del agente. De ella cuelga un span \texttt{invoke\_agent} por turno del cliente, y de cada turno un span \texttt{execute\_tool} por llamada a herramienta. La Tabla~\ref{tab:otel}, al final del anexo, resume el mapeo.
+\par
+
+Tres decisiones de interpretación conviene declarar. La variante se registra como versión del agente, porque es exactamente lo que AgentProof compara. El uso de tokens va una sola vez en la raíz, porque la traza solo guarda el total de la conversación, y repartirlo entre turnos sería inventarlo. Y alcanzar el límite de pasos no es un error: queda en el motivo de parada del turno, sin estado \texttt{ERROR}.
+\par
+Lo que la traza no registra no se inventa. No hay spans de inferencia ni uso por turno, ni el identificador de cada llamada a herramienta, ni el modelo pedido en cada llamada, ni los parámetros de la petición, porque la traza no los guarda: son de la edición del agente. Un resultado de herramienta en texto, como la política de reembolsos, queda como texto, aunque la convención espera un objeto. El mapeo completo, con cada atributo y su justificación, está en la documentación del repositorio.
+\par
+
+\begin{table}[H]
+  \setstretch{1}
+  \caption{Mapeo de los campos de una traza de AgentProof a atributos de OpenTelemetry. Estabilidad en el commit fijado: D, \emph{development}; E, estable; ---, atributo propio con prefijo \texttt{agentproof.}}
+  \label{tab:otel}
+  \small
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{0.85in}|>{\raggedright\arraybackslash}p{1.95in}|>{\raggedright\arraybackslash}p{2.35in}|c|}
+    \hline
+    \textbf{Span} & \textbf{Campo de la traza} & \textbf{Atributo} & \textbf{Estab.} \\ \hline
+    Conversación & identificador de la traza & \texttt{gen\_ai.conversation.id} & D \\ \hline
+    Conversación & uso total del agente & \texttt{gen\_ai.usage.input\_tokens}, \texttt{gen\_ai.usage.output\_tokens} & D \\ \hline
+    Conversación & condición, corrida, escenario, repetición, intento, motivo de terminación, costo, uso del usuario simulado, modelos & \texttt{agentproof.<campo>} & --- \\ \hline
+    Turno & --- & \texttt{gen\_ai.operation.name = invoke\_agent} & D \\ \hline
+    Turno & edición del agente & \texttt{gen\_ai.agent.name} & D \\ \hline
+    Turno & variante & \texttt{gen\_ai.agent.version} & D \\ \hline
+    Turno & mensaje del cliente; mensajes del agente & \texttt{gen\_ai.input.messages}; \texttt{gen\_ai.output.messages} & D \\ \hline
+    Turno & motivo de parada del turno & \texttt{agentproof.turn.stop\_reason} & --- \\ \hline
+    Herramienta & --- & \texttt{gen\_ai.operation.name = execute\_tool} & D \\ \hline
+    Herramienta & nombre, argumentos y resultado & \texttt{gen\_ai.tool.name}, \texttt{gen\_ai.tool.call.arguments}, \texttt{gen\_ai.tool.call.result} & D \\ \hline
+    Turno o herramienta & error del agente o de la herramienta & \texttt{error.type} y estado \texttt{ERROR} & E \\ \hline
+  \end{tabular}
+\end{table}
+
+\endgroup
