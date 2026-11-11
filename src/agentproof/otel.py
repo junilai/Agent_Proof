@@ -11,17 +11,22 @@ reproducible.
 from __future__ import annotations
 
 import hashlib
+import re
+from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from agentproof import __version__
-from agentproof.schema import Trace
+from agentproof.schema import Trace, TraceEvent
 
 SEMCONV_REPOSITORY = "open-telemetry/semantic-conventions-genai"
 SEMCONV_COMMIT = "e6658f14c9d9ea0760825f029cb82e7673f48fab"
 SEMCONV_DATE = "2026-11-06"
 
 SPAN_KIND_INTERNAL = 1
+STATUS_CODE_ERROR = 2
+OTHER_ERROR = "_OTHER"
+"""Fallback value of ``error.type`` when the error names no exception class."""
 
 _EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
 
@@ -74,6 +79,8 @@ class _Spans:
         start: datetime,
         end: datetime,
         attributes: dict[str, Any],
+        parent: str | None = None,
+        error: str | None = None,
     ) -> str:
         span_id = _hex_id(self.source, key, 16)
         span: dict[str, Any] = {
@@ -85,8 +92,75 @@ class _Spans:
             "endTimeUnixNano": _nanos(end),
             "attributes": _key_values(attributes),
         }
+        if parent is not None:
+            span["parentSpanId"] = parent
+        if error is not None:
+            span["attributes"] += _key_values({"error.type": _error_type(error)})
+            span["status"] = {"code": STATUS_CODE_ERROR, "message": error}
         self.spans.append(span)
         return span_id
+
+
+def _error_type(text: str) -> str:
+    """Exception class of an error event (``Class: message``), else ``_OTHER``."""
+    match = re.match(r"([A-Za-z_][\w.]*): ", text)
+    return match.group(1) if match else OTHER_ERROR
+
+
+@dataclass
+class _Turn:
+    """A user message and what the agent did until the next one."""
+
+    number: int
+    opening: TraceEvent
+    events: list[TraceEvent] = field(default_factory=list)
+    stop_reason: str = "completed"
+
+
+def _split(trace: Trace) -> tuple[list[TraceEvent], list[_Turn]]:
+    """Events that belong to the conversation itself, and the agent turns."""
+    outside: list[TraceEvent] = []
+    turns: list[_Turn] = []
+    for event in trace.events:
+        if event.kind == "user_message":
+            turns.append(_Turn(len(turns) + 1, event))
+        elif turns:
+            turns[-1].events.append(event)
+        else:
+            outside.append(event)
+    if turns and trace.termination == "simulator_error":
+        last = turns[-1].events
+        if last and last[-1].kind == "error":  # the simulated user failed after the turn
+            outside.append(last.pop())
+    if turns and trace.termination in ("step_limit", "agent_error"):
+        turns[-1].stop_reason = "step_limit" if trace.termination == "step_limit" else "error"
+    return outside, turns
+
+
+def _last_error(events: list[TraceEvent]) -> str | None:
+    errors = [e.text or "" for e in events if e.kind == "error"]
+    return errors[-1] if errors else None
+
+
+def _turn_attributes(trace: Trace, turn: _Turn) -> dict[str, Any]:
+    replies = [
+        {"type": "text", "content": e.text}
+        for e in turn.events
+        if e.kind == "agent_message" and e.text
+    ]
+    return {
+        "gen_ai.operation.name": "invoke_agent",
+        "gen_ai.agent.name": trace.agent,
+        "gen_ai.agent.version": trace.variant,
+        "gen_ai.conversation.id": trace.trace_id,
+        "gen_ai.input.messages": [
+            {"role": "user", "parts": [{"type": "text", "content": turn.opening.text or ""}]}
+        ],
+        "gen_ai.output.messages": [{"role": "assistant", "parts": replies}] if replies else None,
+        "agentproof.turn": turn.number,
+        "agentproof.step": turn.opening.step,
+        "agentproof.turn.stop_reason": turn.stop_reason,
+    }
 
 
 def _conversation_attributes(trace: Trace) -> dict[str, Any]:
@@ -118,13 +192,28 @@ def _conversation_attributes(trace: Trace) -> dict[str, Any]:
 def trace_to_otlp(trace: Trace) -> dict[str, Any]:
     """OTLP/JSON document with the spans of one conversation."""
     spans = _Spans(trace)
-    spans.add(
+    outside, turns = _split(trace)
+    conversation = spans.add(
         "conversation",
         "agentproof.conversation",
         trace.started_at,
         trace.ended_at,
         _conversation_attributes(trace),
+        error=_last_error(outside),
     )
+    for turn in turns:
+        error = None
+        if turn.stop_reason == "error":
+            error = _last_error(turn.events) or "agent_error"
+        spans.add(
+            f"turn:{turn.number}",
+            f"invoke_agent {trace.agent}",
+            turn.opening.ts,
+            max([turn.opening.ts, *(e.ts for e in turn.events)]),
+            _turn_attributes(trace, turn),
+            parent=conversation,
+            error=error,
+        )
     return {
         "resourceSpans": [
             {
