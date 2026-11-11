@@ -546,6 +546,34 @@ CrewAI está pensado para tareas, no para conversar. El spec admitía dos camino
 
 **Dependencias.** CrewAI 1.15.23 exige `pydantic<2.13` y `mcp` 1.x. El proyecto pasó de pydantic 2.13.5 a 2.12.5 y de mcp 2.2.0 a 1.28.1, también para la edición Claude Agent SDK. Antes de integrarlo se verificó que las 800 trazas y los 800 veredictos de E1, el volcado del oráculo y el análisis de E1 salen idénticos. E1 se reproduce con el `uv.lock` de su tag (`preregistro-v2`) y E4 con el de `preregistro-v3`. La edición Claude Agent SDK se verificará en vivo con mcp 1.28.1, con sus pruebas en vivo, antes de cerrar F4. CrewAI no está en E4 ni en la huella del pre-registro: su corrida de punta a punta demuestra la portabilidad.
 
+## D-015 · Versión de las convenciones GenAI y mapeo del esquema
+
+- **Fecha:** 11 de noviembre de 2026
+- **Estado:** decidida e implementada en `src/agentproof/otel.py`; el mapeo completo está en [otel.md](otel.md)
+- **Origen:** F4, portabilidad (§5); el spec de F4 (§9) pide fijar la versión de la convención y su estado de estabilidad
+
+### El problema
+
+Las convenciones semánticas de IA generativa de OpenTelemetry cambian casi cada semana y no publican versiones, así que "seguir las convenciones" no dice nada si no se fija cuáles. Además, el esquema de AgentProof guarda cosas que la convención no contempla (condición, repetición, motivo de terminación) y le faltan otras que la convención espera (uso por llamada al modelo, identificador de cada llamada a herramienta).
+
+### Lo que se fija
+
+- **Fuente.** `open-telemetry/semantic-conventions-genai`, commit `e6658f14c9d9ea0760825f029cb82e7673f48fab` del 6 de noviembre de 2026. Las convenciones GenAI se mudaron ahí desde `open-telemetry/semantic-conventions`, cuya página de GenAI ahora dice "Moved". El repositorio no tiene releases ni tags; su manifiesto declara el esquema `gen-ai-dev/1.42.0-dev` y depende de las convenciones generales v1.45.0.
+- **Estabilidad.** Todo lo de GenAI que se usa está en *development*: los spans `gen_ai.invoke_agent.internal` y `gen_ai.execute_tool` y cada atributo `gen_ai.*`. Solo `error.type` y `service.name`, de las convenciones generales, son estables. Un cambio de nombre aguas arriba no rompe nada aquí hasta que se decida mover el commit fijado, que es una decisión nueva.
+- **Estructura.** Un span raíz propio por conversación (`agentproof.conversation`), un span `invoke_agent` por turno y un span `execute_tool` por llamada a herramienta, hijo de su turno. El uso del agente va en `gen_ai.usage.*` de la raíz; la conversación se identifica con `gen_ai.conversation.id`, que es el `trace_id` de AgentProof.
+- **Lo propio, con prefijo.** Todo lo que no tiene atributo estándar va con prefijo `agentproof.`: la condición, la variante, la corrida, el escenario, la repetición, el intento, el motivo de terminación y el de parada de cada turno, el costo, el uso del usuario simulado y los modelos.
+- **Formato.** OTLP/JSON, generado por una función pura sin el SDK de OpenTelemetry ni dependencias nuevas, con ids derivados del `trace_id` para que la salida sea reproducible.
+- **Verificación.** `tests/test_otel.py` tiene su propia tabla de los atributos estándar con su estabilidad en ese commit, y convierte las 100 trazas de D6 de E1 y las 23 del piloto de LangGraph.
+
+### Por qué así
+
+- **Un commit y no una versión**, porque no hay versiones; el commit queda además en cada documento exportado (`agentproof.semconv.commit`).
+- **Raíz propia.** La convención no define un span de conversación. La conversación la conduce AgentProof, fuera del agente, y los datos de la traza que no son de ningún turno necesitan un lugar.
+- **El uso en la raíz y no en cada turno**, porque la traza guarda solo el total de la conversación. Repartirlo entre turnos sería inventarlo; ponerlo en la raíz, una vez, permite sumar el uso de todos los spans sin contarlo dos veces.
+- **La variante como `gen_ai.agent.version`**, porque es la versión del agente que AgentProof compara.
+- **No se inventa lo que la traza no tiene.** Sin `gen_ai.tool.call.id`, `gen_ai.request.model`, `gen_ai.provider.name` ni spans de inferencia: la traza no los registra. Un resultado de herramienta en texto queda como texto, aunque el esquema espera un objeto.
+- **No cambia el esquema.** El mapeo es una vista de la traza: no toca `Trace`, ninguna pieza de la huella del pre-registro ni ningún dato de E1, y es código nuevo del núcleo, no una modificación para un framework (spec de F4, §9), así que no cuenta en el costo de incorporación (D-014).
+
 ## D-016 · Análisis de los desacuerdos entre el oráculo y AgentProof
 
 - **Fecha:** 20 de octubre de 2026; corregida el 21 de octubre de 2026
