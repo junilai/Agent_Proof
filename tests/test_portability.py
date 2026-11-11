@@ -1,8 +1,18 @@
 """Incorporation cost of each framework (spec F4, §8; counting rule D-014)."""
 
+import subprocess
 from textwrap import dedent
 
-from experiments.portability import logical_lines, physical_lines
+import pytest
+
+from experiments.portability import (
+    HistoryUnavailable,
+    Mentions,
+    PullRequest,
+    core_files,
+    logical_lines,
+    physical_lines,
+)
 
 
 def src(text: str) -> str:
@@ -103,3 +113,79 @@ def test_a_one_line_function_keeps_its_header_but_not_its_docstring():
     # def f, def g, x = 1 (the docstring shares its logical line with code)
     assert logical_lines(source) == 2 + 1
     assert physical_lines(source) == 2 + 1
+
+
+def git(repo, *args):
+    command = ["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t"]
+    command += ["-c", "commit.gpgsign=false", *args]
+    return subprocess.run(command, check=True, capture_output=True, text=True).stdout.strip()
+
+
+def commit(repo, message, *paths):
+    for path in paths:
+        file = repo / path
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text(file.read_text() + "x = 1\n" if file.exists() else "x = 1\n")
+    git(repo, "add", *paths)
+    git(repo, "commit", "-q", "-m", message)
+    return git(repo, "rev-parse", "HEAD")
+
+
+@pytest.fixture
+def history(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    git(repo, "init", "-q")
+    shas = {
+        "base": commit(repo, "inicio", "src/agentproof/core.py", "src/agentproof/store.py"),
+        "tip": commit(
+            repo,
+            "feat: un framework",
+            "src/agentproof/adapters/one.py",
+            "src/agentproof/core.py",
+            "docs/x.md",
+        ),
+    }
+    commit(
+        repo, "feat(adapters): SmolAgents", "src/agentproof/adapters/s.py", "src/agentproof/a.py"
+    )
+    commit(repo, "fix: otra cosa", "src/agentproof/store.py")
+    commit(repo, "test: modelo falso de smolagents", "tests/fakes_s.py", "src/agentproof/b.py")
+    return repo, shas
+
+
+def test_a_pull_request_modifies_the_core_files_between_its_base_and_its_tip(history):
+    repo, shas = history
+    assert core_files(repo, PullRequest(shas["base"], shas["tip"])) == ["src/agentproof/core.py"]
+
+
+def test_commits_that_mention_a_framework_are_its_own_whatever_the_case(history):
+    repo, shas = history
+    found = core_files(repo, Mentions(since=shas["tip"], word="smolagents"))
+    assert found == ["src/agentproof/a.py", "src/agentproof/b.py"]
+
+
+def test_no_commit_mentioning_the_framework_is_not_reported_as_zero_files(history):
+    repo, shas = history
+    with pytest.raises(HistoryUnavailable, match="crewai"):
+        core_files(repo, Mentions(since=shas["tip"], word="crewai"))
+
+
+def test_a_commit_missing_from_the_history_is_reported(history):
+    repo, _ = history
+    with pytest.raises(HistoryUnavailable, match="no está en la historia"):
+        core_files(repo, PullRequest("0" * 40, "1" * 40))
+
+
+def test_a_shallow_clone_is_reported_instead_of_counted(history, tmp_path):
+    repo, shas = history
+    shallow = tmp_path / "shallow"
+    git(tmp_path, "clone", "-q", "--depth", "1", f"file://{repo}", str(shallow))
+    with pytest.raises(HistoryUnavailable, match="clon superficial"):
+        core_files(shallow, PullRequest(shas["base"], shas["tip"]))
+
+
+def test_a_folder_that_is_not_a_repository_is_reported(tmp_path, monkeypatch):
+    monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(tmp_path.parent))
+    with pytest.raises(HistoryUnavailable, match="git"):
+        core_files(tmp_path, PullRequest("a", "b"))
