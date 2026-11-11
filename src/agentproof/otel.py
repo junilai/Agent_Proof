@@ -11,6 +11,7 @@ reproducible.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -27,6 +28,8 @@ SPAN_KIND_INTERNAL = 1
 STATUS_CODE_ERROR = 2
 OTHER_ERROR = "_OTHER"
 """Fallback value of ``error.type`` when the error names no exception class."""
+TOOL_ERROR = "tool_error"
+"""``error.type`` of a tool call the trace marks with ``is_error``."""
 
 _EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
 
@@ -81,6 +84,7 @@ class _Spans:
         attributes: dict[str, Any],
         parent: str | None = None,
         error: str | None = None,
+        error_type: str | None = None,
     ) -> str:
         span_id = _hex_id(self.source, key, 16)
         span: dict[str, Any] = {
@@ -95,7 +99,7 @@ class _Spans:
         if parent is not None:
             span["parentSpanId"] = parent
         if error is not None:
-            span["attributes"] += _key_values({"error.type": _error_type(error)})
+            span["attributes"] += _key_values({"error.type": error_type or _error_type(error)})
             span["status"] = {"code": STATUS_CODE_ERROR, "message": error}
         self.spans.append(span)
         return span_id
@@ -163,6 +167,41 @@ def _turn_attributes(trace: Trace, turn: _Turn) -> dict[str, Any]:
     }
 
 
+def _tool_attributes(trace: Trace, event: TraceEvent) -> dict[str, Any]:
+    return {
+        "gen_ai.operation.name": "execute_tool",
+        "gen_ai.tool.name": event.tool,
+        "gen_ai.tool.type": "function",
+        "gen_ai.tool.call.arguments": event.arguments,
+        "gen_ai.tool.call.result": None if event.is_error else event.result,
+        "gen_ai.agent.name": trace.agent,
+        "gen_ai.conversation.id": trace.trace_id,
+        "agentproof.step": event.step,
+    }
+
+
+def _as_text(raw: Any) -> str:
+    if raw is None:
+        return ""
+    return raw if isinstance(raw, str) else json.dumps(raw, ensure_ascii=False)
+
+
+def _add_tool_calls(spans: _Spans, trace: Trace, events: list[TraceEvent], parent: str) -> None:
+    for event in events:
+        if event.kind != "tool_call":
+            continue
+        spans.add(
+            f"tool:{event.step}",
+            f"execute_tool {event.tool}",
+            event.ts,
+            event.ts,
+            _tool_attributes(trace, event),
+            parent=parent,
+            error=_as_text(event.result) if event.is_error else None,
+            error_type=TOOL_ERROR,
+        )
+
+
 def _conversation_attributes(trace: Trace) -> dict[str, Any]:
     return {
         "gen_ai.conversation.id": trace.trace_id,
@@ -201,11 +240,12 @@ def trace_to_otlp(trace: Trace) -> dict[str, Any]:
         _conversation_attributes(trace),
         error=_last_error(outside),
     )
+    _add_tool_calls(spans, trace, outside, conversation)
     for turn in turns:
         error = None
         if turn.stop_reason == "error":
             error = _last_error(turn.events) or "agent_error"
-        spans.add(
+        turn_span = spans.add(
             f"turn:{turn.number}",
             f"invoke_agent {trace.agent}",
             turn.opening.ts,
@@ -214,6 +254,7 @@ def trace_to_otlp(trace: Trace) -> dict[str, Any]:
             parent=conversation,
             error=error,
         )
+        _add_tool_calls(spans, trace, turn.events, turn_span)
     return {
         "resourceSpans": [
             {

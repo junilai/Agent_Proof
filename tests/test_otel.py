@@ -273,3 +273,112 @@ def test_an_error_before_any_user_message_belongs_to_the_conversation():
     document = otel.trace_to_otlp(run_trace(events=events, termination="simulator_error"))
     assert turns(document) == []
     assert attributes(root(document))["error.type"] == "_OTHER"
+
+
+def with_tools(**overrides):
+    events = [
+        event(1, "user_message", text="Mi pedido es AT-1010"),
+        event(2, "tool_call", tool="get_refund_policy", arguments={}, result="Política..."),
+        event(
+            3,
+            "tool_call",
+            tool="lookup_order",
+            arguments={"order_id": "AT-1010"},
+            result={"pedido": "AT-1010", "monto_usd": 39.9, "entregado": True},
+        ),
+        event(4, "agent_message", text="Procede el reembolso."),
+        event(5, "user_message", text="Abra un ticket"),
+        event(
+            6,
+            "tool_call",
+            tool="create_ticket",
+            arguments={"summary": "x"},
+            result="Error: servicio caído",
+            is_error=True,
+        ),
+        event(7, "agent_message", text="No pude crear el ticket."),
+    ]
+    events[1].ts = at(1)
+    return run_trace(events=events, **overrides)
+
+
+def tools(document: dict) -> list[dict]:
+    return [
+        s for s in spans(document) if attributes(s).get("gen_ai.operation.name") == "execute_tool"
+    ]
+
+
+def test_every_tool_call_becomes_one_execute_tool_span_under_its_turn():
+    document = otel.trace_to_otlp(with_tools())
+    first_turn, second_turn = turns(document)
+    found = tools(document)
+    assert [s["name"] for s in found] == [
+        "execute_tool get_refund_policy",
+        "execute_tool lookup_order",
+        "execute_tool create_ticket",
+    ]
+    assert [s["parentSpanId"] for s in found] == [
+        first_turn["spanId"],
+        first_turn["spanId"],
+        second_turn["spanId"],
+    ]
+    assert [attributes(s)["agentproof.step"] for s in found] == [2, 3, 6]
+    assert all(s["kind"] == INTERNAL for s in found)
+
+
+def test_tool_span_records_name_arguments_and_result():
+    found = attributes(tools(otel.trace_to_otlp(with_tools()))[1])
+    assert found["gen_ai.tool.name"] == "lookup_order"
+    assert found["gen_ai.tool.type"] == "function"
+    assert found["gen_ai.tool.call.arguments"] == {"order_id": "AT-1010"}
+    assert found["gen_ai.tool.call.result"] == {
+        "pedido": "AT-1010",
+        "monto_usd": 39.9,
+        "entregado": True,
+    }
+    assert found["gen_ai.conversation.id"] == "tr-000000000001"
+    assert found["gen_ai.agent.name"] == "tests:fake"
+
+
+def test_text_results_and_empty_arguments_are_kept_as_they_are():
+    found = attributes(tools(otel.trace_to_otlp(with_tools()))[0])
+    assert found["gen_ai.tool.call.arguments"] == {}
+    assert found["gen_ai.tool.call.result"] == "Política..."
+
+
+def test_tool_span_has_the_instant_the_trace_recorded():
+    span = tools(otel.trace_to_otlp(with_tools()))[0]
+    assert span["startTimeUnixNano"] == span["endTimeUnixNano"] == otel._nanos(at(1))
+
+
+def test_a_failed_tool_call_is_an_error_span_without_a_result():
+    span = tools(otel.trace_to_otlp(with_tools()))[2]
+    assert span["status"] == {"code": STATUS_ERROR, "message": "Error: servicio caído"}
+    assert attributes(span)["error.type"] == "tool_error"
+    assert "gen_ai.tool.call.result" not in attributes(span)
+
+
+def test_a_tool_error_does_not_mark_its_turn():
+    second_turn = turns(otel.trace_to_otlp(with_tools()))[1]
+    assert "status" not in second_turn
+
+
+def test_tool_call_ids_are_not_invented():
+    for span in tools(otel.trace_to_otlp(with_tools())):
+        assert "gen_ai.tool.call.id" not in attributes(span)
+
+
+def test_a_tool_call_outside_any_turn_hangs_from_the_conversation():
+    events = [event(1, "tool_call", tool="lookup_order", arguments={"order_id": "AT-1"})]
+    document = otel.trace_to_otlp(run_trace(events=events, termination="agent_error"))
+    (span,) = tools(document)
+    assert span["parentSpanId"] == root(document)["spanId"]
+
+
+def test_a_failed_tool_call_without_a_result_has_an_empty_message():
+    events = [
+        event(1, "user_message", text="Hola"),
+        event(2, "tool_call", tool="create_ticket", arguments={"summary": "x"}, is_error=True),
+    ]
+    (span,) = tools(otel.trace_to_otlp(run_trace(events=events)))
+    assert span["status"] == {"code": STATUS_ERROR, "message": ""}
