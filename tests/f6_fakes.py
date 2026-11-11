@@ -88,3 +88,26 @@ def write_all(folder: Path, one: Fill | None = None, two: Fill | None = None) ->
         if two:
             write_labels(folder, annotator, 2, two)
     return folder
+
+
+@cache
+def judge_criteria() -> dict[str, tuple[bool, ...]]:
+    """What the judge said of each criterion, per trace of the store."""
+    return {
+        f"{run_id}/{v.trace_id}": tuple(c.met for c in v.criteria)
+        for run_id in store().runs()
+        for v in store().verdicts(run_id)
+    }
+
+
+def like_the_judge(inverted: frozenset[str] = frozenset(), **facts) -> Fill:
+    """The judge's criteria, every one inverted for the annotators named."""
+    base = constant(**facts)
+
+    def fill(annotator: str, key: str, spec: dict) -> dict:
+        row = base(annotator, key, spec)
+        if spec["criteria"]:
+            row["criteria"] = [met != (annotator in inverted) for met in judge_criteria()[key]]
+        return row
+
+    return fill
