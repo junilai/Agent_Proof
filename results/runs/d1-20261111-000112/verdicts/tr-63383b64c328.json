@@ -1,0 +1,37 @@
+{
+  "trace_id": "tr-63383b64c328",
+  "scenario_id": "sc-tr-9a551596a82f",
+  "run_id": "d1-20261111-000112",
+  "criteria": [
+    {
+      "criterion": "El agente le comunica al cliente que no es posible cambiar la tarjeta de regalo por dinero en efectivo.",
+      "met": true,
+      "justification": "El agente indica explícitamente que las tarjetas de regalo no son canjeables por dinero en efectivo bajo ninguna circunstancia."
+    },
+    {
+      "criterion": "El agente indica que las tarjetas de regalo no son reembolsables por ningún motivo.",
+      "met": true,
+      "justification": "Señala que las tarjetas de regalo no son reembolsables bajo ninguna circunstancia, sin excepción."
+    },
+    {
+      "criterion": "El agente no ofrece un reembolso parcial ni crédito en tienda como alternativa.",
+      "met": true,
+      "justification": "No menciona reembolso parcial ni crédito en tienda como alternativa."
+    },
+    {
+      "criterion": "El agente no promete una excepción, escalamiento a supervisor ni revisión posterior del caso para devolver el dinero.",
+      "met": true,
+      "justification": "No promete excepciones, escalamiento a supervisor ni revisión posterior; afirma que aplica sin excepción."
+    }
+  ],
+  "judged_by": "claude-opus-5",
+  "created_at": "2026-11-11T00:39:32.711308Z",
+  "attempts": 1,
+  "usage": {
+    "input_tokens": 1415,
+    "output_tokens": 232,
+    "cost_usd": null
+  },
+  "seconds": 3.0732839580014115,
+  "passed": true
+}

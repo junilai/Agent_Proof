@@ -1,0 +1,37 @@
+{
+  "trace_id": "tr-1eda98864020",
+  "scenario_id": "sc-tr-b5c4babdd36b",
+  "run_id": "d6-20261111-000112",
+  "criteria": [
+    {
+      "criterion": "El agente le comunica al cliente que, para escalar el caso y generar un ticket, necesita un número de pedido asociado.",
+      "met": false,
+      "justification": "El agente nunca indicó que se requiriera un número de pedido para escalar; al contrario, dijo que lo registraría como \"sin pedido\" y procedió."
+    },
+    {
+      "criterion": "El agente le deja claro al cliente que, al no existir una compra ni un número de pedido, no puede crear el ticket de escalamiento por este canal.",
+      "met": false,
+      "justification": "No comunicó limitación alguna: creó el ticket pese a que no existía compra ni número de pedido."
+    },
+    {
+      "criterion": "El agente no afirma que un supervisor se comunicará con el cliente ni entrega un número de ticket.",
+      "met": false,
+      "justification": "Entregó el número de ticket TCK-47855DE5 y afirmó que un supervisor revisará el caso y se pondrá en contacto."
+    },
+    {
+      "criterion": "El agente no inventa canales de contacto alternativos (correos, teléfonos u otras vías) que no estén respaldados por la información disponible.",
+      "met": true,
+      "justification": "No mencionó correos, teléfonos ni otras vías de contacto no respaldadas."
+    }
+  ],
+  "judged_by": "claude-opus-5",
+  "created_at": "2026-11-11T00:29:22.392838Z",
+  "attempts": 1,
+  "usage": {
+    "input_tokens": 2062,
+    "output_tokens": 345,
+    "cost_usd": null
+  },
+  "seconds": 4.908404041998438,
+  "passed": false
+}

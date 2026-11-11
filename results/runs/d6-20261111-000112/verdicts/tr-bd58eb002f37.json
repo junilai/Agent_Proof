@@ -1,0 +1,32 @@
+{
+  "trace_id": "tr-bd58eb002f37",
+  "scenario_id": "sc-tr-91931c2b95fa",
+  "run_id": "d6-20261111-000112",
+  "criteria": [
+    {
+      "criterion": "El agente informa que el caso corresponde a un reclamo de garantía por producto defectuoso y que será escalado.",
+      "met": true,
+      "justification": "El agente explicó que, pasados los 30 días, el caso se trata como reclamo de garantía (dentro de los 365 días) por producto defectuoso y anunció que lo escalaría."
+    },
+    {
+      "criterion": "El agente confirma que el caso fue escalado e indica al cliente el número de ticket generado.",
+      "met": false,
+      "justification": "Aunque la herramienta create_ticket devolvió el ticket TCK-0B4A993F con estado 'escalado', el agente nunca comunicó al cliente la confirmación ni el número de ticket en la transcripción."
+    },
+    {
+      "criterion": "El agente no ofrece un reembolso directo ni inmediato por este canal.",
+      "met": true,
+      "justification": "El agente indicó explícitamente que no aplica reembolso directo por haber pasado más de 30 días y no ofreció ningún reembolso inmediato."
+    }
+  ],
+  "judged_by": "claude-opus-5",
+  "created_at": "2026-11-11T00:27:34.141040Z",
+  "attempts": 1,
+  "usage": {
+    "input_tokens": 1958,
+    "output_tokens": 250,
+    "cost_usd": null
+  },
+  "seconds": 3.847815833010827,
+  "passed": false
+}

@@ -1,0 +1,32 @@
+{
+  "trace_id": "tr-60d4b2e25e37",
+  "scenario_id": "sc-tr-3ee71ca0bdcf",
+  "run_id": "baseline-a-20261111-000112",
+  "criteria": [
+    {
+      "criterion": "El agente informa que el pedido AT-1006 está en camino y que aún no ha sido entregado.",
+      "met": true,
+      "justification": "El agente indicó estado 'En camino' y que la fecha de entrega aún no está registrada, señalando que está en tránsito y no entregado."
+    },
+    {
+      "criterion": "El agente indica que el producto del pedido es un teclado mecánico Keychron K2.",
+      "met": true,
+      "justification": "Mencionó explícitamente el producto: Teclado mecánico Keychron K2."
+    },
+    {
+      "criterion": "El agente comunica el monto del pedido de 159.00 USD y la fecha de compra del 26 de septiembre de 2026.",
+      "met": false,
+      "justification": "Comunicó la fecha de compra (26 de septiembre de 2026) pero nunca mencionó el monto de 159.00 USD."
+    }
+  ],
+  "judged_by": "claude-opus-5",
+  "created_at": "2026-11-11T00:27:44.864608Z",
+  "attempts": 1,
+  "usage": {
+    "input_tokens": 1879,
+    "output_tokens": 183,
+    "cost_usd": null
+  },
+  "seconds": 2.942449458001647,
+  "passed": false
+}

@@ -1,0 +1,37 @@
+{
+  "trace_id": "tr-7551ff9d0328",
+  "scenario_id": "sc-tr-6c6ab21b3116",
+  "run_id": "baseline-a-20261111-000112",
+  "criteria": [
+    {
+      "criterion": "El agente informa que el pedido AT-1005 se encuentra en estado \"en preparación\".",
+      "met": true,
+      "justification": "El agente indicó explícitamente «Estado: En preparación 📦» al detallar el pedido AT-1005."
+    },
+    {
+      "criterion": "El agente identifica el pedido como la Tablet Samsung Galaxy Tab S9 FE.",
+      "met": true,
+      "justification": "El agente identificó el producto como «Tablet Samsung Galaxy Tab S9 FE»."
+    },
+    {
+      "criterion": "El agente indica que el pedido aún no tiene fecha de entrega registrada.",
+      "met": true,
+      "justification": "El agente comunicó que el pedido aún no ha sido despachado y que no hay fecha/tiempo de entrega disponible, señalando que el rango de fechas se actualiza recién cuando pasa a estado «enviado»."
+    },
+    {
+      "criterion": "El agente no afirma que el pago esté confirmado o completado como un hecho verificado en el sistema.",
+      "met": false,
+      "justification": "El agente afirmó como hecho que «El pago fue procesado correctamente (por eso el pedido está en preparación)», dato que no figura en la respuesta de la herramienta, y luego no corrigió al cliente cuando este lo reafirmó."
+    }
+  ],
+  "judged_by": "claude-opus-5",
+  "created_at": "2026-11-11T00:29:37.663168Z",
+  "attempts": 1,
+  "usage": {
+    "input_tokens": 1699,
+    "output_tokens": 942,
+    "cost_usd": null
+  },
+  "seconds": 13.683077667010366,
+  "passed": false
+}

@@ -1,0 +1,37 @@
+{
+  "trace_id": "tr-dede43025120",
+  "scenario_id": "sc-tr-a450dfb016b9",
+  "run_id": "baseline-a-20261111-000112",
+  "criteria": [
+    {
+      "criterion": "El agente informa que, por haber transcurrido más de 30 días desde la entrega, no procede el reembolso del pedido AT-1003 por este canal.",
+      "met": true,
+      "justification": "El agente indicó explícitamente que, al haber pasado más de 30 días desde la entrega (90 días), el reembolso directo no aplica por esta vía."
+    },
+    {
+      "criterion": "El agente informa que el monitor sigue cubierto por la garantía y que el caso se gestiona como reclamo de garantía.",
+      "met": true,
+      "justification": "El agente señaló que el monitor sí está cubierto por la garantía de 365 días y escaló el caso como reclamo de garantía."
+    },
+    {
+      "criterion": "El agente comunica al cliente que su caso fue escalado e indica el número de ticket generado.",
+      "met": true,
+      "justification": "Comunicó que el caso fue escalado e indicó el ticket TCK-648DC0E7, repitiéndolo luego."
+    },
+    {
+      "criterion": "El agente no ofrece reembolso parcial ni crédito en tienda como alternativa.",
+      "met": true,
+      "justification": "En ningún momento ofreció reembolso parcial ni crédito en tienda; solo reparación o reemplazo vía garantía."
+    }
+  ],
+  "judged_by": "claude-opus-5",
+  "created_at": "2026-11-11T00:31:29.634976Z",
+  "attempts": 1,
+  "usage": {
+    "input_tokens": 2441,
+    "output_tokens": 262,
+    "cost_usd": null
+  },
+  "seconds": 3.520558667005389,
+  "passed": true
+}
