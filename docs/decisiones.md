@@ -546,6 +546,46 @@ CrewAI está pensado para tareas, no para conversar. El spec admitía dos camino
 
 **Dependencias.** CrewAI 1.15.23 exige `pydantic<2.13` y `mcp` 1.x. El proyecto pasó de pydantic 2.13.5 a 2.12.5 y de mcp 2.2.0 a 1.28.1, también para la edición Claude Agent SDK. Antes de integrarlo se verificó que las 800 trazas y los 800 veredictos de E1, el volcado del oráculo y el análisis de E1 salen idénticos. E1 se reproduce con el `uv.lock` de su tag (`preregistro-v2`) y E4 con el de `preregistro-v3`. La edición Claude Agent SDK se verificará en vivo con mcp 1.28.1, con sus pruebas en vivo, antes de cerrar F4. CrewAI no está en E4 ni en la huella del pre-registro: su corrida de punta a punta demuestra la portabilidad.
 
+## D-014 · Regla de conteo del costo de incorporación
+
+- **Fecha:** 11 de noviembre de 2026
+- **Estado:** decidida con el autor e implementada en `src/experiments/portability.py`
+- **Origen:** spec de F4, §8, que pide fijar la regla antes de medir
+
+### El problema
+
+El spec de F4 (§8) pide medir cuánto cuesta incorporar un framework: líneas del adaptador y de la edición, líneas de sus pruebas y archivos del núcleo que hubo que tocar. Cada uno de esos números admite varias lecturas. "Línea de código" puede ser una línea física, que depende de dónde corte el formateador, o una sentencia. Las pruebas de un framework se reparten entre archivos propios, modelos falsos, pruebas compartidas por todas las ediciones y pruebas en vivo que no todas las ediciones tienen. Los commits de un framework se pueden identificar por su pull request o por su mensaje, y el Claude Agent SDK no tiene ni lo uno ni lo otro, porque el núcleo se escribió junto con él.
+
+### La regla
+
+- **Línea de código = línea física con código**, como dice el spec. No cuentan las líneas en blanco, los comentarios ni los docstrings (la primera sentencia de un módulo, una clase o una función, cuando es una cadena). Cualquier otra cadena cuenta, aunque ocupe varias líneas. Como complemento, el adaptador y la edición se cuentan también en líneas lógicas, una por sentencia, que no cambian con cómo el formateador parte las líneas. Se implementa con `tokenize` y `ast`.
+- **Adaptador y edición.** El adaptador es `src/agentproof/adapters/<framework>.py` y la edición es `src/casestudy/editions/<framework>.py`. El dominio del caso de estudio y `adapters/__init__.py` son compartidos y no se atribuyen a ningún framework.
+- **Pruebas.** Se cuentan los archivos propios del framework: las pruebas del adaptador y de la edición, su modelo falso y las pruebas de ese modelo falso, y la prueba de su interfaz local si existe. Quedan fuera los modelos falsos del núcleo (`tests/fakes.py`) y la prueba que comparten todas las ediciones (`tests/test_editions_mutations.py`). Las pruebas en vivo llaman a la API de pago y nunca corren en CI, así que van en una columna aparte. La lista de archivos es una constante declarada en el módulo. Una prueba verifica que todo archivo de `tests/` cuyo nombre mencione un framework esté asignado a ese framework y a ningún otro.
+- **Archivos del núcleo modificados.** El núcleo es `src/agentproof` sin `adapters/`. En LangGraph se toma `git diff --name-only` entre la base del PR #29 (`25aaf08`, primer padre del merge `012a7a8`) y su último commit (`6fca512`). En CrewAI y smolagents, que todavía no tienen un PR fusionado, se toman los commits posteriores a `012a7a8` cuyo mensaje menciona el framework, sin distinguir mayúsculas de minúsculas. Para el Claude Agent SDK no aplica, porque fue el primer framework y el núcleo se diseñó con él: la tabla muestra "—".
+- **Interfaz local (`studio/`).** Se mide aparte, porque no forma parte de lo que necesita la herramienta. Se cuentan las líneas de código de los `.py` y las líneas no vacías de la configuración `.json`. Los README no se cuentan.
+- **Historia incompleta.** Si el clon es superficial o falta un commit de referencia, la columna del núcleo muestra "n/d" con el motivo, en lugar de un número. Lo mismo pasa si ningún commit menciona el framework. El CI clona con profundidad 1, así que ahí siempre sale "n/d".
+
+### Por qué así
+
+- **Las físicas, porque es lo que se fijó antes de medir.** El spec aprobado define así la línea de código. Se consideró contar líneas lógicas, que no dependen del formateador (la misma llamada cuenta 1 o 6 según quepa en 100 columnas). El autor prefirió la regla del spec y dejar las lógicas como columna complementaria; las conclusiones son las mismas con las dos.
+- **Las pruebas en vivo, aparte.** Así las ediciones que no tienen pruebas en vivo no parecen más baratas de probar.
+- **El conteo del núcleo no depende de cómo se ordenaron los commits.** Con el diff del PR, en LangGraph no importa el orden de sus commits. Identificar los commits por mensaje sobrevive a un rebase, cosa que no pasaría con una lista de SHA. Cuando CrewAI y smolagents se fusionen en su PR, el modo se puede cambiar al de LangGraph sin cambiar la regla.
+- **Mejor "n/d" que un cero falso.** Un clon superficial devolvería cero archivos modificados, que es justo el resultado que se quiere demostrar.
+- **Lo que queda fuera se declara.** El PR de LangGraph también tocó código compartido fuera del núcleo: `src/casestudy/domain/tools.py`, donde las descripciones de las herramientas pasaron al dominio, y `src/casestudy/editions/claude_sdk.py`. También tocó el oráculo (`src/experiments/oracle/`), pero por la enmienda 2 y no por la incorporación. Nada de eso entra en la columna del núcleo, y la tesis lo menciona en el texto.
+
+### Tabla que imprime el comando
+
+`uv run python -m experiments.portability`, el 11 de noviembre de 2026:
+
+| Framework | Adaptador | Edición | Pruebas | Pruebas en vivo | Archivos del núcleo modificados | Interfaz local (studio/) | Adaptador / edición en líneas lógicas |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Claude Agent SDK (referencia) | 124 | 49 | 203 | 116 | — | — | 98 / 34 |
+| LangGraph | 130 | 74 | 524 | 45 | 0 | 14 | 102 / 66 |
+| CrewAI | 150 | 62 | 740 | 0 | 0 | 54 | 115 / 43 |
+| smolagents | 142 | 57 | 623 | 0 | 0 | 16 | 118 / 48 |
+
+Ningún framework obligó a modificar el núcleo. Sus adaptadores miden entre 130 y 150 líneas, cerca de las 124 del de Claude Agent SDK.
+
 ## D-015 · Versión de las convenciones GenAI y mapeo del esquema
 
 - **Fecha:** 11 de noviembre de 2026
