@@ -262,10 +262,10 @@ def test_the_markdown_table_marks_the_reference_and_what_could_not_be_measured()
     table = render_markdown(ROWS)
     lines = table.splitlines()
     assert lines[0].startswith("| Framework | Adaptador | Edición | Pruebas |")
-    assert lines[2] == "| Claude Agent SDK (referencia) | 120 | 50 | 140 | 160 | — | — |"
-    assert lines[3] == "| LangGraph | 130 | 80 | 400 | 50 | 0 | 15 |"
-    assert lines[4] == "| CrewAI | 150 | 70 | 500 | 0 | 1 (`cost.py`) | 40 |"
-    assert lines[5] == "| smolagents | 140 | 60 | 450 | 0 | n/d | 20 |"
+    assert lines[2] == "| Claude Agent SDK (referencia) | 120 | 50 | 140 | 160 | — | — | 0 / 0 |"
+    assert lines[3] == "| LangGraph | 130 | 80 | 400 | 50 | 0 | 15 | 0 / 0 |"
+    assert lines[4] == "| CrewAI | 150 | 70 | 500 | 0 | 1 (`cost.py`) | 40 | 0 / 0 |"
+    assert lines[5] == "| smolagents | 140 | 60 | 450 | 0 | n/d | 20 | 0 / 0 |"
     assert "n/d (smolagents): clon superficial: falta la historia" in table
 
 
@@ -298,10 +298,12 @@ def test_the_command_measures_the_four_frameworks_of_this_repository():
     for cells in rows.values():
         adapter, edition, tests = (int(cell) for cell in cells[:3])
         assert 50 < adapter < 500 and 20 < edition < 300 and tests > adapter
+        logical_adapter, logical_edition = (int(n) for n in cells[6].split(" / "))
+        assert logical_adapter < adapter and logical_edition < edition
     assert rows["Claude Agent SDK (referencia)"][4] == "—"
     shallow = "clon superficial" in result.output
     for name in ("LangGraph", "CrewAI", "smolagents"):
-        core, studio = rows[name][4:]
+        core, studio = rows[name][4:6]
         assert int(studio) > 0
         assert core == "n/d" if shallow else core.split()[0].isdigit()
 

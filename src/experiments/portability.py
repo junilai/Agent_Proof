@@ -6,10 +6,12 @@ Prints, for the Claude Agent SDK (the reference) and each framework added in F4,
 the lines of code of its adapter, its edition and its tests, the files of the
 core it had to modify and the size of its local interface under ``studio/``.
 
-A line of code is a logical line of Python: one statement, however many
-physical lines the formatter splits it into. Blank lines, comments and
-docstrings (the first statement of a module, class or function, when it is a
-string) do not count. Any other string counts, whatever its length.
+A line of code is a physical line with code on it, as the spec says: blank
+lines, comments and docstrings (the first statement of a module, class or
+function, when it is a string) do not count; any other string counts, whatever
+its length. As a complement, the adapter and the edition are also counted in
+logical lines, one per statement, which the formatter's line splitting does not
+change.
 """
 
 from __future__ import annotations
@@ -242,11 +244,11 @@ UNAVAILABLE = "n/d"
 
 
 def studio_lines(folder: Path) -> int:
-    """Logical lines of the Python files plus non-blank lines of the configuration."""
+    """Lines of code of the Python files plus non-blank lines of the configuration."""
     total = 0
     for path in sorted(folder.rglob("*")):
         if path.suffix == ".py":
-            total += logical_lines(path.read_text())
+            total += physical_lines(path.read_text())
         elif path.suffix == ".json":
             total += sum(1 for line in path.read_text().splitlines() if line.strip())
     return total
@@ -262,10 +264,13 @@ class Row:
     core: list[str] | None
     unavailable: str | None
     studio: int | None
+    adapter_logical: int = 0
+    edition_logical: int = 0
 
 
-def _lines(repo: Path, paths: tuple[str, ...]) -> int:
-    return sum(logical_lines((repo / path).read_text()) for path in paths)
+def _lines(repo: Path, paths: tuple[str, ...], count=None) -> int:
+    count = count or physical_lines
+    return sum(count((repo / path).read_text()) for path in paths)
 
 
 def measure(repo: Path = REPO) -> list[Row]:
@@ -288,6 +293,8 @@ def measure(repo: Path = REPO) -> list[Row]:
                 core=core,
                 unavailable=unavailable,
                 studio=studio,
+                adapter_logical=_lines(repo, (framework.adapter,), logical_lines),
+                edition_logical=_lines(repo, (framework.edition,), logical_lines),
             )
         )
     return rows
@@ -311,6 +318,7 @@ HEADER = (
     "Pruebas en vivo",
     "Archivos del núcleo modificados",
     "Interfaz local (studio/)",
+    "Adaptador / edición en líneas lógicas",
 )
 
 
@@ -321,7 +329,17 @@ def render_markdown(rows: list[Row]) -> str:
         core = _core_count(row)
         if row.core:
             core += " (" + ", ".join(f"`{Path(f).name}`" for f in row.core) + ")"
-        cells = (name, row.adapter, row.edition, row.tests, row.live_tests, core, _studio(row))
+        logical = f"{row.adapter_logical} / {row.edition_logical}"
+        cells = (
+            name,
+            row.adapter,
+            row.edition,
+            row.tests,
+            row.live_tests,
+            core,
+            _studio(row),
+            logical,
+        )
         lines.append("| " + " | ".join(str(cell) for cell in cells) + " |")
     notes = [f"{UNAVAILABLE} ({row.name}): {row.unavailable}" for row in rows if row.unavailable]
     return "\n".join(lines + ([""] + notes if notes else []))
@@ -340,13 +358,15 @@ def render_csv(rows: list[Row]) -> str:
             "nucleo",
             "nucleo_archivos",
             "interfaz",
+            "adaptador_logicas",
+            "edicion_logicas",
         )
     )
     for row in rows:
         files = " ".join(row.core or [])
         writer.writerow(
             (row.name, row.adapter, row.edition, row.tests, row.live_tests)
-            + (_core_count(row), files, _studio(row))
+            + (_core_count(row), files, _studio(row), row.adapter_logical, row.edition_logical)
         )
     return out.getvalue()
 
