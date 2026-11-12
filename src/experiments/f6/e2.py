@@ -17,6 +17,7 @@ from pydantic import BaseModel
 from agentproof.store import Store
 from experiments.f6.agreement import cohen_matrix, fleiss_kappa, majority
 from experiments.f6.labels import TraceLabel
+from experiments.samples import e1_runs
 from experiments.validation import cohen_kappa
 
 SAMPLE = ("results", "samples", "e2.json")
@@ -47,7 +48,7 @@ class Natural(BaseModel):
 
 def natural_approval(store: Store) -> Natural:
     """The judge's approvals over every judged trace of E1."""
-    verdicts = [v for run_id in store.runs() for v in store.verdicts(run_id)]
+    verdicts = [v for run_id in e1_runs(store) for v in store.verdicts(run_id)]
     passed = sum(v.passed for v in verdicts)
     return Natural(passed=passed, judged=len(verdicts), share=passed / len(verdicts))
 

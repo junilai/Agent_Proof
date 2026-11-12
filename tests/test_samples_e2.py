@@ -1,18 +1,21 @@
 import json
 from collections import Counter
+from pathlib import Path
 
 from typer.testing import CliRunner
 
 from agentproof.store import Store
-from experiments.samples import app, e2_sample
+from experiments.samples import app, e1_runs, e2_sample
 from tests.factories import manifest, trace, verdict
 
+ROOT = Path(__file__).resolve().parents[1]
 
-def judged_run(store, variant, scenarios, judged=True):
+
+def judged_run(store, variant, scenarios, judged=True, adapter="claude_sdk", day="20261018"):
     """A run of ``variant`` with one passed and one failed trace per scenario."""
     condition = "baseline-a" if variant == "baseline" else variant
-    run_id = f"{condition}-20261018-000000"
-    store.create_run(manifest(run_id=run_id, condition=condition, variant=variant))
+    run_id = f"{condition}-{day}-000000"
+    store.create_run(manifest(run_id=run_id, condition=condition, variant=variant, adapter=adapter))
     n = 0
     for s in range(scenarios):
         for passed in (True, False):
@@ -97,3 +100,25 @@ def test_the_command_writes_both_samples(tmp_path):
     assert audit["seed"] == 20261021 and len(audit["traces"]) == 10
     assert audit["ticket_share"]["d1"] == [0, 6]
     assert e2["seed"] == 20261018 and e2["per_stratum"] == 6
+
+
+def test_the_command_draws_only_from_the_runs_of_e1(tmp_path):
+    store = Store(tmp_path)
+    for v in ("baseline", "d1"):
+        judged_run(store, v, scenarios=3)
+    judged_run(store, "d4", scenarios=3, adapter="langgraph", day="20261111")
+    result = CliRunner().invoke(app, ["--data", str(tmp_path)])
+    assert result.exit_code == 0, result.output
+    audit = json.loads((tmp_path / "results" / "samples" / "auditoria.json").read_text())
+    e2 = json.loads((tmp_path / "results" / "samples" / "e2.json").read_text())
+    assert set(audit["ticket_share"]) == {"baseline-a", "d1"}
+    assert {pair["variant"] for pair in e2["pairs"]} <= {"baseline", "d1"}
+
+
+def test_the_frozen_samples_come_from_the_runs_of_e1():
+    store = Store(ROOT)
+    runs = e1_runs(store)
+    assert len(runs) == 8
+    assert {store.manifest(r).adapter for r in runs} == {"claude_sdk"}
+    frozen = json.loads((ROOT / "results" / "samples" / "e2.json").read_text())
+    assert json.loads(e2_sample(store, runs).model_dump_json()) == frozen
