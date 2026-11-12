@@ -94,6 +94,8 @@ La tabla es la misma que en Claude Agent SDK, y por la misma razón: el agente p
 
 **Adenda, smolagents (11 de noviembre de 2026).** La misma sonda con la edición smolagents (D-012), con los mismos tres casos y un turno por celda, da la misma tabla: con 2 se completan los casos de una y dos llamadas y se trunca el de tres; con 3 y 4 se completan todos. Un paso es una llamada al modelo, y la respuesta pasa por `final_answer`, que cuenta como una llamada más. D6 usa un límite de 2. La diferencia está en lo que ve el cliente: al agotar los pasos, smolagents fuerza una respuesta, y en el caso de garantía el agente le comunicó el número del ticket que ya había creado. En esta edición, el corte de D6 no deja el ticket sin comunicar, como sí ocurrió en E1. La sonda costó USD 0.154 según la herramienta, conciliado con la consola del 11 de noviembre (UTC) junto con E4 ([`docs/e4.md`](e4.md) en la rama de E4). Las respuestas completas están en `evidence/sondas-d6/smolagents.json`.
 
+**Adenda, CrewAI (12 de noviembre de 2026).** La misma sonda con la edición CrewAI (D-013), con los mismos tres casos y un turno por celda, da la misma tabla: con 2 se completan los casos de una y dos llamadas y se trunca el de tres; con 3 y 4 se completan todos. En CrewAI el límite (`max_iter`) cuenta rondas de herramientas: con 2, el agente pide el pedido y la política en la primera ronda y crea el ticket en la segunda, y el framework hace entonces una llamada más, sin herramientas, que lo obliga a responder. D6 usa un límite de 2. Como en smolagents, lo que cambia es lo que ve el cliente: en el caso de garantía, la respuesta forzada le comunicó el número del ticket que el agente ya había creado. La sonda también verificó, con Sonnet 5, lo que D-013 dejaba pendiente: la API acepta las herramientas de CrewAI con esquema estricto (`strict: true`) y la respuesta forzada, sin errores en ninguna de las nueve celdas. Su costo se lee de la consola del 12 de noviembre (UTC), junto con la corrida de punta a punta, porque el proveedor de CrewAI usa caché de prompts. Las respuestas completas están en `evidence/sondas-d6/crewai.json`.
+
 ## D-004 · Política corrupta de D4
 
 - **Fecha:** 13 de octubre de 2026
@@ -515,7 +517,7 @@ La planificación de smolagents y la salida en streaming quedan desactivadas, co
 ## D-013 · Conversación de varios turnos y equivalencias de la edición CrewAI
 
 - **Fecha:** 10 de noviembre de 2026
-- **Estado:** decidida e implementada. Quedan por verificar en vivo el límite de D6 (sonda de D-003) y, con Sonnet 5, que la API acepte las herramientas con esquema estricto y la respuesta forzada; esta última se verificó con Haiku 4.5 el 10 de noviembre
+- **Estado:** decidida e implementada; verificada en vivo el 12 de noviembre de 2026 (sonda de D-003, adenda de CrewAI). La respuesta forzada se había verificado antes con Haiku 4.5, el 10 de noviembre
 - **Origen:** F4, portabilidad (§5.7); el spec de F4 dejaba la conversación de varios turnos para después de leer el código de CrewAI 1.15.23
 
 ### El problema
@@ -530,7 +532,7 @@ CrewAI está pensado para tareas, no para conversar. El spec admitía dos camino
 
 ### Equivalencias
 
-**Límite de pasos.** `max_iter` cuenta rondas de herramientas, no llamadas al modelo. Con `max_iter = k`, el agente tiene a lo sumo k llamadas al modelo con herramientas; si en la k-ésima sigue pidiendo herramientas, la siguiente llamada, sin herramientas, lo obliga a responder. Así, un turno que necesitaría más de k llamadas al modelo se corta, la misma regla que un límite de k pasos en el SDK. La respuesta forzada es la que recibe el cliente, cuenta como comunicada y el turno queda como `step_limit`; el adaptador lo reconoce porque el turno usó k rondas de herramientas. CrewAI no guarda esa respuesta en el historial (ni la final de un turno sin herramientas), así que el adaptador la agrega para que el turno siguiente la vea. La línea base tiene 10. D6 empieza en 2 y se calibra en vivo con la sonda de D-003; por la respuesta forzada, es posible que el caso "creó el ticket pero no comunicó el número" no se repita en este framework.
+**Límite de pasos.** `max_iter` cuenta rondas de herramientas, no llamadas al modelo. Con `max_iter = k`, el agente tiene a lo sumo k llamadas al modelo con herramientas; si en la k-ésima sigue pidiendo herramientas, la siguiente llamada, sin herramientas, lo obliga a responder. Así, un turno que necesitaría más de k llamadas al modelo se corta, la misma regla que un límite de k pasos en el SDK. La respuesta forzada es la que recibe el cliente, cuenta como comunicada y el turno queda como `step_limit`; el adaptador lo reconoce porque el turno usó k rondas de herramientas. CrewAI no guarda esa respuesta en el historial (ni la final de un turno sin herramientas), así que el adaptador la agrega para que el turno siguiente la vea. La línea base tiene 10. D6 usa un límite de 2 (D-003, adenda de CrewAI), y por la respuesta forzada el caso "creó el ticket pero no comunicó el número" no se repite en este framework: en la sonda, el agente comunicó el número.
 
 **Prompt.** El prompt del dominio va sin cambios como `backstory`. CrewAI exige además un rol y un objetivo, que son dos frases cortas tomadas del mismo prompt, y lo envuelve todo en su propio texto en inglés ("You are…", "Current Task:"). Es el uso nativo y no se reescribe.
 
