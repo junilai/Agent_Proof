@@ -27,7 +27,7 @@ El corpus semilla tiene exactamente las veinte conversaciones previstas, elicita
 \par
 \subsubtituloapa{El instrumento se comporta igual en otro framework} E4 reprodujo E1 operador por operador: casi la misma aprobación de la línea base, la misma pass$^k$, la detección completa de D4, la misma ausencia de regresiones declaradas en D1 y las mismas cinco regresiones de D6. Con un solo dominio, un solo modelo y tres operadores, es evidencia de que el comportamiento de AgentProof no depende del framework con que se construyó el agente.
 \par
-\subsubtituloapa{La misma mutación no siempre se manifiesta igual} Las ediciones aplican exactamente la misma definición de cada mutación, y sin embargo el límite de pasos de D6 produce efectos distintos según el framework. Claude Agent SDK y LangGraph cortan el turno sin responder, y el cliente se queda sin el número del ticket. smolagents, en cambio, obliga al modelo a dar una respuesta final, y en ella el agente comunicó el número. % PENDIENTE: CrewAI tras la sonda del 12-nov.
+\subsubtituloapa{La misma mutación no siempre se manifiesta igual} Las ediciones aplican exactamente la misma definición de cada mutación, y sin embargo el límite de pasos de D6 produce efectos distintos según el framework. Claude Agent SDK y LangGraph cortan el turno sin responder, y el cliente se queda sin el número del ticket. smolagents y CrewAI, en cambio, obligan al modelo a dar una respuesta final, y en ella el agente comunicó el número.
 Una degradación definida sobre la configuración del agente no determina por sí sola lo que el cliente experimenta: también depende de cómo el framework maneja el límite. Por eso, el efecto de una mutación medida en un framework no puede trasladarse a otro sin volver a medirlo.
 \par
 
