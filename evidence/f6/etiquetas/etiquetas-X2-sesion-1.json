@@ -1,0 +1,982 @@
+{
+  "annotator": "X2",
+  "session": 1,
+  "labels": [
+    {
+      "item": "c01",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c02",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [],
+      "nota": "Dice que el reembolso no procede pero escala a un supervisor y dice que posiblemente no cambien de decisión pero que el mismo revisará más a fondo dejando abierta la posibilidad"
+    },
+    {
+      "item": "c03",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "nota": "informa que los primeros días son un total de 90 y no de 30 "
+    },
+    {
+      "item": "c04",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        false,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "item": "c05",
+      "decision": "sin resolver",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true
+      ],
+      "nota": "No ofrece reembolso pero es porque ni menciona nada acerca del reembolso "
+    },
+    {
+      "item": "c06",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c07",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c08",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c09",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        false,
+        false,
+        false,
+        true,
+        true
+      ],
+      "nota": "Como le escribe alguien que no es la persona que está registrada en el pedido no e da ninguna información"
+    },
+    {
+      "item": "c10",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c11",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c12",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "item": "c13",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "item": "c14",
+      "decision": null,
+      "contradicts_base": false,
+      "answers_card": true,
+      "criteria": [
+        true,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "item": "c15",
+      "decision": null,
+      "contradicts_base": false,
+      "answers_card": true,
+      "criteria": []
+    },
+    {
+      "item": "c16",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c17",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c18",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c19",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c20",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "item": "c21",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c22",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c23",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "item": "c24",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c25",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c26",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c27",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c28",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        false,
+        true,
+        true,
+        true
+      ],
+      "nota": "no revisa el el estado del pedido y solo asume por lo que le dijo el cliente "
+    },
+    {
+      "item": "c29",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "item": "c30",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c31",
+      "decision": "escalamiento",
+      "contradicts_base": true,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c32",
+      "decision": "procede",
+      "contradicts_base": true,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c33",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c34",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c35",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c36",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c37",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c38",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c39",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c40",
+      "decision": null,
+      "contradicts_base": false,
+      "answers_card": false,
+      "criteria": []
+    },
+    {
+      "item": "c41",
+      "decision": "sin resolver",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [],
+      "nota": "habla sobre el reembolso y dice que procede sin problema pero hay un pequeño dilema y es que el cliente prefiere un remplazo y n oun reembolso "
+    },
+    {
+      "item": "c42",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        false,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c43",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        false,
+        true
+      ],
+      "nota": "Dice que no procede el reembolso pero escala y dice que el supervisor podría tomar otra decisión"
+    },
+    {
+      "item": "c44",
+      "decision": null,
+      "contradicts_base": false,
+      "answers_card": true,
+      "criteria": []
+    },
+    {
+      "item": "c45",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c46",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c47",
+      "decision": "ninguna",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        false,
+        true
+      ],
+      "nota": "no habla ni menciona tan siquiera la palabra reembolso"
+    },
+    {
+      "item": "c48",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c49",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c50",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c51",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c52",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        false,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c53",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c54",
+      "decision": "procede",
+      "contradicts_base": true,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c55",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        false,
+        false,
+        false,
+        true,
+        true
+      ],
+      "nota": "no consulta la herramienta para ver la info del proyecto"
+    },
+    {
+      "item": "c56",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [],
+      "nota": "Niega el reembolso siempre al completo pero dice al final que escalará para que un supervisor vea detenidamente el caso "
+    },
+    {
+      "item": "c57",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        false,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "item": "c58",
+      "decision": null,
+      "contradicts_base": false,
+      "answers_card": true,
+      "criteria": []
+    },
+    {
+      "item": "c59",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "item": "c60",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c61",
+      "decision": null,
+      "contradicts_base": false,
+      "answers_card": true,
+      "criteria": []
+    },
+    {
+      "item": "c62",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "item": "c63",
+      "decision": "procede",
+      "contradicts_base": true,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c64",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "item": "c65",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c66",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c67",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "item": "c68",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c69",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c70",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c71",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c72",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c73",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c74",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c75",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c76",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "nota": "dice que será escalado pero nunca hace el ticket correspondiente "
+    },
+    {
+      "item": "c77",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c78",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        false,
+        true,
+        false
+      ]
+    },
+    {
+      "item": "c79",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c80",
+      "decision": "escalamiento",
+      "contradicts_base": true,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c81",
+      "decision": "ninguna",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [],
+      "nota": "no menciona nunca algo sobre el reembolso "
+    },
+    {
+      "item": "c82",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "nota": "le da el reembolso porque según la política el reembolso por cualquier caso es de 90 días en este caso en vez de 30 "
+    },
+    {
+      "item": "c83",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "item": "c84",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "nota": "es complicado porque el agente se encarga de decir muchas veces que el caso que presenta no es reembolsable, pero al último deja un mínimo de esperanza de que el supervisor pueda ser capaz de hacer algo frente a eso "
+    },
+    {
+      "item": "c85",
+      "decision": "escalamiento",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": [
+        false,
+        false,
+        true
+      ],
+      "nota": "el agente no consulta ninguna herramienta y solo escala para que el supervisor se haga cargo de todo "
+    },
+    {
+      "item": "c86",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c87",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c88",
+      "decision": null,
+      "contradicts_base": null,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c89",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c90",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c91",
+      "decision": null,
+      "contradicts_base": false,
+      "answers_card": false,
+      "criteria": []
+    },
+    {
+      "item": "c92",
+      "decision": "no procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    },
+    {
+      "item": "c93",
+      "decision": "escalamiento",
+      "contradicts_base": true,
+      "answers_card": null,
+      "criteria": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "item": "c94",
+      "decision": "procede",
+      "contradicts_base": false,
+      "answers_card": null,
+      "criteria": []
+    }
+  ]
+}
