@@ -92,6 +92,10 @@ Con 2, el agente consulta el pedido y la política en paralelo en el primer paso
 
 La tabla es la misma que en Claude Agent SDK, y por la misma razón: el agente pide el pedido y la política en paralelo en la primera llamada. Con 2, en el caso de garantía el agente explica la situación y pide el ticket en la misma llamada. El ticket se crea, pero el agente se queda sin pasos para comunicar su número, igual que en los cortes de D6 de E1. En esta edición D6 también usa un límite de 2. La sonda costó USD 0.083, y las pruebas en vivo de la edición, que pasaron las 8, USD 0.062, según la herramienta. La consola de Anthropic marcó USD 0.15 ese día UTC, sin otro gasto, así que sin caché de prompts la tabla de precios coincide con lo facturado.
 
+**Adenda, smolagents (11 de noviembre de 2026).** La misma sonda con la edición smolagents (D-012), con los mismos tres casos y un turno por celda, da la misma tabla: con 2 se completan los casos de una y dos llamadas y se trunca el de tres; con 3 y 4 se completan todos. Un paso es una llamada al modelo, y la respuesta pasa por `final_answer`, que cuenta como una llamada más. D6 usa un límite de 2. La diferencia está en lo que ve el cliente: al agotar los pasos, smolagents fuerza una respuesta, y en el caso de garantía el agente le comunicó el número del ticket que ya había creado. En esta edición, el corte de D6 no deja el ticket sin comunicar, como sí ocurrió en E1. La sonda costó USD 0.154 según la herramienta, conciliado con la consola del 11 de noviembre (UTC) junto con E4 ([`docs/e4.md`](e4.md) en la rama de E4). Las respuestas completas están en `evidence/sondas-d6/smolagents.json`.
+
+**Adenda, CrewAI (12 de noviembre de 2026).** La misma sonda con la edición CrewAI (D-013), con los mismos tres casos y un turno por celda, da la misma tabla: con 2 se completan los casos de una y dos llamadas y se trunca el de tres; con 3 y 4 se completan todos. En CrewAI el límite (`max_iter`) cuenta rondas de herramientas: con 2, el agente pide el pedido y la política en la primera ronda y crea el ticket en la segunda, y el framework hace entonces una llamada más, sin herramientas, que lo obliga a responder. D6 usa un límite de 2. Como en smolagents, lo que cambia es lo que ve el cliente: en el caso de garantía, la respuesta forzada le comunicó el número del ticket que el agente ya había creado. La sonda también verificó, con Sonnet 5, lo que D-013 dejaba pendiente: la API acepta las herramientas de CrewAI con esquema estricto (`strict: true`) y la respuesta forzada, sin errores en ninguna de las nueve celdas. Como el proveedor de CrewAI usa caché de prompts, el costo se toma de la consola: el 12 de noviembre (UTC) marcó USD 1.15 en total (Opus 0.54, Sonnet 0.52, Haiku 0.09) por la sonda, la corrida de punta a punta y las pruebas en vivo de la edición Claude Agent SDK, sin otro gasto ese día. Opus es solo el evaluador de la corrida y cuadra con la herramienta (USD 0.542). La consola no separa a los tres agentes, así que la sonda, el agente de la corrida y las pruebas del SDK suman a lo sumo USD 0.52; la herramienta, sin caché, estimaba USD 0.63 solo para el agente de la corrida. Las respuestas completas están en `evidence/sondas-d6/crewai.json`.
+
 ## D-004 · Política corrupta de D4
 
 - **Fecha:** 13 de octubre de 2026
@@ -433,7 +437,7 @@ La planificación (§5.5) y el pre-registro (§6) dicen que, dentro de cada estr
 ## D-012 · Equivalencias entre las ediciones del agente
 
 - **Fecha:** 8 de noviembre de 2026
-- **Estado:** decidida e implementada para LangGraph; CrewAI y smolagents se agregan al construir sus ediciones
+- **Estado:** decidida e implementada para LangGraph y smolagents; CrewAI se agrega al construir su edición
 - **Origen:** F4, portabilidad (§5.7, §5.8)
 
 ### El problema
@@ -480,6 +484,137 @@ Cada framework tiene su propia idea de paso, de memoria y de parámetros del mod
 - **Petición al modelo.** Esta edición envía solo el prompt del dominio, las tres herramientas y los parámetros de la tabla. El SDK arma su petición dentro de su CLI, que no se inspeccionó, así que no se puede afirmar que sea idéntica.
 
 Ninguna de estas diferencias cambia la definición de las mutaciones, que se comprueba con la prueba de paridad de las dos ediciones. La versión de cada paquete queda en el lockfile. La enmienda 2 del pre-registro congela antes de E4 las herramientas, los límites, `MAX_TOKENS` y las versiones de esta edición.
+
+### smolagents
+
+**Agente y límite de pasos.** La edición (`casestudy/editions/smolagents.py`) es un `ToolCallingAgent`, el agente de smolagents que llama herramientas de forma nativa. Un paso es una llamada al modelo. La línea base tiene 10 (`max_steps`), D6 usa un límite propio, que se calibra como en D-003, y el contador vuelve a cero en cada turno del cliente.
+
+- Al agotar `max_steps`, smolagents hace **una llamada más**, sin herramientas y sin el prompt del dominio, que obliga al modelo a responder. Esa respuesta es la que recibe el cliente, cuenta como comunicada y el turno queda como `step_limit`. El turno siguiente no la ve en el historial.
+- Es distinto del SDK y de LangGraph, que cortan sin responder. Por eso el comportamiento de D6 puede no ser el mismo con el mismo número, y la sonda lo mide.
+
+**Respuesta y prompt.** smolagents no deja que el modelo responda con texto: cada respuesta al cliente pasa por su herramienta interna `final_answer`, y el modelo está obligado a llamar alguna herramienta en cada paso (`tool_choice: any`). El adaptador toma `final_answer` como la respuesta y nunca la registra como llamada del dominio. El prompt del dominio va, sin cambios, en el lugar nativo (`instructions`), pero dentro del prompt de smolagents en inglés, que describe ese formato. Es el uso nativo del framework y no se reescribe.
+
+**Memoria.** La del propio agente, con `run(mensaje, reset=False)` en cada turno y un agente nuevo por conversación. smolagents le devuelve al modelo las llamadas y sus resultados como texto, no como bloques nativos de herramienta, y presenta cada turno del cliente como una tarea nueva.
+
+**Herramientas.** Las tres del dominio, como subclases de `Tool`, con las mismas descripciones. smolagents exige una descripción por argumento; se deja vacía, porque las otras ediciones no la tienen. Una herramienta que falla no corta el turno: el modelo recibe el error. Si el modelo pide en una misma respuesta `final_answer` y otra herramienta, o varias herramientas y una falla, smolagents ejecuta las demás pero el modelo no ve sus resultados. El adaptador las registra igual, en orden, y marca como error las de un paso fallido; un ticket podría crearse dos veces, y eso queda en la traza.
+
+**Modelo.** `LiteLLMModel` con el modelo de la variante, porque smolagents no tiene una integración propia de Anthropic. Los parámetros son los de LangGraph, salvo los reintentos:
+
+| Parámetro | Valor |
+|---|---|
+| Tokens máximos de salida | 32 000 |
+| Razonamiento extendido | desactivado |
+| Temperatura | la del modelo por omisión |
+| Tiempo máximo por llamada | 600 s |
+| Reintentos | los de smolagents: solo ante el límite de tasa de la API |
+
+La planificación de smolagents y la salida en streaming quedan desactivadas, como vienen por omisión, así que no hay llamadas al modelo fuera de los pasos y la respuesta forzada. No hay caché de prompts, y el costo se calcula con la tabla de precios y el modelo pedido, sumando todos los pasos del turno, incluida la respuesta forzada.
+
+**Lo que agrega el adaptador.** La negativa a correr si litellm saldría a un servicio externo: sin `LITELLM_LOCAL_MODEL_COST_MAP=True` descarga al importarse su tabla de costos desde GitHub; tampoco corre con callbacks de litellm a otros servicios ni con la instrumentación OpenTelemetry de smolagents cargada.
+
+**Interfaz.** La edición se abre en la interfaz de Gradio de smolagents (`studio/smolagents/`), solo en `127.0.0.1`, con el enlace público (`share`) forzado a desactivado y la analítica de Gradio apagada. smolagents no está en E4 ni en la huella del pre-registro: su corrida de punta a punta demuestra la portabilidad.
+
+## D-013 · Conversación de varios turnos y equivalencias de la edición CrewAI
+
+- **Fecha:** 10 de noviembre de 2026
+- **Estado:** decidida e implementada; verificada en vivo el 12 de noviembre de 2026 (sonda de D-003, adenda de CrewAI). La respuesta forzada se había verificado antes con Haiku 4.5, el 10 de noviembre
+- **Origen:** F4, portabilidad (§5.7); el spec de F4 dejaba la conversación de varios turnos para después de leer el código de CrewAI 1.15.23
+
+### El problema
+
+CrewAI está pensado para tareas, no para conversar. El spec admitía dos caminos: `Agent.kickoff(messages=...)` con el historial completo, o un `Crew` con una `Task` por turno. Había que elegir cómo se ven las llamadas a herramientas y cómo se reconoce que se alcanzó el límite de pasos.
+
+### La decisión
+
+- **`Agent.kickoff` con el historial de la sesión.** Un agente por conversación. En cada turno, la sesión del adaptador le pasa el historial completo que ella misma guarda y agrega lo que el turno produjo. CrewAI no guarda memoria entre llamadas, así que cada conversación empieza vacía. Memoria, conocimiento, caché de herramientas, planificación, delegación y resúmenes de historial quedan desactivados.
+- **Las herramientas se leen de los mensajes que devuelve el kickoff** (`LiteAgentOutput.messages`), no del bus de eventos de CrewAI. El bus es global, corre en otros hilos y no trae el identificador de cada llamada, así que podría mezclar sesiones o desordenarlas.
+- **Un turno que falla conserva lo hecho.** Un gancho antes de cada llamada al modelo registra lo que el turno ya produjo; si una llamada falla, el turno termina como error con sus herramientas ya ejecutadas, como en las otras ediciones.
+
+### Equivalencias
+
+**Límite de pasos.** `max_iter` cuenta rondas de herramientas, no llamadas al modelo. Con `max_iter = k`, el agente tiene a lo sumo k llamadas al modelo con herramientas; si en la k-ésima sigue pidiendo herramientas, la siguiente llamada, sin herramientas, lo obliga a responder. Así, un turno que necesitaría más de k llamadas al modelo se corta, la misma regla que un límite de k pasos en el SDK. La respuesta forzada es la que recibe el cliente, cuenta como comunicada y el turno queda como `step_limit`; el adaptador lo reconoce porque el turno usó k rondas de herramientas. CrewAI no guarda esa respuesta en el historial (ni la final de un turno sin herramientas), así que el adaptador la agrega para que el turno siguiente la vea. La línea base tiene 10. D6 usa un límite de 2 (D-003, adenda de CrewAI), y por la respuesta forzada el caso "creó el ticket pero no comunicó el número" no se repite en este framework: en la sonda, el agente comunicó el número.
+
+**Prompt.** El prompt del dominio va sin cambios como `backstory`. CrewAI exige además un rol y un objetivo, que son dos frases cortas tomadas del mismo prompt, y lo envuelve todo en su propio texto en inglés ("You are…", "Current Task:"). Es el uso nativo y no se reescribe.
+
+**Herramientas.** Las tres del dominio, con las mismas descripciones; devuelven el resultado del dominio como JSON. CrewAI las envía con esquema estricto (`strict: true`) y una secuencia de parada (`\nObservation:`). Si el modelo escribe texto junto a una llamada a herramienta, CrewAI lo descarta. Una herramienta que falla no corta el turno: el modelo recibe el error. Una respuesta final vacía se registra como error del turno; en las otras ediciones queda como respuesta vacía.
+
+**Modelo.** El proveedor nativo de Anthropic de CrewAI, con el modelo de la variante y los parámetros de D-012: 32 000 tokens de salida, sin razonamiento extendido, temperatura por omisión y 600 s por llamada (CrewAI usaría 128 000 tokens y ningún tiempo máximo). Reintentos: 2, los del SDK de Anthropic por omisión, más el reintento propio de CrewAI ante el límite de tasa (hasta 3 intentos), que no queda a la vista en la traza. El reintento de tareas de CrewAI (`max_retry_limit`) y su tiempo máximo de ejecución no se aplican a `kickoff`.
+
+**Costo.** El proveedor de CrewAI marca siempre puntos de caché de prompts, y la tabla de precios no los distingue. El costo del agente de esta edición se toma de la consola de facturación, como el del Agent SDK en E1 (D-007), y su corrida de punta a punta va en un día UTC propio para poder leerlo.
+
+**Lo que agrega el adaptador.** La negativa a correr si CrewAI enviaría telemetría o trazas: sin `CREWAI_DISABLE_TELEMETRY=true` (u `OTEL_SDK_DISABLED`, `CREWAI_DISABLE_TRACKING`), el primer kickoff intentó conectarse a `telemetry.crewai.com`; y con `CREWAI_TRACING_ENABLED` activo enviaría las trazas de ejecución.
+
+**Interfaz.** CrewAI no ofrece una interfaz como Studio para un agente individual: `crewai chat` es otra arquitectura, y el gráfico de flujos muestra el bucle genérico de CrewAI, no este agente. Se declara así, y `studio/crewai/` trae una consola local mínima para conversar con la edición viendo cada llamada a herramienta y el corte.
+
+**Dependencias.** CrewAI 1.15.23 exige `pydantic<2.13` y `mcp` 1.x. El proyecto pasó de pydantic 2.13.5 a 2.12.5 y de mcp 2.2.0 a 1.28.1, también para la edición Claude Agent SDK. Antes de integrarlo se verificó que las 800 trazas y los 800 veredictos de E1, el volcado del oráculo y el análisis de E1 salen idénticos. E1 se reproduce con el `uv.lock` de su tag (`preregistro-v2`) y E4 con el de `preregistro-v3`. La edición Claude Agent SDK se verificó en vivo con mcp 1.28.1 el 12 de noviembre: pasaron sus 12 pruebas en vivo, las de la edición y las de sus mutaciones. CrewAI no está en E4 ni en la huella del pre-registro: su corrida de punta a punta demuestra la portabilidad.
+
+## D-014 · Regla de conteo del costo de incorporación
+
+- **Fecha:** 11 de noviembre de 2026
+- **Estado:** decidida con el autor e implementada en `src/experiments/portability.py`
+- **Origen:** spec de F4, §8, que pide fijar la regla antes de medir
+
+### El problema
+
+El spec de F4 (§8) pide medir cuánto cuesta incorporar un framework: líneas del adaptador y de la edición, líneas de sus pruebas y archivos del núcleo que hubo que tocar. Cada uno de esos números admite varias lecturas. "Línea de código" puede ser una línea física, que depende de dónde corte el formateador, o una sentencia. Las pruebas de un framework se reparten entre archivos propios, modelos falsos, pruebas compartidas por todas las ediciones y pruebas en vivo que no todas las ediciones tienen. Los commits de un framework se pueden identificar por su pull request o por su mensaje, y el Claude Agent SDK no tiene ni lo uno ni lo otro, porque el núcleo se escribió junto con él.
+
+### La regla
+
+- **Línea de código = línea física con código**, como dice el spec. No cuentan las líneas en blanco, los comentarios ni los docstrings (la primera sentencia de un módulo, una clase o una función, cuando es una cadena). Cualquier otra cadena cuenta, aunque ocupe varias líneas. Como complemento, el adaptador y la edición se cuentan también en líneas lógicas, una por sentencia, que no cambian con cómo el formateador parte las líneas. Se implementa con `tokenize` y `ast`.
+- **Adaptador y edición.** El adaptador es `src/agentproof/adapters/<framework>.py` y la edición es `src/casestudy/editions/<framework>.py`. El dominio del caso de estudio y `adapters/__init__.py` son compartidos y no se atribuyen a ningún framework.
+- **Pruebas.** Se cuentan los archivos propios del framework: las pruebas del adaptador y de la edición, su modelo falso y las pruebas de ese modelo falso, y la prueba de su interfaz local si existe. Quedan fuera los modelos falsos del núcleo (`tests/fakes.py`) y la prueba que comparten todas las ediciones (`tests/test_editions_mutations.py`). Las pruebas en vivo llaman a la API de pago y nunca corren en CI, así que van en una columna aparte. La lista de archivos es una constante declarada en el módulo. Una prueba verifica que todo archivo de `tests/` cuyo nombre mencione un framework esté asignado a ese framework y a ningún otro.
+- **Archivos del núcleo modificados.** El núcleo es `src/agentproof` sin `adapters/`. En LangGraph se toma `git diff --name-only` entre la base del PR #29 (`25aaf08`, primer padre del merge `012a7a8`) y su último commit (`6fca512`). En CrewAI y smolagents, que todavía no tienen un PR fusionado, se toman los commits posteriores a `012a7a8` cuyo mensaje menciona el framework, sin distinguir mayúsculas de minúsculas. Para el Claude Agent SDK no aplica, porque fue el primer framework y el núcleo se diseñó con él: la tabla muestra "—".
+- **Interfaz local (`studio/`).** Se mide aparte, porque no forma parte de lo que necesita la herramienta. Se cuentan las líneas de código de los `.py` y las líneas no vacías de la configuración `.json`. Los README no se cuentan.
+- **Historia incompleta.** Si el clon es superficial o falta un commit de referencia, la columna del núcleo muestra "n/d" con el motivo, en lugar de un número. Lo mismo pasa si ningún commit menciona el framework. El CI clona con profundidad 1, así que ahí siempre sale "n/d".
+
+### Por qué así
+
+- **Las físicas, porque es lo que se fijó antes de medir.** El spec aprobado define así la línea de código. Se consideró contar líneas lógicas, que no dependen del formateador (la misma llamada cuenta 1 o 6 según quepa en 100 columnas). El autor prefirió la regla del spec y dejar las lógicas como columna complementaria; las conclusiones son las mismas con las dos.
+- **Las pruebas en vivo, aparte.** Así las ediciones que no tienen pruebas en vivo no parecen más baratas de probar.
+- **El conteo del núcleo no depende de cómo se ordenaron los commits.** Con el diff del PR, en LangGraph no importa el orden de sus commits. Identificar los commits por mensaje sobrevive a un rebase, cosa que no pasaría con una lista de SHA. Cuando CrewAI y smolagents se fusionen en su PR, el modo se puede cambiar al de LangGraph sin cambiar la regla.
+- **Mejor "n/d" que un cero falso.** Un clon superficial devolvería cero archivos modificados, que es justo el resultado que se quiere demostrar.
+- **Lo que queda fuera se declara.** El PR de LangGraph también tocó código compartido fuera del núcleo: `src/casestudy/domain/tools.py`, donde las descripciones de las herramientas pasaron al dominio, y `src/casestudy/editions/claude_sdk.py`. También tocó el oráculo (`src/experiments/oracle/`), pero por la enmienda 2 y no por la incorporación. Nada de eso entra en la columna del núcleo, y la tesis lo menciona en el texto.
+
+### Tabla que imprime el comando
+
+`uv run python -m experiments.portability`, el 11 de noviembre de 2026:
+
+| Framework | Adaptador | Edición | Pruebas | Pruebas en vivo | Archivos del núcleo modificados | Interfaz local (studio/) | Adaptador / edición en líneas lógicas |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Claude Agent SDK (referencia) | 124 | 49 | 203 | 116 | — | — | 98 / 34 |
+| LangGraph | 130 | 74 | 524 | 45 | 0 | 14 | 102 / 66 |
+| CrewAI | 150 | 62 | 740 | 0 | 0 | 54 | 115 / 43 |
+| smolagents | 142 | 57 | 623 | 0 | 0 | 16 | 118 / 48 |
+
+Ningún framework obligó a modificar el núcleo. Sus adaptadores miden entre 130 y 150 líneas, cerca de las 124 del de Claude Agent SDK.
+
+## D-015 · Versión de las convenciones GenAI y mapeo del esquema
+
+- **Fecha:** 11 de noviembre de 2026
+- **Estado:** decidida e implementada en `src/agentproof/otel.py`; el mapeo completo está en [otel.md](otel.md)
+- **Origen:** F4, portabilidad (§5); el spec de F4 (§9) pide fijar la versión de la convención y su estado de estabilidad
+
+### El problema
+
+Las convenciones semánticas de IA generativa de OpenTelemetry cambian casi cada semana y no publican versiones, así que "seguir las convenciones" no dice nada si no se fija cuáles. Además, el esquema de AgentProof guarda cosas que la convención no contempla (condición, repetición, motivo de terminación) y le faltan otras que la convención espera (uso por llamada al modelo, identificador de cada llamada a herramienta).
+
+### Lo que se fija
+
+- **Fuente.** `open-telemetry/semantic-conventions-genai`, commit `e6658f14c9d9ea0760825f029cb82e7673f48fab` del 6 de noviembre de 2026. Las convenciones GenAI se mudaron ahí desde `open-telemetry/semantic-conventions`, cuya página de GenAI ahora dice "Moved". El repositorio no tiene releases ni tags; su manifiesto declara el esquema `gen-ai-dev/1.42.0-dev` y depende de las convenciones generales v1.45.0.
+- **Estabilidad.** Todo lo de GenAI que se usa está en *development*: los spans `gen_ai.invoke_agent.internal` y `gen_ai.execute_tool` y cada atributo `gen_ai.*`. Solo `error.type` y `service.name`, de las convenciones generales, son estables. Un cambio de nombre aguas arriba no rompe nada aquí hasta que se decida mover el commit fijado, que es una decisión nueva.
+- **Estructura.** Un span raíz propio por conversación (`agentproof.conversation`), un span `invoke_agent` por turno y un span `execute_tool` por llamada a herramienta, hijo de su turno. El uso del agente va en `gen_ai.usage.*` de la raíz; la conversación se identifica con `gen_ai.conversation.id`, que es el `trace_id` de AgentProof.
+- **Lo propio, con prefijo.** Todo lo que no tiene atributo estándar va con prefijo `agentproof.`: la condición, la variante, la corrida, el escenario, la repetición, el intento, el motivo de terminación y el de parada de cada turno, el costo, el uso del usuario simulado y los modelos.
+- **Formato.** OTLP/JSON, generado por una función pura sin el SDK de OpenTelemetry ni dependencias nuevas, con ids derivados del `trace_id` para que la salida sea reproducible.
+- **Verificación.** `tests/test_otel.py` tiene su propia tabla de los atributos estándar con su estabilidad en ese commit, y convierte las 100 trazas de D6 de E1 y las 23 del piloto de LangGraph.
+
+### Por qué así
+
+- **Un commit y no una versión**, porque no hay versiones; el commit queda además en cada documento exportado (`agentproof.semconv.commit`).
+- **Raíz propia.** La convención no define un span de conversación. La conversación la conduce AgentProof, fuera del agente, y los datos de la traza que no son de ningún turno necesitan un lugar.
+- **El uso en la raíz y no en cada turno**, porque la traza guarda solo el total de la conversación. Repartirlo entre turnos sería inventarlo; ponerlo en la raíz, una vez, permite sumar el uso de todos los spans sin contarlo dos veces.
+- **La variante como `gen_ai.agent.version`**, porque es la versión del agente que AgentProof compara.
+- **No se inventa lo que la traza no tiene.** Sin `gen_ai.tool.call.id`, `gen_ai.request.model`, `gen_ai.provider.name` ni spans de inferencia: la traza no los registra. Un resultado de herramienta en texto queda como texto, aunque el esquema espera un objeto.
+- **No cambia el esquema.** El mapeo es una vista de la traza: no toca `Trace`, ninguna pieza de la huella del pre-registro ni ningún dato de E1, y es código nuevo del núcleo, no una modificación para un framework (spec de F4, §9), así que no cuenta en el costo de incorporación (D-014).
 
 ## D-016 · Análisis de los desacuerdos entre el oráculo y AgentProof
 

@@ -34,3 +34,11 @@ def test_the_command_refuses_while_cases_wait_for_annotation(tmp_path):
     result = analyse(tmp_path, CANDIDATE)
     assert result.exit_code == 1 and "1 caso(s) esperan anotación manual" in result.output
     assert not (tmp_path / "results" / "analysis").exists()
+
+
+def test_the_control_run_is_optional(tmp_path):
+    populated(tmp_path)
+    args = ["--data", str(tmp_path), "--reference", REFERENCE, "--candidate", CANDIDATE]
+    result = CliRunner().invoke(app, args)
+    assert result.exit_code == 0, result.output
+    assert "Control negativo" not in result.output

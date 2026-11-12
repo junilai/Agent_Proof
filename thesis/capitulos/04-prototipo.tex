@@ -6,7 +6,7 @@
 \tituloapa[Desarrollo del prototipo]{DESARROLLO DEL PROTOTIPO}
 \begingroup\dobleesp
 \vspace{6pt}
-Este capítulo describe cómo se implementaron AgentProof y el aparato experimental con que se evalúa, tal como quedaron al congelar el protocolo y ejecutar el primer experimento. El capítulo de la propuesta explica el diseño; aquí se explica cómo se materializó, qué decisiones de implementación exigió y cómo se verifica que el código hace lo que el diseño dice. La portabilidad a LangGraph, CrewAI y smolagents se describirá al completar esa fase.
+Este capítulo describe cómo se implementaron AgentProof y el aparato experimental con que se evalúa, tal como quedaron al congelar el protocolo y ejecutar el primer experimento. El capítulo de la propuesta explica el diseño; aquí se explica cómo se materializó, qué decisiones de implementación exigió y cómo se verifica que el código hace lo que el diseño dice. La última sección describe la portabilidad: cómo se incorporaron LangGraph, smolagents y CrewAI sin modificar el núcleo.
 \par
 
 \subtituloapa{Organización del código}
@@ -111,5 +111,61 @@ Otras 18 pruebas en vivo llaman a la API y se ejecutan a mano, porque cuestan di
 El protocolo experimental también está protegido por pruebas. Una prueba calcula una huella criptográfica de cada pieza del protocolo, como los prompts, los modelos fijados, las mutaciones, las reglas del oráculo, el corpus semilla y los escenarios inducidos, y la compara con la tabla publicada en el documento de pre-registro. Si una pieza cambia sin que se declare como enmienda, la integración continua falla. Los sorteos de las muestras se generan con un comando a partir de semillas fijadas antes de ver los datos, y otra prueba verifica que lo publicado en el pre-registro coincide con lo que el comando genera.
 \par
 La integración continua ejecuta las pruebas, el análisis de estilo y la compilación de este documento ante cada cambio. Además, cada commit se verificó en un clon limpio del repositorio antes de integrarlo, para que ninguno dependa de archivos que solo existen en el equipo del autor.
+\par
+
+\subtituloapa{Portabilidad a otros frameworks}
+La propuesta sostiene que AgentProof no depende del framework con que se construye el agente. Para comprobarlo, el agente del caso de estudio se construyó tres veces más, con LangGraph, smolagents y CrewAI. Cada framework aporta dos archivos: una edición del agente, que lo arma con las piezas nativas del framework, y un adaptador, que traduce cada turno nativo a los eventos del esquema de trazas. El dominio, las herramientas, el prompt y las mutaciones son los mismos datos en las cuatro ediciones. Las cuatro se ejecutan con los mismos comandos, eligiendo el adaptador y la edición por su nombre.
+\par
+\subsubtituloapa{Qué se mantiene igual} Cada framework tiene su propia idea de paso, de memoria y de parámetros del modelo. Si las ediciones difirieran en algo más que el framework, una diferencia en los resultados no podría atribuirse a él. Por eso se fijó, framework por framework, cómo cada edición reproduce lo que hace la de Claude Agent SDK. En Claude Agent SDK, LangGraph y smolagents un paso es una llamada al modelo; en CrewAI el límite cuenta rondas de herramientas, y se traduce de modo que corte el turno en el mismo punto. En las cuatro, el contador vuelve a cero en cada mensaje del cliente, la línea base tiene diez pasos y una herramienta que falla no corta el turno. Los parámetros que el SDK fija y los otros frameworks dejan a su criterio se fijan a mano e iguales en todas las variantes: el tope de tokens de salida, el razonamiento extendido desactivado y un tiempo máximo por llamada. Una prueba de paridad verifica que las cuatro ediciones construyen las siete variantes con la misma definición de cada mutación.
+\par
+Cada framework se usó a su manera nativa, aunque eso significara diferencias que no se pueden eliminar sin dejar de usarlo. La edición LangGraph es un grafo propio de cuatro nodos (Figura~\ref{fig:studio-grafo}), con el contador de pasos en el estado del grafo y la memoria en el checkpointer del framework. La de smolagents es su agente que llama herramientas, que obliga al modelo a responder al cliente por una herramienta interna. La de CrewAI es un agente al que la sesión le pasa en cada turno el historial completo, porque CrewAI está pensado para tareas y no guarda la conversación. smolagents y CrewAI envuelven además el prompt del dominio en su propio texto en inglés. Ninguna de las tres usa la caché de prompts del SDK, así que en LangGraph y smolagents el costo del agente se calcula con la tabla de precios; el proveedor de CrewAI marca siempre la caché, y su costo se toma de la facturación. Todas estas diferencias quedan registradas como decisiones del proyecto.
+\par
+\subsubtituloapa{Que nada salga del equipo} Los tres frameworks traen por omisión algún envío de datos a un servicio externo: el rastreo de LangChain, la descarga de una tabla de precios y los callbacks de litellm en smolagents, y la telemetría y las trazas de ejecución de CrewAI. Cada adaptador se niega a correr si alguno está activo, y lo comprueba antes de la primera conversación de una corrida.
+\par
+\subsubtituloapa{Cada framework en su propia interfaz} Una edición que solo corre dentro del experimento no demuestra que sea un agente ordinario de su framework. Por eso cada una se abre también en la interfaz de desarrollo de su framework, con la configuración incluida en el repositorio. La edición LangGraph se abre en LangGraph Studio con un servidor local, sin enviar trazas a LangSmith. La Figura~\ref{fig:studio-grafo} muestra el grafo tal como lo dibuja Studio, y la Figura~\ref{fig:studio-corte} una conversación con la variante D6, donde se ve paso a paso cómo el agente crea el ticket y el nodo de corte termina el turno antes de que pueda comunicar su número. La edición smolagents se abre en la interfaz de Gradio del framework, solo en el equipo local y con el enlace público desactivado. CrewAI no ofrece una interfaz equivalente para un agente individual, así que el repositorio trae una consola mínima que muestra cada llamada a herramienta y el corte. Ninguna interfaz estuvo abierta durante los experimentos.
+\par
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.42\textwidth]{figuras/studio-grafo.png}
+  \caption{La edición LangGraph del agente en LangGraph Studio. El nodo \texttt{start} pone el contador de pasos en cero, \texttt{model} llama al modelo, \texttt{tools} ejecuta las herramientas y \texttt{cut} termina el turno cuando se agota el límite de pasos}
+  \label{fig:studio-grafo}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figuras/studio-corte-d6.png}
+  \caption{Un turno de la variante D6 de la edición LangGraph en LangGraph Studio. Con el límite de dos pasos, el agente explica el reclamo de garantía y pide el ticket en su segunda llamada al modelo; la herramienta crea el ticket TCK-E8EC1244 y el nodo de corte termina el turno sin que el cliente reciba el número}
+  \label{fig:studio-corte}
+\end{figure}
+
+\subsubtituloapa{El límite de pasos de D6 en cada framework} Como un paso no significa exactamente lo mismo en cada framework, la calibración de D6 se repitió en cada edición con los mismos tres casos de una, dos y tres llamadas a herramientas. Las otras tres ediciones dieron la misma tabla que Claude Agent SDK: con dos pasos se completan los casos de una y dos llamadas y se trunca el de tres, así que D6 usa dos pasos en las cuatro. En CrewAI el límite cuenta rondas de herramientas y no llamadas al modelo, pero el resultado es el mismo.
+Lo que cambia es lo que ve el cliente cuando se agotan los pasos. Claude Agent SDK y LangGraph cortan el turno sin responder, y en el caso de garantía el ticket queda creado sin que el cliente conozca su número, que es el comportamiento que explica los falsos positivos de D6 en E1. smolagents y CrewAI, en cambio, hacen una llamada más que obliga al modelo a responder, y en esa respuesta el agente comunicó el número del ticket en los dos frameworks. La misma mutación, con el mismo número, se manifiesta distinto según el framework, y por eso su efecto no puede trasladarse de un framework a otro sin medirlo.
+\par
+\subsubtituloapa{Costo de incorporación} Para medir cuánto cuesta incorporar un framework se fijó la regla de conteo antes de medir: líneas físicas con código, sin líneas en blanco, comentarios ni docstrings, y como complemento líneas lógicas, una por sentencia. Un comando calcula la Tabla~\ref{tab:incorporacion} a partir del repositorio y de su historia en git.
+\par
+
+\begin{table}[H]
+  \setstretch{1}
+  \caption{Costo de incorporar cada framework, en líneas físicas con código del adaptador, de la edición y de sus pruebas; entre paréntesis, líneas lógicas. Las pruebas en vivo llaman a la API y se cuentan aparte}
+  \label{tab:incorporacion}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{1.7in}|r|r|r|r|>{\raggedleft\arraybackslash}p{1.05in}|}
+    \hline
+    \textbf{Framework} & \textbf{Adaptador} & \textbf{Edición} & \textbf{Pruebas} & \textbf{En vivo} & \textbf{Archivos del núcleo modificados} \\ \hline
+    Claude Agent SDK (referencia) & 124 (98) & 49 (34) & 203 & 116 & --- \\ \hline
+    LangGraph & 130 (102) & 74 (66) & 524 & 45 & 0 \\ \hline
+    smolagents & 142 (118) & 57 (48) & 623 & 0 & 0 \\ \hline
+    CrewAI & 150 (115) & 62 (43) & 740 & 0 & 0 \\ \hline
+  \end{tabular}
+\end{table}
+
+Ningún framework obligó a modificar el núcleo, y sus adaptadores miden entre 130 y 150 líneas, cerca de las 124 del de Claude Agent SDK. Para el SDK la columna del núcleo no aplica, porque el núcleo se diseñó junto con él. Las pruebas de LangGraph, smolagents y CrewAI son más extensas que las del SDK porque sus modelos falsos permiten probar sin la API lo que en el SDK solo se verifica en vivo. La incorporación de LangGraph tocó código compartido fuera del núcleo: las descripciones de las herramientas pasaron al dominio para que todas las ediciones usen las mismas. Además, CrewAI exige versiones anteriores de dos dependencias, pydantic y el SDK del protocolo de herramientas MCP, que se bajaron para todo el proyecto. Antes de aceptarlo se verificó que las 800 trazas y veredictos de E1, la lectura del oráculo y el análisis de E1 salen idénticos con las versiones nuevas.
+\par
+\subsubtituloapa{Las corridas de punta a punta} Cada edición se probó con el camino completo, desde la reejecución hasta el reporte, con los cinco escenarios del piloto y dos repeticiones por escenario en la línea base y D4. En las tres ediciones nuevas las 20 conversaciones terminaron por el usuario simulado, sin errores del agente ni reintentos, y en las tres D4 hizo lo que debía: aprobó reembolsos que la política verdadera no admite en los escenarios de la tarjeta de regalo y del mouse defectuoso.
+La edición LangGraph es además la del experimento E4, que se describe en el capítulo de resultados.
+\par
+\subsubtituloapa{Exportación a OpenTelemetry} Las trazas también se pueden exportar al formato de OpenTelemetry, siguiendo sus convenciones semánticas para IA generativa. Esas convenciones cambian casi cada semana y no publican versiones, así que se fijó un commit de su repositorio. Cada conversación se convierte en un span raíz propio, un span por turno y un span por llamada a herramienta, y lo que la convención no contempla, como la condición o el motivo de terminación, va con un prefijo propio. La conversión es una función pura que no modifica el esquema ni ningún dato de los experimentos. El Anexo~A detalla el mapeo.
+\par
+Con las tres ediciones nuevas, el prototipo tiene 1081 pruebas automatizadas sin acceso a la API, en 70 módulos de prueba, y 26 pruebas en vivo.
 \par
 \endgroup

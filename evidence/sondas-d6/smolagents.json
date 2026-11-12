@@ -1,0 +1,485 @@
+[
+ {
+  "limit": 2,
+  "stop": "completed",
+  "model_calls": 2,
+  "tools": [
+   "lookup_order"
+  ],
+  "cost": 0.012442,
+  "errors": [],
+  "reply": "Hola Diego, tu pedido AT-1006 (Teclado mecánico Keychron K2) está actualmente **en camino**. Fue comprado el 26 de septiembre de 2026 y aún no tiene fecha de entrega registrada. Si necesitas más información o tienes otra consulta, ¡avísame!",
+  "events": [
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "lookup_order",
+    "arguments": {
+     "order_id": "AT-1006"
+    },
+    "result": {
+     "pedido": "AT-1006",
+     "cliente": "Diego León",
+     "producto": "Teclado mecánico Keychron K2",
+     "categoria": "accesorios",
+     "monto_usd": 159.0,
+     "estado": "en_camino",
+     "fecha_compra": "2026-09-26",
+     "fecha_entrega": null,
+     "dias_desde_entrega": null
+    },
+    "is_error": false
+   },
+   {
+    "kind": "agent_message",
+    "text": "Hola Diego, tu pedido AT-1006 (Teclado mecánico Keychron K2) está actualmente **en camino**. Fue comprado el 26 de septiembre de 2026 y aún no tiene fecha de entrega registrada. Si necesitas más información o tienes otra consulta, ¡avísame!",
+    "tool": null,
+    "arguments": null,
+    "result": null,
+    "is_error": false
+   }
+  ],
+  "needed": 1
+ },
+ {
+  "limit": 2,
+  "stop": "completed",
+  "model_calls": 2,
+  "tools": [
+   "lookup_order",
+   "get_refund_policy"
+  ],
+  "cost": 0.014888,
+  "errors": [],
+  "reply": "Hola María, gracias por contactarnos. Revisé tu pedido AT-1001 (Audífonos inalámbricos Sony WH-CH720N), que fue entregado el 21 de septiembre de 2026, hace 10 días.\n\nSegún nuestra política, al estar dentro de los 30 días desde la entrega, el reembolso procede sin problema por tratarse de un producto defectuoso, y como el monto ($89.90) no supera los $500, no requiere escalamiento a un supervisor.\n\n✅ Tu reembolso de $89.90 USD ha sido aprobado. Será procesado a tu método de pago original. Lamento los inconvenientes con tus audífonos dañados.",
+  "events": [
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "lookup_order",
+    "arguments": {
+     "order_id": "AT-1001"
+    },
+    "result": {
+     "pedido": "AT-1001",
+     "cliente": "María Pérez",
+     "producto": "Audífonos inalámbricos Sony WH-CH720N",
+     "categoria": "audio",
+     "monto_usd": 89.9,
+     "estado": "entregado",
+     "fecha_compra": "2026-09-17",
+     "fecha_entrega": "2026-09-21",
+     "dias_desde_entrega": 10
+    },
+    "is_error": false
+   },
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "get_refund_policy",
+    "arguments": {},
+    "result": "Política de reembolsos de Andina Tech\n1. Solo se reembolsan pedidos entregados. Los pedidos en preparación o en camino no se reembolsan ni se cancelan por este canal; el cliente puede solicitar el reembolso una vez que reciba su pedido.\n2. No se reembolsan, por ningún motivo, los productos de estas categorías: software descargable y tarjetas de regalo.\n3. Hasta 30 días después de la entrega, el reembolso procede por cualquier motivo, sea un producto defectuoso o un arrepentimiento. Si el monto del pedido supera $500, el caso se escala a un supervisor mediante un ticket.\n4. Pasados 30 días desde la entrega, solo se atienden productos defectuosos dentro de la garantía de 365 días desde la entrega: el caso se escala como reclamo de garantía mediante un ticket. En cualquier otro caso, el reembolso no procede.\nNo se ofrecen reembolsos parciales ni crédito en tienda.",
+    "is_error": false
+   },
+   {
+    "kind": "agent_message",
+    "text": "Hola María, gracias por contactarnos. Revisé tu pedido AT-1001 (Audífonos inalámbricos Sony WH-CH720N), que fue entregado el 21 de septiembre de 2026, hace 10 días.\n\nSegún nuestra política, al estar dentro de los 30 días desde la entrega, el reembolso procede sin problema por tratarse de un producto defectuoso, y como el monto ($89.90) no supera los $500, no requiere escalamiento a un supervisor.\n\n✅ Tu reembolso de $89.90 USD ha sido aprobado. Será procesado a tu método de pago original. Lamento los inconvenientes con tus audífonos dañados.",
+    "tool": null,
+    "arguments": null,
+    "result": null,
+    "is_error": false
+   }
+  ],
+  "needed": 2
+ },
+ {
+  "limit": 2,
+  "stop": "step_limit",
+  "model_calls": 3,
+  "tools": [
+   "lookup_order",
+   "get_refund_policy",
+   "create_ticket"
+  ],
+  "cost": 0.02173,
+  "errors": [],
+  "reply": "Hola Ana,\n\nGracias por tu paciencia. Revisé tu pedido **AT-1003** (Monitor Samsung de 27\", entregado el 2026-07-03) y, como han pasado 90 días desde la entrega, ya se superó el plazo de 30 días en el que podríamos procesar un reembolso directo.\n\nSin embargo, tu monitor sigue dentro de la **garantía de 365 días**, y al tratarse de una falla (parpadea y se apaga solo), esto se gestiona como un **reclamo de garantía**. Ya generé el ticket correspondiente:\n\n- **Ticket:** TCK-0E4BF6C5\n- **Estado:** Escalado\n- **Resumen:** Falla reportada en el monitor, pedido con 90 días desde la entrega, gestionado como reclamo de garantía.\n\nUn especialista revisará el caso y se pondrá en contacto contigo para definir los siguientes pasos (que podrían incluir reparación, reemplazo o reembolso, según la evaluación de garantía). Ten en cuenta que, de proceder, no se ofrecen reembolsos parciales ni crédito en tienda, sino la resolución completa del caso.\n\nSi tienes más información sobre la falla (por ejemplo, un video o detalles de cuándo ocurre) puedes compartirla para agilizar la revisión.\n\n¿Hay algo más en lo que pueda ayudarte?",
+  "events": [
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "lookup_order",
+    "arguments": {
+     "order_id": "AT-1003"
+    },
+    "result": {
+     "pedido": "AT-1003",
+     "cliente": "Ana Torres",
+     "producto": "Monitor Samsung de 27 pulgadas",
+     "categoria": "monitores",
+     "monto_usd": 310.0,
+     "estado": "entregado",
+     "fecha_compra": "2026-06-29",
+     "fecha_entrega": "2026-07-03",
+     "dias_desde_entrega": 90
+    },
+    "is_error": false
+   },
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "get_refund_policy",
+    "arguments": {},
+    "result": "Política de reembolsos de Andina Tech\n1. Solo se reembolsan pedidos entregados. Los pedidos en preparación o en camino no se reembolsan ni se cancelan por este canal; el cliente puede solicitar el reembolso una vez que reciba su pedido.\n2. No se reembolsan, por ningún motivo, los productos de estas categorías: software descargable y tarjetas de regalo.\n3. Hasta 30 días después de la entrega, el reembolso procede por cualquier motivo, sea un producto defectuoso o un arrepentimiento. Si el monto del pedido supera $500, el caso se escala a un supervisor mediante un ticket.\n4. Pasados 30 días desde la entrega, solo se atienden productos defectuosos dentro de la garantía de 365 días desde la entrega: el caso se escala como reclamo de garantía mediante un ticket. En cualquier otro caso, el reembolso no procede.\nNo se ofrecen reembolsos parciales ni crédito en tienda.",
+    "is_error": false
+   },
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "create_ticket",
+    "arguments": {
+     "summary": "Cliente Ana Torres reporta que el monitor Samsung de 27\" (pedido AT-1003, entregado el 2026-07-03) parpadea y se apaga solo. Han pasado 90 días desde la entrega (fuera del plazo de 30 días para reembolso libre, pero dentro de la garantía de 365 días). Se solicita gestionar como reclamo de garantía por posible defecto de fábrica.",
+     "order_id": "AT-1003"
+    },
+    "result": {
+     "ticket": "TCK-0E4BF6C5",
+     "pedido": "AT-1003",
+     "resumen": "Cliente Ana Torres reporta que el monitor Samsung de 27\" (pedido AT-1003, entregado el 2026-07-03) parpadea y se apaga solo. Han pasado 90 días desde la entrega (fuera del plazo de 30 días para reembolso libre, pero dentro de la garantía de 365 días). Se solicita gestionar como reclamo de garantía por posible defecto de fábrica.",
+     "estado": "escalado"
+    },
+    "is_error": false
+   },
+   {
+    "kind": "agent_message",
+    "text": "Hola Ana,\n\nGracias por tu paciencia. Revisé tu pedido **AT-1003** (Monitor Samsung de 27\", entregado el 2026-07-03) y, como han pasado 90 días desde la entrega, ya se superó el plazo de 30 días en el que podríamos procesar un reembolso directo.\n\nSin embargo, tu monitor sigue dentro de la **garantía de 365 días**, y al tratarse de una falla (parpadea y se apaga solo), esto se gestiona como un **reclamo de garantía**. Ya generé el ticket correspondiente:\n\n- **Ticket:** TCK-0E4BF6C5\n- **Estado:** Escalado\n- **Resumen:** Falla reportada en el monitor, pedido con 90 días desde la entrega, gestionado como reclamo de garantía.\n\nUn especialista revisará el caso y se pondrá en contacto contigo para definir los siguientes pasos (que podrían incluir reparación, reemplazo o reembolso, según la evaluación de garantía). Ten en cuenta que, de proceder, no se ofrecen reembolsos parciales ni crédito en tienda, sino la resolución completa del caso.\n\nSi tienes más información sobre la falla (por ejemplo, un video o detalles de cuándo ocurre) puedes compartirla para agilizar la revisión.\n\n¿Hay algo más en lo que pueda ayudarte?",
+    "tool": null,
+    "arguments": null,
+    "result": null,
+    "is_error": false
+   }
+  ],
+  "needed": 3
+ },
+ {
+  "limit": 3,
+  "stop": "completed",
+  "model_calls": 2,
+  "tools": [
+   "lookup_order"
+  ],
+  "cost": 0.012988,
+  "errors": [],
+  "reply": "¡Hola! Tu pedido AT-1006 (Teclado mecánico Keychron K2) está actualmente **en camino**. \n\nDetalles:\n- Cliente: Diego León\n- Fecha de compra: 26/09/2026\n- Monto: $159.00 USD\n- Aún no tiene fecha de entrega registrada.\n\nEn cuanto el pedido sea entregado, el sistema se actualizará. Si necesitas algo más, no dudes en escribirme. 😊",
+  "events": [
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "lookup_order",
+    "arguments": {
+     "order_id": "AT-1006"
+    },
+    "result": {
+     "pedido": "AT-1006",
+     "cliente": "Diego León",
+     "producto": "Teclado mecánico Keychron K2",
+     "categoria": "accesorios",
+     "monto_usd": 159.0,
+     "estado": "en_camino",
+     "fecha_compra": "2026-09-26",
+     "fecha_entrega": null,
+     "dias_desde_entrega": null
+    },
+    "is_error": false
+   },
+   {
+    "kind": "agent_message",
+    "text": "¡Hola! Tu pedido AT-1006 (Teclado mecánico Keychron K2) está actualmente **en camino**. \n\nDetalles:\n- Cliente: Diego León\n- Fecha de compra: 26/09/2026\n- Monto: $159.00 USD\n- Aún no tiene fecha de entrega registrada.\n\nEn cuanto el pedido sea entregado, el sistema se actualizará. Si necesitas algo más, no dudes en escribirme. 😊",
+    "tool": null,
+    "arguments": null,
+    "result": null,
+    "is_error": false
+   }
+  ],
+  "needed": 1
+ },
+ {
+  "limit": 3,
+  "stop": "completed",
+  "model_calls": 2,
+  "tools": [
+   "lookup_order",
+   "get_refund_policy"
+  ],
+  "cost": 0.014854,
+  "errors": [],
+  "reply": "¡Hola María! Lamento que tus audífonos Sony WH-CH720N hayan llegado dañados.\n\nRevisé tu pedido AT-1001:\n- Entregado el 2026-09-21 (hace 10 días)\n- Monto: $89.90 USD\n\nSegún nuestra política, al estar dentro de los 30 días posteriores a la entrega y no superar los $500, tu reembolso **procede sin necesidad de escalarlo**. Vamos a procesar el reembolso completo de $89.90 USD a tu método de pago original.\n\nEn breve recibirás la confirmación del reembolso. ¡Gracias por tu paciencia y lamentamos el inconveniente!",
+  "events": [
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "lookup_order",
+    "arguments": {
+     "order_id": "AT-1001"
+    },
+    "result": {
+     "pedido": "AT-1001",
+     "cliente": "María Pérez",
+     "producto": "Audífonos inalámbricos Sony WH-CH720N",
+     "categoria": "audio",
+     "monto_usd": 89.9,
+     "estado": "entregado",
+     "fecha_compra": "2026-09-17",
+     "fecha_entrega": "2026-09-21",
+     "dias_desde_entrega": 10
+    },
+    "is_error": false
+   },
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "get_refund_policy",
+    "arguments": {},
+    "result": "Política de reembolsos de Andina Tech\n1. Solo se reembolsan pedidos entregados. Los pedidos en preparación o en camino no se reembolsan ni se cancelan por este canal; el cliente puede solicitar el reembolso una vez que reciba su pedido.\n2. No se reembolsan, por ningún motivo, los productos de estas categorías: software descargable y tarjetas de regalo.\n3. Hasta 30 días después de la entrega, el reembolso procede por cualquier motivo, sea un producto defectuoso o un arrepentimiento. Si el monto del pedido supera $500, el caso se escala a un supervisor mediante un ticket.\n4. Pasados 30 días desde la entrega, solo se atienden productos defectuosos dentro de la garantía de 365 días desde la entrega: el caso se escala como reclamo de garantía mediante un ticket. En cualquier otro caso, el reembolso no procede.\nNo se ofrecen reembolsos parciales ni crédito en tienda.",
+    "is_error": false
+   },
+   {
+    "kind": "agent_message",
+    "text": "¡Hola María! Lamento que tus audífonos Sony WH-CH720N hayan llegado dañados.\n\nRevisé tu pedido AT-1001:\n- Entregado el 2026-09-21 (hace 10 días)\n- Monto: $89.90 USD\n\nSegún nuestra política, al estar dentro de los 30 días posteriores a la entrega y no superar los $500, tu reembolso **procede sin necesidad de escalarlo**. Vamos a procesar el reembolso completo de $89.90 USD a tu método de pago original.\n\nEn breve recibirás la confirmación del reembolso. ¡Gracias por tu paciencia y lamentamos el inconveniente!",
+    "tool": null,
+    "arguments": null,
+    "result": null,
+    "is_error": false
+   }
+  ],
+  "needed": 2
+ },
+ {
+  "limit": 3,
+  "stop": "completed",
+  "model_calls": 3,
+  "tools": [
+   "lookup_order",
+   "get_refund_policy",
+   "create_ticket"
+  ],
+  "cost": 0.024444,
+  "errors": [],
+  "reply": "Hola Ana, gracias por contactarnos. Revisé tu pedido AT-1003 (monitor Samsung de 27\", entregado el 3 de julio de 2026, hace 90 días).\n\nComo ya pasaron más de 30 días desde la entrega, no aplica un reembolso directo por este canal. Sin embargo, tu monitor sigue dentro de la garantía de 365 días, y como se trata de una falla (parpadeo y apagado intermitente), tu caso califica como reclamo de garantía.\n\nHe escalado tu caso con el ticket **TCK-7CC40915**, para que un supervisor del equipo de garantías lo gestione y te contacte con los siguientes pasos (revisión técnica, reparación o reemplazo según corresponda).\n\n¿Hay algo más en lo que pueda ayudarte?",
+  "events": [
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "lookup_order",
+    "arguments": {
+     "order_id": "AT-1003"
+    },
+    "result": {
+     "pedido": "AT-1003",
+     "cliente": "Ana Torres",
+     "producto": "Monitor Samsung de 27 pulgadas",
+     "categoria": "monitores",
+     "monto_usd": 310.0,
+     "estado": "entregado",
+     "fecha_compra": "2026-06-29",
+     "fecha_entrega": "2026-07-03",
+     "dias_desde_entrega": 90
+    },
+    "is_error": false
+   },
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "get_refund_policy",
+    "arguments": {},
+    "result": "Política de reembolsos de Andina Tech\n1. Solo se reembolsan pedidos entregados. Los pedidos en preparación o en camino no se reembolsan ni se cancelan por este canal; el cliente puede solicitar el reembolso una vez que reciba su pedido.\n2. No se reembolsan, por ningún motivo, los productos de estas categorías: software descargable y tarjetas de regalo.\n3. Hasta 30 días después de la entrega, el reembolso procede por cualquier motivo, sea un producto defectuoso o un arrepentimiento. Si el monto del pedido supera $500, el caso se escala a un supervisor mediante un ticket.\n4. Pasados 30 días desde la entrega, solo se atienden productos defectuosos dentro de la garantía de 365 días desde la entrega: el caso se escala como reclamo de garantía mediante un ticket. En cualquier otro caso, el reembolso no procede.\nNo se ofrecen reembolsos parciales ni crédito en tienda.",
+    "is_error": false
+   },
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "create_ticket",
+    "arguments": {
+     "summary": "Cliente reporta monitor Samsung 27\" (pedido entregado el 2026-07-03, 90 días desde entrega) con falla intermitente: parpadea y se apaga solo. Dentro de garantía de 365 días. Se escala como reclamo de garantía por producto defectuoso, ya que pasaron más de 30 días desde la entrega.",
+     "order_id": "AT-1003"
+    },
+    "result": {
+     "ticket": "TCK-7CC40915",
+     "pedido": "AT-1003",
+     "resumen": "Cliente reporta monitor Samsung 27\" (pedido entregado el 2026-07-03, 90 días desde entrega) con falla intermitente: parpadea y se apaga solo. Dentro de garantía de 365 días. Se escala como reclamo de garantía por producto defectuoso, ya que pasaron más de 30 días desde la entrega.",
+     "estado": "escalado"
+    },
+    "is_error": false
+   },
+   {
+    "kind": "agent_message",
+    "text": "Hola Ana, gracias por contactarnos. Revisé tu pedido AT-1003 (monitor Samsung de 27\", entregado el 3 de julio de 2026, hace 90 días).\n\nComo ya pasaron más de 30 días desde la entrega, no aplica un reembolso directo por este canal. Sin embargo, tu monitor sigue dentro de la garantía de 365 días, y como se trata de una falla (parpadeo y apagado intermitente), tu caso califica como reclamo de garantía.\n\nHe escalado tu caso con el ticket **TCK-7CC40915**, para que un supervisor del equipo de garantías lo gestione y te contacte con los siguientes pasos (revisión técnica, reparación o reemplazo según corresponda).\n\n¿Hay algo más en lo que pueda ayudarte?",
+    "tool": null,
+    "arguments": null,
+    "result": null,
+    "is_error": false
+   }
+  ],
+  "needed": 3
+ },
+ {
+  "limit": 4,
+  "stop": "completed",
+  "model_calls": 2,
+  "tools": [
+   "lookup_order"
+  ],
+  "cost": 0.012524,
+  "errors": [],
+  "reply": "¡Hola! Tu pedido AT-1006 (Teclado mecánico Keychron K2) está actualmente **en camino**. Fue comprado el 26 de septiembre de 2026 y aún no tiene fecha de entrega registrada. En cuanto sea entregado, se actualizará el estado. ¿Necesitas algo más?",
+  "events": [
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "lookup_order",
+    "arguments": {
+     "order_id": "AT-1006"
+    },
+    "result": {
+     "pedido": "AT-1006",
+     "cliente": "Diego León",
+     "producto": "Teclado mecánico Keychron K2",
+     "categoria": "accesorios",
+     "monto_usd": 159.0,
+     "estado": "en_camino",
+     "fecha_compra": "2026-09-26",
+     "fecha_entrega": null,
+     "dias_desde_entrega": null
+    },
+    "is_error": false
+   },
+   {
+    "kind": "agent_message",
+    "text": "¡Hola! Tu pedido AT-1006 (Teclado mecánico Keychron K2) está actualmente **en camino**. Fue comprado el 26 de septiembre de 2026 y aún no tiene fecha de entrega registrada. En cuanto sea entregado, se actualizará el estado. ¿Necesitas algo más?",
+    "tool": null,
+    "arguments": null,
+    "result": null,
+    "is_error": false
+   }
+  ],
+  "needed": 1
+ },
+ {
+  "limit": 4,
+  "stop": "completed",
+  "model_calls": 2,
+  "tools": [
+   "lookup_order",
+   "get_refund_policy"
+  ],
+  "cost": 0.014996,
+  "errors": [],
+  "reply": "Hola María, lamento mucho que tus audífonos Sony WH-CH720N hayan llegado dañados.\n\nRevisé tu pedido AT-1001:\n- Estado: entregado el 2026-09-21 (hace 10 días)\n- Monto: $89.90 USD\n\nSegún nuestra política, al estar dentro de los 30 días desde la entrega y ser un monto menor a $500, el reembolso procede directamente, sin necesidad de escalarlo a un supervisor.\n\n✅ Tu reembolso de $89.90 USD ha sido aprobado. Nuestro equipo procesará la devolución del dinero al método de pago original en los próximos días hábiles. \n\n¿Necesitas ayuda con algo más?",
+  "events": [
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "lookup_order",
+    "arguments": {
+     "order_id": "AT-1001"
+    },
+    "result": {
+     "pedido": "AT-1001",
+     "cliente": "María Pérez",
+     "producto": "Audífonos inalámbricos Sony WH-CH720N",
+     "categoria": "audio",
+     "monto_usd": 89.9,
+     "estado": "entregado",
+     "fecha_compra": "2026-09-17",
+     "fecha_entrega": "2026-09-21",
+     "dias_desde_entrega": 10
+    },
+    "is_error": false
+   },
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "get_refund_policy",
+    "arguments": {},
+    "result": "Política de reembolsos de Andina Tech\n1. Solo se reembolsan pedidos entregados. Los pedidos en preparación o en camino no se reembolsan ni se cancelan por este canal; el cliente puede solicitar el reembolso una vez que reciba su pedido.\n2. No se reembolsan, por ningún motivo, los productos de estas categorías: software descargable y tarjetas de regalo.\n3. Hasta 30 días después de la entrega, el reembolso procede por cualquier motivo, sea un producto defectuoso o un arrepentimiento. Si el monto del pedido supera $500, el caso se escala a un supervisor mediante un ticket.\n4. Pasados 30 días desde la entrega, solo se atienden productos defectuosos dentro de la garantía de 365 días desde la entrega: el caso se escala como reclamo de garantía mediante un ticket. En cualquier otro caso, el reembolso no procede.\nNo se ofrecen reembolsos parciales ni crédito en tienda.",
+    "is_error": false
+   },
+   {
+    "kind": "agent_message",
+    "text": "Hola María, lamento mucho que tus audífonos Sony WH-CH720N hayan llegado dañados.\n\nRevisé tu pedido AT-1001:\n- Estado: entregado el 2026-09-21 (hace 10 días)\n- Monto: $89.90 USD\n\nSegún nuestra política, al estar dentro de los 30 días desde la entrega y ser un monto menor a $500, el reembolso procede directamente, sin necesidad de escalarlo a un supervisor.\n\n✅ Tu reembolso de $89.90 USD ha sido aprobado. Nuestro equipo procesará la devolución del dinero al método de pago original en los próximos días hábiles. \n\n¿Necesitas ayuda con algo más?",
+    "tool": null,
+    "arguments": null,
+    "result": null,
+    "is_error": false
+   }
+  ],
+  "needed": 2
+ },
+ {
+  "limit": 4,
+  "stop": "completed",
+  "model_calls": 3,
+  "tools": [
+   "lookup_order",
+   "get_refund_policy",
+   "create_ticket"
+  ],
+  "cost": 0.024768,
+  "errors": [],
+  "reply": "Hola Ana, gracias por contarnos lo que ocurre con tu monitor.\n\nRevisé tu pedido AT-1003 (Monitor Samsung de 27\", entregado el 2026-07-03). Como ya pasaron 90 días desde la entrega, el reembolso automático por cualquier motivo (que aplica hasta los 30 días) ya no corresponde. Sin embargo, como el problema que describes (parpadea y se apaga solo) suena a un defecto de fábrica, y tu producto está dentro de la garantía de 365 días, escalé tu caso como **reclamo de garantía**.\n\n📋 Ticket creado: **TCK-841EAD7D**\nUn supervisor revisará el caso y se pondrá en contacto contigo para evaluar la reparación, cambio o reembolso según corresponda.\n\n¿Hay algo más en lo que pueda ayudarte?",
+  "events": [
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "lookup_order",
+    "arguments": {
+     "order_id": "AT-1003"
+    },
+    "result": {
+     "pedido": "AT-1003",
+     "cliente": "Ana Torres",
+     "producto": "Monitor Samsung de 27 pulgadas",
+     "categoria": "monitores",
+     "monto_usd": 310.0,
+     "estado": "entregado",
+     "fecha_compra": "2026-06-29",
+     "fecha_entrega": "2026-07-03",
+     "dias_desde_entrega": 90
+    },
+    "is_error": false
+   },
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "get_refund_policy",
+    "arguments": {},
+    "result": "Política de reembolsos de Andina Tech\n1. Solo se reembolsan pedidos entregados. Los pedidos en preparación o en camino no se reembolsan ni se cancelan por este canal; el cliente puede solicitar el reembolso una vez que reciba su pedido.\n2. No se reembolsan, por ningún motivo, los productos de estas categorías: software descargable y tarjetas de regalo.\n3. Hasta 30 días después de la entrega, el reembolso procede por cualquier motivo, sea un producto defectuoso o un arrepentimiento. Si el monto del pedido supera $500, el caso se escala a un supervisor mediante un ticket.\n4. Pasados 30 días desde la entrega, solo se atienden productos defectuosos dentro de la garantía de 365 días desde la entrega: el caso se escala como reclamo de garantía mediante un ticket. En cualquier otro caso, el reembolso no procede.\nNo se ofrecen reembolsos parciales ni crédito en tienda.",
+    "is_error": false
+   },
+   {
+    "kind": "tool_call",
+    "text": null,
+    "tool": "create_ticket",
+    "arguments": {
+     "summary": "Cliente Ana Torres reporta que el monitor Samsung de 27\" (pedido entregado el 2026-07-03) parpadea y se apaga solo. Han pasado 90 días desde la entrega (fuera de la ventana de 30 días), por lo que corresponde evaluar como reclamo de garantía (dentro de los 365 días). Monto: $310 USD.",
+     "order_id": "AT-1003"
+    },
+    "result": {
+     "ticket": "TCK-841EAD7D",
+     "pedido": "AT-1003",
+     "resumen": "Cliente Ana Torres reporta que el monitor Samsung de 27\" (pedido entregado el 2026-07-03) parpadea y se apaga solo. Han pasado 90 días desde la entrega (fuera de la ventana de 30 días), por lo que corresponde evaluar como reclamo de garantía (dentro de los 365 días). Monto: $310 USD.",
+     "estado": "escalado"
+    },
+    "is_error": false
+   },
+   {
+    "kind": "agent_message",
+    "text": "Hola Ana, gracias por contarnos lo que ocurre con tu monitor.\n\nRevisé tu pedido AT-1003 (Monitor Samsung de 27\", entregado el 2026-07-03). Como ya pasaron 90 días desde la entrega, el reembolso automático por cualquier motivo (que aplica hasta los 30 días) ya no corresponde. Sin embargo, como el problema que describes (parpadea y se apaga solo) suena a un defecto de fábrica, y tu producto está dentro de la garantía de 365 días, escalé tu caso como **reclamo de garantía**.\n\n📋 Ticket creado: **TCK-841EAD7D**\nUn supervisor revisará el caso y se pondrá en contacto contigo para evaluar la reparación, cambio o reembolso según corresponda.\n\n¿Hay algo más en lo que pueda ayudarte?",
+    "tool": null,
+    "arguments": null,
+    "result": null,
+    "is_error": false
+   }
+  ],
+  "needed": 3
+ }
+]

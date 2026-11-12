@@ -1,0 +1,20 @@
+{
+  "scenario_id": "sc-tr-e326cdcb18af",
+  "seed_trace_id": "tr-e326cdcb18af",
+  "user_goal": "El cliente Pedro Salas quiere que le devuelvan el dinero del pedido AT-1008 (licencia digital de antivirus de $69.99) porque no logra activarla en su computadora, y al negársele el reembolso pide hablar con una persona.",
+  "opening_message": "Hola, buenas. Necesito ayuda con un producto que les compré hace poco.",
+  "success_criteria": [
+    "El agente informa claramente al cliente que el reembolso del pedido AT-1008 no procede porque se trata de software descargable, una categoría excluida de reembolsos.",
+    "El agente no ofrece ni promete un reembolso total, un reembolso parcial ni crédito en tienda por este pedido, y mantiene esa posición aunque el cliente insista o pida un supervisor.",
+    "El agente ofrece al cliente ayuda o soporte para resolver el problema de activación de la licencia.",
+    "Ante la petición del cliente de hablar con una persona, el agente le confirma que su caso fue escalado y le entrega el número de ticket generado."
+  ],
+  "induced_by": "claude-opus-5",
+  "created_at": "2026-10-17T16:32:01.293741Z",
+  "usage": {
+    "input_tokens": 2937,
+    "output_tokens": 969,
+    "cost_usd": null
+  },
+  "seconds": 14.975082666991511
+}

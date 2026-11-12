@@ -9,7 +9,7 @@ authors = [{ name = "Jarod Tierra Medina", email = "jarodtierra@gmail.com" }]
 requires-python = ">=3.12"
 dependencies = [
     "anthropic>=1.7.0",
-    "pydantic>=2.13.5",
+    "pydantic>=2.11.9",
     "typer>=0.27.2",
 ]
 
@@ -20,10 +20,17 @@ agentproof = "agentproof.cli:app"
 claude-sdk = [
     "claude-agent-sdk>=0.2.157",
 ]
+crewai = [
+    "crewai==1.15.23",
+]
 langgraph = [
     "langchain-anthropic==1.7.5",
     "langchain-core<=1.6.6",
     "langgraph==1.2.12",
+]
+smolagents = [
+    "litellm<=1.103.3",
+    "smolagents[litellm]==1.26.0",
 ]
 
 [build-system]
@@ -33,14 +40,19 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "claude-agent-sdk>=0.2.157",
+    "crewai==1.15.23",
     "langchain-anthropic==1.7.5",
     "langchain-core<=1.6.6",
     "langgraph==1.2.12",
+    "litellm<=1.103.3",
     "pytest>=9.1.1",
     "ruff>=0.16.8",
+    "smolagents[litellm]==1.26.0",
 ]
 studio = [
+    "gradio==6.29.1",
     "langgraph-cli[inmem]==0.4.32",
+    "smolagents[gradio]==1.26.0",
 ]
 
 [tool.ruff]
