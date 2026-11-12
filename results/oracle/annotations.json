@@ -115,5 +115,50 @@
     "answers_card": true,
     "annotated_at": "2026-10-19T02:59:22.003707Z",
     "manual": true
+  },
+  {
+    "run_id": "baseline-a-20261111-000112",
+    "trace_id": "tr-1fc5688444fb",
+    "decision": "procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-11-11T12:01:53.251499Z",
+    "manual": true
+  },
+  {
+    "run_id": "d4-20261111-000112",
+    "trace_id": "tr-bf76499fbfb9",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-11-11T12:04:34.500374Z",
+    "manual": true
+  },
+  {
+    "run_id": "d4-20261111-000112",
+    "trace_id": "tr-a184ba82e261",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-11-11T12:06:52.999531Z",
+    "manual": true
+  },
+  {
+    "run_id": "baseline-a-20261111-000112",
+    "trace_id": "tr-a6990431e511",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-11-11T12:08:55.554309Z",
+    "manual": true
+  },
+  {
+    "run_id": "baseline-a-20261111-000112",
+    "trace_id": "tr-6e7ec87ceb90",
+    "decision": "no procede",
+    "contradicts_base": false,
+    "answers_card": true,
+    "annotated_at": "2026-11-11T12:13:39.154479Z",
+    "manual": true
   }
 ]

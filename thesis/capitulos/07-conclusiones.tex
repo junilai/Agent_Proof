@@ -6,5 +6,58 @@
 \tituloapa[Conclusiones y trabajo futuro]{CONCLUSIONES Y TRABAJO FUTURO}
 \begingroup\dobleesp
 \vspace{6pt}
+Este trabajo se propuso detectar de forma automática, y con evidencia estadística, que una nueva versión de un agente conversacional se comporta peor que la anterior, partiendo de las conversaciones que el agente ya sostuvo y reejecutándolas de una forma que tolere su variabilidad. Este capítulo resume lo que se logró frente a cada objetivo, lo que enseñan los experimentos, los límites de esas conclusiones y el trabajo que queda abierto.
+\par
+
+\subtituloapa{Cumplimiento de los objetivos}
+El pipeline de AgentProof funciona de extremo a extremo y sin intervención: graba una conversación, induce su escenario, lo reejecuta con un usuario simulado contra una versión del agente, juzga cada repetición a ciegas y compara dos versiones con un reporte cuyo código de salida sirve como compuerta de integración continua. Sus dos experimentos de detección suman 1200 conversaciones y 1200 juicios sin un solo reintento, lo que indica que el pipeline es estable a esa escala.
+\par
+El esquema de trazas y el protocolo de sesión cumplieron su función de desacoplar el núcleo de los frameworks. El agente del caso de estudio se construyó con Claude Agent SDK, LangGraph, smolagents y CrewAI, y los tres frameworks que se incorporaron después del primero no obligaron a modificar ningún archivo del núcleo. Cada uno costó un adaptador de 130 a 150 líneas de código y una edición del agente de 57 a 74, medidos con una regla fijada antes de contar.
+\par
+El corpus semilla tiene exactamente las veinte conversaciones previstas, elicitadas con cinco participantes y una matriz de cobertura. Las seis degradaciones se formalizaron como operadores de mutación declarados como datos, cada uno con su comportamiento afectado, su conjunto expuesto y su predicado de fallo. La capacidad de detección se midió con un protocolo pre-registrado, congelado con una huella criptográfica que verifica la integración continua, y con un control negativo de la línea base contra sí misma. El experimento de detección se replicó en LangGraph manteniendo constantes el dominio, las herramientas, la base de conocimiento, el modelo y el corpus. El sistema se publica como software de código abierto, con 1081 pruebas automatizadas, el protocolo, sus dos enmiendas y todos los datos necesarios para regenerar cada cifra sin volver a llamar a ningún modelo.
+\par
+% PENDIENTE F6: párrafo del objetivo 6 (E2 y E3) con las cifras de los tres anotadores.
+
+\subtituloapa{Lo que muestran los experimentos}
+\subsubtituloapa{Lo que se manifiesta en varios escenarios se detecta} D4, la política corrupta, se detectó por completo en los dos frameworks: las seis regresiones de su conjunto manifestado aparecieron como regresión en E1 y en E4. El control negativo no declaró ninguna regresión cuando el agente no cambió. Dentro del alcance del estudio, entonces, una degradación sistemática que cambia el desenlace de varios escenarios se detecta, y el agente sano no dispara falsas alarmas.
+\par
+\subsubtituloapa{El criterio es conservador, y eso tiene un costo} D1 y D3 bajaron la aprobación de la suite entre 25 y 30 puntos sin que se declarara ninguna regresión. No es un fallo del instrumento sino la consecuencia, prevista en el diseño, de cinco repeticiones y veinte escenarios: con la corrección por comparaciones múltiples, ninguna regresión se declara a menos que al menos cuatro escenarios caigan a la vez del todo. Para un equipo que use AgentProof, la lección práctica es que el código de salida no basta: el reporte debe leerse junto con la caída de la suite y las señales débiles, que en estos dos operadores son la evidencia de que el agente empeoró. Si lo que importa es no dejar pasar degradaciones que afectan a pocos escenarios, el criterio tiene que tener más resolución, con más repeticiones o con una prueba sobre la suite completa además de la prueba por escenario.
+\par
+\subsubtituloapa{La verdad de referencia también es una medición} El oráculo y el evaluador automático no miden lo mismo. El oráculo lee, con reglas fijas, la decisión y los datos que el agente comunicó; el evaluador califica criterios inducidos de la conversación semilla, que describen su desenlace. En D6, el corte del límite de pasos deja creado un ticket cuyo número el cliente nunca recibe: el evaluador lo registra como fallo y el predicado del oráculo no, así que las cinco regresiones de D6 cuentan como falsos positivos por definición en los dos frameworks. Además, dos reglas del oráculo debieron corregirse antes de E4, como enmienda declarada, al leer respuestas de otro framework. La métrica de detección depende tanto del detector como de la referencia contra la que se mide, y por eso la referencia necesita su propia validación, que en este trabajo hacen los anotadores externos.
+\par
+\subsubtituloapa{El instrumento se comporta igual en otro framework} E4 reprodujo E1 operador por operador: casi la misma aprobación de la línea base, la misma pass$^k$, la detección completa de D4, la misma ausencia de regresiones declaradas en D1 y las mismas cinco regresiones de D6. Con un solo dominio, un solo modelo y tres operadores, es evidencia de que el comportamiento de AgentProof no depende del framework con que se construyó el agente.
+\par
+\subsubtituloapa{La misma mutación no siempre se manifiesta igual} Las ediciones aplican exactamente la misma definición de cada mutación, y sin embargo el límite de pasos de D6 produce efectos distintos según el framework. Claude Agent SDK y LangGraph cortan el turno sin responder, y el cliente se queda sin el número del ticket. smolagents y CrewAI, en cambio, obligan al modelo a dar una respuesta final, y en ella el agente comunicó el número.
+Una degradación definida sobre la configuración del agente no determina por sí sola lo que el cliente experimenta: también depende de cómo el framework maneja el límite. Por eso, el efecto de una mutación medida en un framework no puede trasladarse a otro sin volver a medirlo.
+\par
+
+\subtituloapa{Limitaciones}
+Las conclusiones anteriores valen dentro de un alcance que conviene decir con claridad.
+\par
+\begin{itemize}[leftmargin=0.5in,itemsep=0pt,parsep=0pt,topsep=0pt]
+  \item \textbf{Un dominio y una familia de modelos.} Todo el estudio se hizo con un agente de atención al cliente sobre reembolsos y con modelos de un solo proveedor. No se sabe cómo se comporta el instrumento con agentes de otros dominios, con conversaciones más largas o con modelos de otras familias.
+  \item \textbf{Interacción elicitada, no tráfico de producción.} Las veinte conversaciones semilla las sostuvieron personas a partir de situaciones entregadas. Son variadas y en español, pero no representan la distribución de lo que piden los clientes de un sistema desplegado.
+  \item \textbf{Degradaciones sintéticas.} Los operadores de mutación son cambios deliberados y aislados. D4 cambia a la vez tres parámetros de la política, y su detección completa no indica que se detectaría un cambio de uno solo. Las regresiones que ocurren en la práctica, como el cambio de versión de un modelo o un prompt reescrito, pueden ser más sutiles.
+  \item \textbf{Operadores con poco efecto.} D2 y D5 casi no se manifestaron, porque el agente resistió las instrucciones que debían degradarlo. No permiten estimar la sensibilidad del instrumento para esa familia de fallos.
+  \item \textbf{Resolución estadística.} Con cinco repeticiones y veinte escenarios, una regresión aislada nunca se declara. Es una elección de diseño declarada, no un hallazgo, pero limita lo que el instrumento puede ver.
+  \item \textbf{La referencia depende de reglas y de un segundo anotador no humano.} Las reglas del oráculo se validaron antes de los experimentos con el acuerdo entre el autor y Claude, que conocía las reglas, y así también se calibró la enmienda 2. La única medición humana independiente es la de los anotadores externos.
+  \item \textbf{Replicación parcial.} E4 replica solo la familia A, en un framework. smolagents y CrewAI demuestran la portabilidad con una corrida de punta a punta, no con un experimento de detección completo.
+  \item \textbf{Costo del agente con caché.} En las ediciones que usan caché de prompts, el costo del agente no puede calcularse con la tabla de precios y se toma de la facturación del proveedor, conciliada por día.
+\end{itemize}
+\par
+% PENDIENTE F6: limitaciones que surjan de E2 y E3 (por ejemplo, la concordancia del evaluador).
+
+\subtituloapa{Trabajo futuro}
+El trabajo deja abiertas varias líneas, en el orden en que más ampliarían lo que se puede afirmar.
+\par
+\subsubtituloapa{Validación sobre tráfico de producción} La extensión más importante es partir de conversaciones de un sistema desplegado en lugar de un corpus elicitado. La exportación a OpenTelemetry que ya tiene AgentProof va en la dirección contraria: de las trazas propias a la convención estándar. Agregar la importación, de trazas de OpenTelemetry a trazas semilla, permitiría tomar el corpus directamente de la observabilidad de un sistema en producción.
+\par
+\subsubtituloapa{Un criterio con más resolución} El criterio actual exige que varios escenarios caigan a la vez. Un diseño adaptativo, que agregue repeticiones solo a los escenarios con señal débil, o una prueba adicional sobre la tasa de aprobación de toda la suite, podrían detectar degradaciones como D1 y D3 sin multiplicar el costo de toda la corrida.
+\par
+\subsubtituloapa{Ablación del evaluador con autocrítica} El evaluador hace una sola pasada. Queda por medir si un evaluador con autocrítica iterativa concuerda mejor con los anotadores humanos, y a qué costo.
+\par
+\subsubtituloapa{Más frameworks y otros modelos} Con un adaptador de unas 150 líneas por framework, extender AgentProof a otros frameworks es barato. Más interesante es repetir E4 con modelos de otros proveedores, que es la variación que este trabajo no cubre.
+\par
+\subsubtituloapa{Degradaciones más finas y un oráculo más rico} Los operadores podrían cubrir cambios más pequeños, como alterar un solo parámetro de la política, y las reglas del oráculo podrían leer intervalos de tiempo y no solo fechas, y el número de un ticket como parte de la decisión comunicada.
 \par
 \endgroup

@@ -1,0 +1,151 @@
+{
+  "trace_id": "tr-60d4b2e25e37",
+  "kind": "run",
+  "adapter": "langgraph",
+  "agent": "casestudy.editions.langgraph:builder",
+  "variant": "baseline",
+  "condition": "baseline-a",
+  "run_id": "baseline-a-20261111-000112",
+  "scenario_id": "sc-tr-3ee71ca0bdcf",
+  "repetition": 3,
+  "card_id": null,
+  "attempt": 1,
+  "termination": "user_ended",
+  "events": [
+    {
+      "step": 1,
+      "kind": "user_message",
+      "ts": "2026-11-11T00:06:46.850023Z",
+      "text": "Buenos días, quisiera saber cómo va mi pedido, ¿me pueden dar información del estado?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 2,
+      "kind": "agent_message",
+      "ts": "2026-11-11T00:06:47.906567Z",
+      "text": "¡Buenos días! Con gusto te ayudo a revisar el estado de tu pedido. ¿Podrías indicarme el número de tu pedido (por ejemplo, AT-1001)?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 3,
+      "kind": "user_message",
+      "ts": "2026-11-11T00:06:48.850942Z",
+      "text": "El número de mi pedido es AT-1006. ¿Podrían decirme en qué estado se encuentra y cuándo llega?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 4,
+      "kind": "tool_call",
+      "ts": "2026-11-11T00:06:52.455831Z",
+      "text": null,
+      "tool": "lookup_order",
+      "arguments": {
+        "order_id": "AT-1006"
+      },
+      "result": {
+        "pedido": "AT-1006",
+        "cliente": "Diego León",
+        "producto": "Teclado mecánico Keychron K2",
+        "categoria": "accesorios",
+        "monto_usd": 159.0,
+        "estado": "en_camino",
+        "fecha_compra": "2026-09-26",
+        "fecha_entrega": null,
+        "dias_desde_entrega": null
+      },
+      "is_error": false
+    },
+    {
+      "step": 5,
+      "kind": "agent_message",
+      "ts": "2026-11-11T00:06:52.455847Z",
+      "text": "¡Hola, Diego! Aquí tienes la información de tu pedido:\n\n- **Pedido:** AT-1006\n- **Producto:** Teclado mecánico Keychron K2\n- **Fecha de compra:** 26 de septiembre de 2026\n- **Estado actual:** 🚚 En camino\n- **Fecha de entrega:** aún no registrada en el sistema\n\nTu pedido ya está en tránsito, pero todavía no contamos con una fecha exacta de entrega confirmada en el sistema. Te recomiendo estar pendiente de las notificaciones de la empresa de envíos, ya que suelen actualizarse en los próximos días.\n\n¿Hay algo más en lo que pueda ayudarte?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 6,
+      "kind": "user_message",
+      "ts": "2026-11-11T00:06:53.562252Z",
+      "text": "Perfecto, gracias por la información. Me queda claro que está en camino. ¿Me pueden enviar una notificación cuando se actualice la fecha de entrega?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 7,
+      "kind": "agent_message",
+      "ts": "2026-11-11T00:06:56.917889Z",
+      "text": "Entiendo tu solicitud, Diego, pero debo aclararte que no tengo la capacidad de programar notificaciones automáticas ni de hacer seguimiento proactivo de tu pedido. \n\nTe sugiero lo siguiente:\n- Revisa periódicamente el estado de tu pedido aquí mismo, o\n- Verifica los correos/SMS de la empresa de envíos, ya que normalmente ellos notifican directamente cuando hay actualizaciones de la fecha de entrega.\n\nSi en los próximos días no ves movimiento o tienes dudas adicionales sobre tu pedido, no dudes en escribirme y con gusto reviso el estado nuevamente. ¿Hay algo más en lo que pueda ayudarte?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 8,
+      "kind": "user_message",
+      "ts": "2026-11-11T00:06:58.011020Z",
+      "text": "Está bien, entendido. Muchas gracias por tu ayuda y por la información. Estaré atento a los correos de la empresa de envíos. Si tengo más dudas, me comunicaré con ustedes.",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 9,
+      "kind": "agent_message",
+      "ts": "2026-11-11T00:06:59.604107Z",
+      "text": "¡Con mucho gusto, Diego! Me alegra haber podido ayudarte. 😊\n\nNo dudes en escribirnos si tienes cualquier otra duda sobre tu pedido o necesitas ayuda con algo más. ¡Que tengas un excelente día!",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    }
+  ],
+  "models": {
+    "inducer": {
+      "model": "claude-opus-5",
+      "max_tokens": 16000,
+      "effort": "high"
+    },
+    "judge": {
+      "model": "claude-opus-5",
+      "max_tokens": 16000,
+      "effort": "high"
+    },
+    "sim_user": {
+      "model": "claude-haiku-4-5-20251001",
+      "max_tokens": 1024,
+      "effort": null
+    },
+    "target_baseline": "claude-sonnet-5",
+    "target_downgraded": "claude-haiku-4-5-20251001"
+  },
+  "usage": {
+    "input_tokens": 6602,
+    "output_tokens": 721,
+    "cost_usd": 0.020414
+  },
+  "simulator_usage": {
+    "input_tokens": 2404,
+    "output_tokens": 148,
+    "cost_usd": null
+  },
+  "agent_seconds": 9.609811292000813,
+  "simulator_seconds": 3.646273957012454,
+  "started_at": "2026-11-11T00:06:46.840664Z",
+  "ended_at": "2026-11-11T00:07:00.107102Z"
+}

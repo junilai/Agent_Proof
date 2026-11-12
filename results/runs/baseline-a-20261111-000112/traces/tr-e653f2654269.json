@@ -1,0 +1,189 @@
+{
+  "trace_id": "tr-e653f2654269",
+  "kind": "run",
+  "adapter": "langgraph",
+  "agent": "casestudy.editions.langgraph:builder",
+  "variant": "baseline",
+  "condition": "baseline-a",
+  "run_id": "baseline-a-20261111-000112",
+  "scenario_id": "sc-tr-3ee71ca0bdcf",
+  "repetition": 1,
+  "card_id": null,
+  "attempt": 1,
+  "termination": "user_ended",
+  "events": [
+    {
+      "step": 1,
+      "kind": "user_message",
+      "ts": "2026-11-11T00:06:10.569479Z",
+      "text": "Buenos días, quisiera saber cómo va mi pedido, ¿me pueden dar información del estado?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 2,
+      "kind": "agent_message",
+      "ts": "2026-11-11T00:06:11.772152Z",
+      "text": "¡Buenos días! Con gusto te ayudo a revisar el estado de tu pedido. ¿Podrías indicarme el número de pedido? (por ejemplo, AT-1001)",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 3,
+      "kind": "user_message",
+      "ts": "2026-11-11T00:06:12.428343Z",
+      "text": "El número de pedido es AT-1006.",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 4,
+      "kind": "tool_call",
+      "ts": "2026-11-11T00:06:15.231775Z",
+      "text": null,
+      "tool": "lookup_order",
+      "arguments": {
+        "order_id": "AT-1006"
+      },
+      "result": {
+        "pedido": "AT-1006",
+        "cliente": "Diego León",
+        "producto": "Teclado mecánico Keychron K2",
+        "categoria": "accesorios",
+        "monto_usd": 159.0,
+        "estado": "en_camino",
+        "fecha_compra": "2026-09-26",
+        "fecha_entrega": null,
+        "dias_desde_entrega": null
+      },
+      "is_error": false
+    },
+    {
+      "step": 5,
+      "kind": "agent_message",
+      "ts": "2026-11-11T00:06:15.231883Z",
+      "text": "¡Buenos días, Diego! Aquí tienes el estado de tu pedido:\n\n- **Pedido:** AT-1006\n- **Producto:** Teclado mecánico Keychron K2\n- **Fecha de compra:** 26 de septiembre de 2026\n- **Estado:** 🚚 En camino\n- **Entrega:** Aún no registrada en el sistema\n\nTu teclado va en camino, pero todavía no figura la fecha de entrega. ¿Necesitas ayuda con algo más?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 6,
+      "kind": "user_message",
+      "ts": "2026-11-11T00:06:16.185080Z",
+      "text": "Perfecto, muchas gracias por la información. ¿Cuándo aproximadamente debería llegar? ¿Hay alguna forma de rastrear el envío?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 7,
+      "kind": "agent_message",
+      "ts": "2026-11-11T00:06:20.568988Z",
+      "text": "Con gusto te aclaro, Diego, pero debo ser transparente: en nuestro sistema solo tengo registrado el estado \"en camino\" y la fecha de compra (26 de septiembre de 2026). No tengo acceso a una fecha estimada de entrega exacta ni a un número de guía o enlace de rastreo en tiempo real desde esta plataforma.\n\nTe recomiendo:\n1. **Revisar tu correo electrónico** asociado a la compra, ya que normalmente el transportista envía un número de guía y enlace de rastreo una vez que el pedido sale de nuestro almacén.\n2. Si no has recibido esa notificación o ha pasado más de una semana sin novedades, puedo **escalar tu caso** a un supervisor para que verifiquen con el transportista el estado exacto y una fecha estimada.\n\n¿Quieres que cree un ticket de seguimiento para tu pedido?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 8,
+      "kind": "user_message",
+      "ts": "2026-11-11T00:06:21.700845Z",
+      "text": "Sí, por favor crea un ticket de seguimiento. También revisaré mi correo a ver si recibí algo del transportista. ¿En cuánto tiempo aproximado debería tener respuesta del supervisor?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 9,
+      "kind": "tool_call",
+      "ts": "2026-11-11T00:06:26.328120Z",
+      "text": null,
+      "tool": "create_ticket",
+      "arguments": {
+        "summary": "Cliente solicita seguimiento de envío: no tiene información de fecha estimada de entrega ni número de guía para el pedido en camino.",
+        "order_id": "AT-1006"
+      },
+      "result": {
+        "ticket": "TCK-0B45EB32",
+        "pedido": "AT-1006",
+        "resumen": "Cliente solicita seguimiento de envío: no tiene información de fecha estimada de entrega ni número de guía para el pedido en camino.",
+        "estado": "escalado"
+      },
+      "is_error": false
+    },
+    {
+      "step": 10,
+      "kind": "agent_message",
+      "ts": "2026-11-11T00:06:26.328151Z",
+      "text": "¡Listo, Diego! Tu caso fue escalado exitosamente:\n\n- **Ticket:** TCK-0B45EB32\n- **Pedido:** AT-1006\n- **Estado:** Escalado a supervisor\n\nUn supervisor se pondrá en contacto contigo para darte información detallada sobre el estado del envío con el transportista. Generalmente las respuestas a este tipo de tickets se gestionan en un plazo de **24 a 48 horas hábiles**, pero si tu correo tiene novedades antes, no dudes en revisarlas.\n\n¿Hay algo más en lo que pueda ayudarte?",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 11,
+      "kind": "user_message",
+      "ts": "2026-11-11T00:06:27.551632Z",
+      "text": "Gracias por tu ayuda. Por ahora está todo resuelto, revisaré mi correo y estaré atento a la respuesta del supervisor. ¡Que tengas un buen día!",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    },
+    {
+      "step": 12,
+      "kind": "agent_message",
+      "ts": "2026-11-11T00:06:28.584762Z",
+      "text": "¡Con gusto, Diego! Que tengas un excelente día. No dudes en escribirnos si necesitas algo más. 😊👋",
+      "tool": null,
+      "arguments": null,
+      "result": null,
+      "is_error": false
+    }
+  ],
+  "models": {
+    "inducer": {
+      "model": "claude-opus-5",
+      "max_tokens": 16000,
+      "effort": "high"
+    },
+    "judge": {
+      "model": "claude-opus-5",
+      "max_tokens": 16000,
+      "effort": "high"
+    },
+    "sim_user": {
+      "model": "claude-haiku-4-5-20251001",
+      "max_tokens": 1024,
+      "effort": null
+    },
+    "target_baseline": "claude-sonnet-5",
+    "target_downgraded": "claude-haiku-4-5-20251001"
+  },
+  "usage": {
+    "input_tokens": 10858,
+    "output_tokens": 1033,
+    "cost_usd": 0.032046000000000005
+  },
+  "simulator_usage": {
+    "input_tokens": 3410,
+    "output_tokens": 171,
+    "cost_usd": null
+  },
+  "agent_seconds": 14.049944625992794,
+  "simulator_seconds": 4.570391166009358,
+  "started_at": "2026-11-11T00:06:10.558976Z",
+  "ended_at": "2026-11-11T00:06:29.195057Z"
+}

@@ -1,0 +1,28 @@
+Análisis: referencia baseline-a-20261111-000112 · sin corrida de control
+
+Familia A (métricas principales)
+D1 · d1-20261111-000112
+  VP 0 · FN 10 · FP 0 (no expuestos 0, expuestos 0) · VN 10
+  TPR 0% · FPR 0%
+  sensibilidad: 0.2 -> TPR 0%, FPR 0% · 0.4 -> TPR 0%, FPR 0% · 0.6 -> TPR 0%, FPR 0%
+  señales débiles: sc-tr-0b1ba54b3bff, sc-tr-1bcac31bb099, sc-tr-3ee71ca0bdcf, sc-tr-49f9d41b2bc6, sc-tr-8e76607664f8, sc-tr-d707df857e02, sc-tr-f4fbcd9bf2e0
+  efecto (suite): aprobación 65% -> 40%, caída 25%
+D4 · d4-20261111-000112
+  VP 6 · FN 0 · FP 2 (no expuestos 0, expuestos 2) · VN 12
+  TPR 100% · FPR 14%
+  sensibilidad: 0.2 -> TPR 100%, FPR 8% · 0.4 -> TPR 100%, FPR 14% · 0.6 -> TPR 100%, FPR 14%
+  señales débiles: sc-tr-8e76607664f8, sc-tr-9a551596a82f
+  efecto (suite): aprobación 65% -> 24%, caída 41%
+D6 · d6-20261111-000112
+  VP 0 · FN 0 · FP 5 (no expuestos 0, expuestos 5) · VN 15
+  TPR — · FPR 25%
+  sensibilidad: 0.2 -> TPR —, FPR 25% · 0.4 -> TPR —, FPR 25% · 0.6 -> TPR —, FPR 25%
+  señales débiles: sc-tr-49f9d41b2bc6
+  efecto (suite): aprobación 65% -> 36%, caída 29%
+
+pass^k
+  baseline-a-20261111-000112: k=1 65% · k=2 58% · k=3 56% · k=4 55% · k=5 55%
+  d1-20261111-000112: k=1 40% · k=2 35% · k=3 32% · k=4 31% · k=5 30%
+  d4-20261111-000112: k=1 24% · k=2 20% · k=3 18% · k=4 16% · k=5 15%
+  d6-20261111-000112: k=1 36% · k=2 33% · k=3 32% · k=4 31% · k=5 30%
+
