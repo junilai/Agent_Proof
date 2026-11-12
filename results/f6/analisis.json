@@ -1,0 +1,3198 @@
+{
+  "annotators": [
+    "X1",
+    "X2",
+    "X3"
+  ],
+  "oracle": "53f6a1c4ebc346f4",
+  "e2": {
+    "pairs": 40,
+    "approvals": {
+      "X1": 25,
+      "X2": 25,
+      "X3": 24
+    },
+    "fleiss_approval": 0.8589894242068156,
+    "fleiss_criteria": 0.8005050505050505,
+    "cohen_approval": {
+      "X1-X2": 0.7866666666666667,
+      "X1-X3": 0.8421052631578948,
+      "X2-X3": 0.9473684210526315
+    },
+    "cohen_criteria": {
+      "X1-X2": 0.7428233205090261,
+      "X1-X3": 0.7506456241032997,
+      "X2-X3": 0.9079522283716864
+    },
+    "majority_approved": 24,
+    "judge_approval": {
+      "agreed": 34,
+      "total": 40,
+      "kappa": 0.7
+    },
+    "judge_criteria": {
+      "agreed": 143,
+      "total": 158,
+      "kappa": 0.6879115090861209
+    },
+    "strata": {
+      "aprobado": {
+        "pairs": 20,
+        "majority_approved": 19,
+        "judge_agreed": 19
+      },
+      "reprobado": {
+        "pairs": 20,
+        "majority_approved": 5,
+        "judge_agreed": 15
+      }
+    },
+    "approval_of_majority_criteria_differs": 0,
+    "natural": {
+      "passed": 413,
+      "judged": 800,
+      "share": 0.51625
+    },
+    "traces": [
+      {
+        "key": "d2-20261018-053954/tr-f8ab143eee8d",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-46332da948a0",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d5-20261018-053956/tr-6e22c4ddd065",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "baseline-a-20261018-000105/tr-f7f1b0163df9",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d5-20261018-053956/tr-0f59e25df25c",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-9693d164f40c",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": false,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-a530da5829a8",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "baseline-b-20261018-053952/tr-afd6b5fd9769",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d5-20261018-053956/tr-20aef36a233e",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-4b1b1d1044b9",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-0dfa699907a2",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "baseline-b-20261018-053952/tr-5e12cf1d31cf",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-5895872a19bc",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          false,
+          false,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-bda49284d240",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-ec4e8b45b119",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-24ae61385fb7",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-afef4e7908fb",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-e107e1e07f06",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-f227b45ded35",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-8bb3a16f553b",
+        "stratum": "aprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": true,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-544f8bfa4a9c",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-c1cec1a7bf9f",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-9795f182ad27",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": true,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          false
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-6fd4a66a466f",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": true,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          false
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-3c351a9161f6",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          false,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          false,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-b104dd6253c4",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          false,
+          true,
+          false
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          false,
+          false,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-460bebd86c0e",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          false,
+          false,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          false,
+          false,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-027d21015b71",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          false,
+          false,
+          false,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          false,
+          false,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-468ea9d0c353",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          false,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          false,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "baseline-b-20261018-053952/tr-bc39eee1d70e",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          false,
+          false
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          false,
+          false
+        ]
+      },
+      {
+        "key": "baseline-b-20261018-053952/tr-c3209087a00a",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-9985ae0ca8e3",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": true,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          false,
+          true,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          false,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "key": "d5-20261018-053956/tr-a85966f2d7df",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          false,
+          false,
+          false,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          false,
+          false,
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "baseline-a-20261018-000105/tr-729fffa55391",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          false,
+          false
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          false,
+          false
+        ]
+      },
+      {
+        "key": "d5-20261018-053956/tr-71a0395c6fcf",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          false
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-4670f1c04162",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          false,
+          false,
+          false,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          false,
+          true,
+          false,
+          false
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-a923fb28c752",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-d9aabd39662c",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          true,
+          false,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          false,
+          true
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-48feb38e2297",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "majority_approved": false,
+        "criteria_majority": [
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-017304fef7fc",
+        "stratum": "reprobado",
+        "approvals": {
+          "X1": true,
+          "X2": true,
+          "X3": true
+        },
+        "majority_approved": true,
+        "criteria_majority": [
+          true,
+          true,
+          true
+        ],
+        "judge_passed": false,
+        "judge_criteria": [
+          true,
+          true,
+          false
+        ]
+      }
+    ]
+  },
+  "audit": {
+    "audited": 36,
+    "left_out": [
+      "baseline-a-20261018-000105/tr-92d58142f67d",
+      "baseline-b-20261018-053952/tr-6a60814572bc",
+      "d5-20261018-053956/tr-492c9344d2cd",
+      "d6-20261018-044847/tr-23cc3b2bc2e1"
+    ],
+    "strata": {
+      "con ticket": {
+        "traces": 23,
+        "table": {
+          "decisión": {
+            "al revés": 5,
+            "de más": 2,
+            "exacta": 12
+          },
+          "atributos": {
+            "VN": 22,
+            "VP": 1
+          },
+          "estado": {
+            "coincide": 3
+          },
+          "predicado d1": {
+            "coincide": 6
+          },
+          "predicado d2": {
+            "coincide": 3,
+            "difiere": 3
+          },
+          "predicado d4": {
+            "coincide": 2,
+            "difiere": 4
+          },
+          "predicado d5": {},
+          "predicado d6": {
+            "coincide": 4
+          }
+        }
+      },
+      "sin ticket": {
+        "traces": 13,
+        "table": {
+          "decisión": {
+            "a la cola": 2,
+            "exacta": 7,
+            "omitida": 1
+          },
+          "atributos": {
+            "FP": 1,
+            "VN": 12
+          },
+          "estado": {
+            "coincide": 3
+          },
+          "predicado d1": {
+            "coincide": 2,
+            "difiere": 1
+          },
+          "predicado d2": {
+            "a la cola": 1,
+            "coincide": 2
+          },
+          "predicado d4": {
+            "coincide": 2
+          },
+          "predicado d5": {
+            "coincide": 1
+          },
+          "predicado d6": {}
+        }
+      }
+    },
+    "overall": {
+      "decisión": {
+        "a la cola": 2,
+        "al revés": 5,
+        "de más": 2,
+        "exacta": 19,
+        "omitida": 1
+      },
+      "atributos": {
+        "FP": 1,
+        "VN": 34,
+        "VP": 1
+      },
+      "estado": {
+        "coincide": 6
+      },
+      "predicado d1": {
+        "coincide": 8,
+        "difiere": 1
+      },
+      "predicado d2": {
+        "a la cola": 1,
+        "coincide": 5,
+        "difiere": 3
+      },
+      "predicado d4": {
+        "coincide": 4,
+        "difiere": 4
+      },
+      "predicado d5": {
+        "coincide": 1
+      },
+      "predicado d6": {
+        "coincide": 4
+      }
+    },
+    "ticket_weight": 0.5025,
+    "weighted": {
+      "decisión": {
+        "a la cola": 0.0995,
+        "al revés": 0.13223684210526315,
+        "de más": 0.05289473684210526,
+        "exacta": 0.6656184210526316,
+        "omitida": 0.04975
+      },
+      "atributos": {
+        "FP": 0.03826923076923077,
+        "VN": 0.9398829431438127,
+        "VP": 0.02184782608695652
+      },
+      "estado": {
+        "coincide": 1.0
+      },
+      "predicado d1": {
+        "coincide": 0.8341666666666667,
+        "difiere": 0.16583333333333336
+      },
+      "predicado d2": {
+        "a la cola": 0.16583333333333336,
+        "coincide": 0.5829166666666667,
+        "difiere": 0.25125
+      },
+      "predicado d4": {
+        "coincide": 0.665,
+        "difiere": 0.33499999999999996
+      },
+      "predicado d5": {
+        "coincide": null
+      },
+      "predicado d6": {
+        "coincide": null
+      }
+    },
+    "without_majority": [
+      {
+        "key": "baseline-b-20261018-053952/tr-5e12cf1d31cf",
+        "field": "decision",
+        "votes": [
+          "escalamiento",
+          "sin resolver",
+          "ninguna"
+        ]
+      }
+    ],
+    "annotators": {
+      "decision": {
+        "items": 30,
+        "unanimous": 24,
+        "fleiss": 0.7952397619880994,
+        "cohen": {
+          "X1-X2": 0.7619047619047621,
+          "X1-X3": 0.7160883280757099,
+          "X2-X3": 0.9071207430340558
+        }
+      },
+      "contradicts_base": {
+        "items": 36,
+        "unanimous": 34,
+        "fleiss": 0.3142857142857143,
+        "cohen": {
+          "X1-X2": 0.0,
+          "X1-X3": 0.0,
+          "X2-X3": 0.6538461538461537
+        }
+      },
+      "answers_card": {
+        "items": 6,
+        "unanimous": 6,
+        "fleiss": 1.0,
+        "cohen": {
+          "X1-X2": 1.0,
+          "X1-X3": 1.0,
+          "X2-X3": 1.0
+        }
+      }
+    },
+    "traces": [
+      {
+        "key": "baseline-a-20261018-000105/tr-9661686c0f99",
+        "condition": "baseline-a",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d1 coincide"
+          ],
+          [
+            "predicados",
+            "d2 coincide"
+          ],
+          [
+            "predicados",
+            "d4 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "baseline-a-20261018-000105/tr-6d87e694318a",
+        "condition": "baseline-a",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "al revés"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d1 coincide"
+          ],
+          [
+            "predicados",
+            "d2 difiere"
+          ],
+          [
+            "predicados",
+            "d4 difiere"
+          ],
+          [
+            "predicados",
+            "d6 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "baseline-a-20261018-000105/tr-a8189505f9d5",
+        "condition": "baseline-a",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "al revés"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d1 coincide"
+          ],
+          [
+            "predicados",
+            "d2 difiere"
+          ],
+          [
+            "predicados",
+            "d4 difiere"
+          ],
+          [
+            "predicados",
+            "d6 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "baseline-a-20261018-000105/tr-06da731041f5",
+        "condition": "baseline-a",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d1 coincide"
+          ],
+          [
+            "predicados",
+            "d2 coincide"
+          ],
+          [
+            "predicados",
+            "d4 coincide"
+          ],
+          [
+            "predicados",
+            "d5 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "baseline-b-20261018-053952/tr-5e12cf1d31cf",
+        "condition": "baseline-b",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": null,
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "baseline-b-20261018-053952/tr-bed4450d026f",
+        "condition": "baseline-b",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "al revés"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "baseline-b-20261018-053952/tr-e209639ea78c",
+        "condition": "baseline-b",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": null,
+          "contradicts_base": false,
+          "answers_card": true
+        },
+        "outcomes": [
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "estado",
+            "coincide"
+          ]
+        ]
+      },
+      {
+        "key": "baseline-b-20261018-053952/tr-64447aed96ec",
+        "condition": "baseline-b",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "a la cola"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-8ca2295eda83",
+        "condition": "d1",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "escalamiento",
+          "contradicts_base": true,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VP"
+          ],
+          [
+            "predicados",
+            "d1 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-82259013a79b",
+        "condition": "d1",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": null,
+          "contradicts_base": false,
+          "answers_card": false
+        },
+        "outcomes": [
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "estado",
+            "coincide"
+          ],
+          [
+            "predicados",
+            "d1 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-0a7342ff884c",
+        "condition": "d1",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": null,
+          "contradicts_base": false,
+          "answers_card": false
+        },
+        "outcomes": [
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "estado",
+            "coincide"
+          ],
+          [
+            "predicados",
+            "d1 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-7b7248d6e975",
+        "condition": "d1",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "FP"
+          ],
+          [
+            "predicados",
+            "d1 difiere"
+          ]
+        ]
+      },
+      {
+        "key": "d1-20261018-044843/tr-23b8687799dc",
+        "condition": "d1",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "a la cola"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d1 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-0628fac414b8",
+        "condition": "d2",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "al revés"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d2 difiere"
+          ]
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-f41c3cb2f5d3",
+        "condition": "d2",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "escalamiento",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d2 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-d30f4a917f89",
+        "condition": "d2",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "escalamiento",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d2 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-b2413a7f3f88",
+        "condition": "d2",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "omitida"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d2 a la cola"
+          ]
+        ]
+      },
+      {
+        "key": "d2-20261018-053954/tr-ccbe60b71f73",
+        "condition": "d2",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d2 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-075e54e623aa",
+        "condition": "d3",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-2310586c680f",
+        "condition": "d3",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-82b4e390f66b",
+        "condition": "d3",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-9906613c0ce5",
+        "condition": "d3",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d3-20261018-053958/tr-0dfa699907a2",
+        "condition": "d3",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-3130ac13781f",
+        "condition": "d4",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "ninguna",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "de más"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d4 difiere"
+          ]
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-79bbd837bc84",
+        "condition": "d4",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d4 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-65675f197702",
+        "condition": "d4",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "sin resolver",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "de más"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d4 difiere"
+          ]
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-75442b9d766b",
+        "condition": "d4",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": null,
+          "contradicts_base": false,
+          "answers_card": true
+        },
+        "outcomes": [
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "estado",
+            "coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d4-20261018-044845/tr-568159851a09",
+        "condition": "d4",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d4 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d5-20261018-053956/tr-2a7bc490fadd",
+        "condition": "d5",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "escalamiento",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d5-20261018-053956/tr-203d7fcd22a2",
+        "condition": "d5",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "escalamiento",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d5-20261018-053956/tr-bbadab1f6c3b",
+        "condition": "d5",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "no procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "al revés"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d5-20261018-053956/tr-33ba1e669c88",
+        "condition": "d5",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": "procede",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ]
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-e7587467ef84",
+        "condition": "d6",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "escalamiento",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d6 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-1eee6ca656fc",
+        "condition": "d6",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": "escalamiento",
+          "contradicts_base": false,
+          "answers_card": null
+        },
+        "outcomes": [
+          [
+            "decisión",
+            "exacta"
+          ],
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "predicados",
+            "d6 coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-eead92a75bd8",
+        "condition": "d6",
+        "stratum": "con ticket",
+        "majority": {
+          "decision": null,
+          "contradicts_base": false,
+          "answers_card": true
+        },
+        "outcomes": [
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "estado",
+            "coincide"
+          ]
+        ]
+      },
+      {
+        "key": "d6-20261018-044847/tr-54496a6d910d",
+        "condition": "d6",
+        "stratum": "sin ticket",
+        "majority": {
+          "decision": null,
+          "contradicts_base": false,
+          "answers_card": true
+        },
+        "outcomes": [
+          [
+            "atributos",
+            "VN"
+          ],
+          [
+            "estado",
+            "coincide"
+          ]
+        ]
+      }
+    ]
+  },
+  "disagreements": {
+    "cells": [
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-08b90a7484e8",
+        "run": "candidata",
+        "run_id": "d1-20261018-044843",
+        "direction": "oráculo falla, evaluador aprueba",
+        "discordant": 4,
+        "trace_id": "tr-a4707abf6dc4",
+        "oracle_fails": true,
+        "labels_fails": true,
+        "judge_passed": true,
+        "labels_passed": true,
+        "decision_votes": [
+          "escalamiento",
+          "escalamiento",
+          "escalamiento"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-1bcac31bb099",
+        "run": "candidata",
+        "run_id": "d1-20261018-044843",
+        "direction": "oráculo falla, evaluador aprueba",
+        "discordant": 3,
+        "trace_id": "tr-b49ea9675671",
+        "oracle_fails": true,
+        "labels_fails": true,
+        "judge_passed": true,
+        "labels_passed": true,
+        "decision_votes": [
+          "escalamiento",
+          "escalamiento",
+          "escalamiento"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-49f9d41b2bc6",
+        "run": "referencia",
+        "run_id": "baseline-a-20261018-000105",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 4,
+        "trace_id": "tr-749642038cc0",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": true,
+        "decision_votes": [
+          "procede",
+          "procede",
+          "procede"
+        ],
+        "causes": [
+          "evaluador"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-69b396c04669",
+        "run": "referencia",
+        "run_id": "baseline-a-20261018-000105",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 2,
+        "trace_id": "tr-29aa60c1b351",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": true,
+        "decision_votes": [
+          "procede",
+          "procede",
+          "procede"
+        ],
+        "causes": [
+          "evaluador"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-69b396c04669",
+        "run": "candidata",
+        "run_id": "d1-20261018-044843",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 1,
+        "trace_id": "tr-31aa4ee2c71d",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "escalamiento",
+          "escalamiento",
+          "ninguna"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-6c6ab21b3116",
+        "run": "referencia",
+        "run_id": "baseline-a-20261018-000105",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 4,
+        "trace_id": "tr-770f679e595b",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          null,
+          null,
+          null
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-8e76607664f8",
+        "run": "referencia",
+        "run_id": "baseline-a-20261018-000105",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 5,
+        "trace_id": "tr-2b409bde146c",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "procede",
+          "procede",
+          "procede"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-8e76607664f8",
+        "run": "candidata",
+        "run_id": "d1-20261018-044843",
+        "direction": "oráculo falla, evaluador aprueba",
+        "discordant": 2,
+        "trace_id": "tr-7b7248d6e975",
+        "oracle_fails": true,
+        "labels_fails": false,
+        "judge_passed": true,
+        "labels_passed": true,
+        "decision_votes": [
+          "procede",
+          "procede",
+          "procede"
+        ],
+        "causes": [
+          "reglas del oráculo"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-8e76607664f8",
+        "run": "candidata",
+        "run_id": "d1-20261018-044843",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 2,
+        "trace_id": "tr-831764d3cddf",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "escalamiento",
+          "escalamiento",
+          "ninguna"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-96424db58a33",
+        "run": "referencia",
+        "run_id": "baseline-a-20261018-000105",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 3,
+        "trace_id": "tr-729fffa55391",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "no procede",
+          "no procede",
+          "no procede"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-c54fe59dc976",
+        "run": "referencia",
+        "run_id": "baseline-a-20261018-000105",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 5,
+        "trace_id": "tr-ccfcd62f43b3",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": true,
+        "decision_votes": [
+          "procede",
+          "procede",
+          "procede"
+        ],
+        "causes": [
+          "evaluador"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-c54fe59dc976",
+        "run": "candidata",
+        "run_id": "d1-20261018-044843",
+        "direction": "oráculo falla, evaluador aprueba",
+        "discordant": 1,
+        "trace_id": "tr-6da1e11c54da",
+        "oracle_fails": true,
+        "labels_fails": true,
+        "judge_passed": true,
+        "labels_passed": true,
+        "decision_votes": [
+          "procede",
+          "procede",
+          "procede"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-c54fe59dc976",
+        "run": "candidata",
+        "run_id": "d1-20261018-044843",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 3,
+        "trace_id": "tr-3391b58cae59",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "escalamiento",
+          "escalamiento",
+          "escalamiento"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-d707df857e02",
+        "run": "candidata",
+        "run_id": "d1-20261018-044843",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 3,
+        "trace_id": "tr-2812024fadd8",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "no procede",
+          "no procede",
+          "no procede"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-f4615497b746",
+        "run": "referencia",
+        "run_id": "baseline-a-20261018-000105",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 3,
+        "trace_id": "tr-00630db1696b",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "no procede",
+          "procede",
+          "procede"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d1",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-f4615497b746",
+        "run": "candidata",
+        "run_id": "d1-20261018-044843",
+        "direction": "oráculo falla, evaluador aprueba",
+        "discordant": 1,
+        "trace_id": "tr-793ca97c3215",
+        "oracle_fails": true,
+        "labels_fails": false,
+        "judge_passed": true,
+        "labels_passed": true,
+        "decision_votes": [
+          "procede",
+          "procede",
+          "procede"
+        ],
+        "causes": [
+          "reglas del oráculo"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d2",
+        "kind": "falso negativo",
+        "scenario_id": "sc-tr-69b396c04669",
+        "run": "referencia",
+        "run_id": "baseline-a-20261018-000105",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 2,
+        "trace_id": "tr-29aa60c1b351",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": true,
+        "decision_votes": [
+          "procede",
+          "procede",
+          "procede"
+        ],
+        "causes": [
+          "evaluador"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d4",
+        "kind": "falso positivo",
+        "scenario_id": "sc-tr-e326cdcb18af",
+        "run": "referencia",
+        "run_id": "baseline-a-20261018-000105",
+        "direction": "oráculo falla, evaluador aprueba",
+        "discordant": 4,
+        "trace_id": "tr-a046b3148545",
+        "oracle_fails": true,
+        "labels_fails": false,
+        "judge_passed": true,
+        "labels_passed": true,
+        "decision_votes": [
+          "no procede",
+          "escalamiento",
+          "no procede"
+        ],
+        "causes": [
+          "reglas del oráculo"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d6",
+        "kind": "falso positivo",
+        "scenario_id": "sc-tr-08b90a7484e8",
+        "run": "candidata",
+        "run_id": "d6-20261018-044847",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 5,
+        "trace_id": "tr-b77553c70015",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "escalamiento",
+          "escalamiento",
+          "escalamiento"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d6",
+        "kind": "falso positivo",
+        "scenario_id": "sc-tr-0b1ba54b3bff",
+        "run": "candidata",
+        "run_id": "d6-20261018-044847",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 4,
+        "trace_id": "tr-86f921b38c7c",
+        "oracle_fails": false,
+        "labels_fails": true,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "no procede",
+          "no procede",
+          "no procede"
+        ],
+        "causes": [
+          "reglas del oráculo"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d6",
+        "kind": "falso positivo",
+        "scenario_id": "sc-tr-1bcac31bb099",
+        "run": "candidata",
+        "run_id": "d6-20261018-044847",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 5,
+        "trace_id": "tr-8cb5ed0aa69b",
+        "oracle_fails": false,
+        "labels_fails": false,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "escalamiento",
+          "escalamiento",
+          "escalamiento"
+        ],
+        "causes": [
+          "alcance distinto"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d6",
+        "kind": "falso positivo",
+        "scenario_id": "sc-tr-91931c2b95fa",
+        "run": "candidata",
+        "run_id": "d6-20261018-044847",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 4,
+        "trace_id": "tr-e71962bde2f8",
+        "oracle_fails": false,
+        "labels_fails": true,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "sin resolver",
+          "ninguna",
+          "ninguna"
+        ],
+        "causes": [
+          "reglas del oráculo"
+        ],
+        "apart": null
+      },
+      {
+        "operator": "d6",
+        "kind": "falso positivo",
+        "scenario_id": "sc-tr-a450dfb016b9",
+        "run": "candidata",
+        "run_id": "d6-20261018-044847",
+        "direction": "evaluador reprueba, oráculo no",
+        "discordant": 5,
+        "trace_id": "tr-0628253e74a6",
+        "oracle_fails": false,
+        "labels_fails": true,
+        "judge_passed": false,
+        "labels_passed": false,
+        "decision_votes": [
+          "no procede",
+          "no procede",
+          "no procede"
+        ],
+        "causes": [
+          "reglas del oráculo"
+        ],
+        "apart": null
+      }
+    ],
+    "by_cause": {
+      "reglas del oráculo": {
+        "cells": 6,
+        "repetitions": 20
+      },
+      "evaluador": {
+        "cells": 4,
+        "repetitions": 13
+      },
+      "alcance distinto": {
+        "cells": 13,
+        "repetitions": 42
+      }
+    },
+    "both": {
+      "cells": 0,
+      "repetitions": 0
+    },
+    "by_operator": {
+      "d1": {
+        "alcance distinto": 32,
+        "evaluador": 11,
+        "reglas del oráculo": 3
+      },
+      "d2": {
+        "evaluador": 2
+      },
+      "d4": {
+        "reglas del oráculo": 4
+      },
+      "d6": {
+        "alcance distinto": 10,
+        "reglas del oráculo": 13
+      }
+    },
+    "by_run": {
+      "candidata": {
+        "alcance distinto": 27,
+        "reglas del oráculo": 16
+      },
+      "referencia": {
+        "evaluador": 13,
+        "alcance distinto": 15,
+        "reglas del oráculo": 4
+      }
+    },
+    "by_direction": {
+      "oráculo falla, evaluador aprueba": {
+        "alcance distinto": 8,
+        "reglas del oráculo": 7
+      },
+      "evaluador reprueba, oráculo no": {
+        "evaluador": 13,
+        "alcance distinto": 34,
+        "reglas del oráculo": 13
+      }
+    },
+    "apart": {}
+  },
+  "e3": {
+    "scenarios": 20,
+    "median_at_least_4": 20,
+    "share_median_at_least_4": 1.0,
+    "alpha_ordinal": -0.20408163265306123,
+    "pairs": {
+      "X1-X2": {
+        "exact": 12,
+        "within_one": 20,
+        "total": 20,
+        "mean_difference": 0.1,
+        "alpha_ordinal": -0.21875
+      },
+      "X1-X3": {
+        "exact": 14,
+        "within_one": 20,
+        "total": 20,
+        "mean_difference": 0.0,
+        "alpha_ordinal": -0.14705882352941177
+      },
+      "X2-X3": {
+        "exact": 12,
+        "within_one": 20,
+        "total": 20,
+        "mean_difference": -0.1,
+        "alpha_ordinal": -0.21875
+      }
+    },
+    "distribution": {
+      "X1": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 17
+      },
+      "X2": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 5,
+        "5": 15
+      },
+      "X3": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 17
+      },
+      "todos": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 11,
+        "5": 49
+      }
+    },
+    "needs_correction": 0,
+    "share_needs_correction": 0.0,
+    "per_scenario": [
+      {
+        "scenario_id": "sc-tr-08b90a7484e8",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-0b1ba54b3bff",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-1bcac31bb099",
+        "ratings": {
+          "X1": 5,
+          "X2": 4,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-1d3d63b4ec80",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-3ee71ca0bdcf",
+        "ratings": {
+          "X1": 5,
+          "X2": 4,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-49f9d41b2bc6",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-69b396c04669",
+        "ratings": {
+          "X1": 5,
+          "X2": 4,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-6c6ab21b3116",
+        "ratings": {
+          "X1": 4,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": true,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-8e76607664f8",
+        "ratings": {
+          "X1": 4,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-91931c2b95fa",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 4
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-96424db58a33",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-9a551596a82f",
+        "ratings": {
+          "X1": 4,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-a450dfb016b9",
+        "ratings": {
+          "X1": 5,
+          "X2": 4,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-b5c4babdd36b",
+        "ratings": {
+          "X1": 5,
+          "X2": 4,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-c54fe59dc976",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-d707df857e02",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 4
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-dcdc60171b83",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-e326cdcb18af",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-f4615497b746",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 4
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      },
+      {
+        "scenario_id": "sc-tr-f4fbcd9bf2e0",
+        "ratings": {
+          "X1": 5,
+          "X2": 5,
+          "X3": 5
+        },
+        "median": 5.0,
+        "corrections": {
+          "X1": false,
+          "X2": false,
+          "X3": false
+        },
+        "needs_correction": false
+      }
+    ]
+  },
+  "notes": [
+    {
+      "annotator": "X1",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-65675f197702",
+      "note": "El agente dice que puede proceder el reembolso pero el cliente lo declina y dice que prefiere un reemplazo. "
+    },
+    {
+      "annotator": "X1",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-5895872a19bc",
+      "note": "el agente dice que no puede dar un reembolso de ningún tipo, pero también informa que al escalar a un supervisor su caso podría ser analizado a mayor escala para poder dar una decisión final, dejando abierto esto "
+    },
+    {
+      "annotator": "X1",
+      "session": 1,
+      "key": "d6-20261018-044847/tr-e71962bde2f8",
+      "note": "no ofrece un reembolso, pero tampoco dice nunca nada sobre el mismo, es un tema que se salta y deja ambiguo "
+    },
+    {
+      "annotator": "X1",
+      "session": 1,
+      "key": "d3-20261018-053958/tr-3c351a9161f6",
+      "note": "escala pero no informa sobre la política de 30 días para reembolso por cualquier razón"
+    },
+    {
+      "annotator": "X1",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-831764d3cddf",
+      "note": "no puede usar la herramienta de buscar detalles del pedido y deja todo en manos del supervisor"
+    },
+    {
+      "annotator": "X1",
+      "session": 1,
+      "key": "d6-20261018-044847/tr-8cb5ed0aa69b",
+      "note": "dice que si al reembolso pero la aprobación final queda en manos del supervisor"
+    },
+    {
+      "annotator": "X1",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-3130ac13781f",
+      "note": "Dice que es un reclamo de garantía y lo escala pero no dice nada sobre el reembolso "
+    },
+    {
+      "annotator": "X1",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-027d21015b71",
+      "note": "Aquí es diferente porque la política que tiene el agente es diferente y en lugar de decir 30 días para el reembolso dice 90 y por eso pasa "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d6-20261018-044847/tr-1eee6ca656fc",
+      "note": "Dice que el reembolso no procede pero escala a un supervisor y dice que posiblemente no cambien de decisión pero que el mismo revisará más a fondo dejando abierta la posibilidad"
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-460bebd86c0e",
+      "note": "informa que los primeros días son un total de 90 y no de 30 "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "baseline-b-20261018-053952/tr-5e12cf1d31cf",
+      "note": "No ofrece reembolso pero es porque ni menciona nada acerca del reembolso "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d5-20261018-053956/tr-a85966f2d7df",
+      "note": "Como le escribe alguien que no es la persona que está registrada en el pedido no e da ninguna información"
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-9985ae0ca8e3",
+      "note": "no revisa el el estado del pedido y solo asume por lo que le dijo el cliente "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-65675f197702",
+      "note": "habla sobre el reembolso y dice que procede sin problema pero hay un pequeño dilema y es que el cliente prefiere un remplazo y n oun reembolso "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-5895872a19bc",
+      "note": "Dice que no procede el reembolso pero escala y dice que el supervisor podría tomar otra decisión"
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d6-20261018-044847/tr-e71962bde2f8",
+      "note": "no habla ni menciona tan siquiera la palabra reembolso"
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-831764d3cddf",
+      "note": "no consulta la herramienta para ver la info del proyecto"
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d2-20261018-053954/tr-f41c3cb2f5d3",
+      "note": "Niega el reembolso siempre al completo pero dice al final que escalará para que un supervisor vea detenidamente el caso "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d6-20261018-044847/tr-8cb5ed0aa69b",
+      "note": "dice que será escalado pero nunca hace el ticket correspondiente "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-3130ac13781f",
+      "note": "no menciona nunca algo sobre el reembolso "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-027d21015b71",
+      "note": "le da el reembolso porque según la política el reembolso por cualquier caso es de 90 días en este caso en vez de 30 "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "baseline-a-20261018-000105/tr-a046b3148545",
+      "note": "es complicado porque el agente se encarga de decir muchas veces que el caso que presenta no es reembolsable, pero al último deja un mínimo de esperanza de que el supervisor pueda ser capaz de hacer algo frente a eso "
+    },
+    {
+      "annotator": "X2",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-31aa4ee2c71d",
+      "note": "el agente no consulta ninguna herramienta y solo escala para que el supervisor se haga cargo de todo "
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d6-20261018-044847/tr-1eee6ca656fc",
+      "note": "dice que el reembolso no es posible pero termina diciendo que \"Quiero ser honesto: la política de reembolsos para software descargable es estricta y es posible que la decisión final se mantenga, pero es justo que un supervisor evalúe tu situación particular\"  lo que deja ambiguedad"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-460bebd86c0e",
+      "note": "dice que el reembolso por cualquier motivo es de 90 y no 30 días \n"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "baseline-b-20261018-053952/tr-5e12cf1d31cf",
+      "note": "el agente no menciona nunca que el reembolso no procede, solo que se escala por garantía"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d5-20261018-053956/tr-a85966f2d7df",
+      "note": "como detecta que la persona con la que está hablando no es la que hizo el pedido, no llega a nada "
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "baseline-a-20261018-000105/tr-2b409bde146c",
+      "note": "el agente dice que sí procede pero aparece un condicionante que se basa en que la persona que hizo el pedido debe actuar para dar una confirmación"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-82259013a79b",
+      "note": "no pudo consultar  el estado del pedido "
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-65675f197702",
+      "note": "un caso raro porque el agente ofrece y aprueba el reembolso, pero el cliente quiere un reemplazo, y el camino toma otro rumbo"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-5895872a19bc",
+      "note": "el agente declara la imposibilidad del reembolso, pero escala el caso existiendo ahora una mínima posibilidad"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d6-20261018-044847/tr-e71962bde2f8",
+      "note": "no dice nada sobre el reembolso, solo garantía"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-831764d3cddf",
+      "note": "no pudo ver el estado de la compra y solo escaló la situación"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d2-20261018-053954/tr-f41c3cb2f5d3",
+      "note": "escala para una decisión final a pesar de decir al inicio que no hay reembolso"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-b104dd6253c4",
+      "note": "acepta el reembolso pero como el cliente dice otro precio lo condiciona a escalamiento"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-3130ac13781f",
+      "note": "no entrega información alguna del reembolso"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d4-20261018-044845/tr-027d21015b71",
+      "note": "se equivoca diciendo que los días son 90 en vez de 30 y otorga el reembolso"
+    },
+    {
+      "annotator": "X3",
+      "session": 1,
+      "key": "d1-20261018-044843/tr-31aa4ee2c71d",
+      "note": "no puede consultar y solo escala"
+    },
+    {
+      "annotator": "X1",
+      "session": 2,
+      "key": "sc-tr-6c6ab21b3116",
+      "note": "dudo porque en la conversación semilla el agente declara al pago como un hecho confirmado en el sistema pero el criterio de éxito dice lo contrario, aparte de eso está perfecto"
+    }
+  ]
+}
