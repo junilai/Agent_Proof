@@ -67,6 +67,7 @@ El reporte compara dos corridas escenario por escenario con la prueba exacta de 
     \textbf{Comando} & \textbf{Qué hace} \\ \hline
     \texttt{record} & Graba una conversación con una persona como traza semilla, ligada a su tarjeta de situación \\ \hline
     \texttt{induce} & Induce el escenario de cada traza semilla que aún no lo tiene \\ \hline
+    \texttt{review} & Revisión humana opcional: muestra cada escenario junto a su conversación semilla para aprobarlo o corregirlo, y guarda la suite curada en otra carpeta sin tocar el corpus \\ \hline
     \texttt{run} & Reejecuta los escenarios con el usuario simulado contra una variante del agente, con repeticiones \\ \hline
     \texttt{resume} & Retoma una corrida interrumpida sin repetir lo que ya se ejecutó \\ \hline
     \texttt{judge} & Juzga las trazas de una corrida que aún no tienen juicio \\ \hline
@@ -166,6 +167,6 @@ La edición LangGraph es además la del experimento E4, que se describe en el ca
 \par
 \subsubtituloapa{Exportación a OpenTelemetry} Las trazas también se pueden exportar al formato de OpenTelemetry, siguiendo sus convenciones semánticas para IA generativa. Esas convenciones cambian casi cada semana y no publican versiones, así que se fijó un commit de su repositorio. Cada conversación se convierte en un span raíz propio, un span por turno y un span por llamada a herramienta, y lo que la convención no contempla, como la condición o el motivo de terminación, va con un prefijo propio. La conversión es una función pura que no modifica el esquema ni ningún dato de los experimentos. El Anexo~A detalla el mapeo.
 \par
-Con las tres ediciones nuevas, el prototipo tiene 1081 pruebas automatizadas sin acceso a la API, en 70 módulos de prueba, y 26 pruebas en vivo.
+Al cierre, con las tres ediciones nuevas, el análisis de la validación humana y la revisión opcional de escenarios, el prototipo tiene 1153 pruebas automatizadas sin acceso a la API, en 80 módulos de prueba, y 26 pruebas en vivo.
 \par
 \endgroup

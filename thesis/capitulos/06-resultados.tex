@@ -5,7 +5,7 @@
 \tituloapa[Experimentos y análisis de resultados]{EXPERIMENTOS Y ANÁLISIS DE RESULTADOS}
 \begingroup\dobleesp
 \vspace{6pt}
-Este capítulo presenta los resultados de los experimentos en el orden del diseño experimental. En esta versión del documento se presentan E1, la medición de la capacidad de detección sobre el framework principal, y E4, su réplica en un segundo framework. Las cifras de E1 son preliminares por dos razones fijadas antes del experimento: la auditoría del oráculo sobre cuarenta trazas de E1, que hacen anotadores externos, puede obligar a corregir sus reglas como enmienda y a volver a puntuar el experimento; y la concordancia del evaluador automático con los anotadores, que mide E2, todavía no se conoce.
+Este capítulo presenta los resultados en el orden del diseño experimental. Primero E1, la medición de la capacidad de detección sobre el framework principal, y E4, su réplica en un segundo framework. Después, la validación humana que hicieron tres anotadores externos: la concordancia del evaluador automático con las personas (E2), la fidelidad de la inducción de escenarios (E3), la auditoría del oráculo sobre E1 y el origen de los desacuerdos entre el oráculo y el evaluador. Las cifras de E1 y E4 se presentan tal como salieron del protocolo congelado, y la validación humana, al final del capítulo, dice hasta dónde pueden creerse.
 \par
 
 \subtituloapa{E1: ejecución}
@@ -42,7 +42,7 @@ La Tabla~\ref{tab:e1-deteccion} resume la detección por operador. Una regresió
 D4, una degradación compuesta, se detectó por completo: las seis regresiones de su conjunto manifestado aparecen como regresión, con un falso positivo en un escenario expuesto donde el oráculo no registró fallo. D1 degrada la suite en 26 puntos y tiene once escenarios manifestados, pero ninguno llega a declararse regresión: tres caen del 100\,\% al 0\,\% y quedan como señal débil. D6 produce cinco regresiones, todas en escenarios expuestos, pero su conjunto manifestado está vacío, de modo que por la definición pre-registrada las cinco son falsos positivos y su TPR no está definida. Las mutaciones de la familia B, D2 y D5, casi no cambian la aprobación, y D3, el modelo de menor capacidad, la baja en 30 puntos con nueve señales débiles y ninguna regresión. El control negativo no marca ninguna regresión.
 \par
 
-\subtituloapa{E1: lectura preliminar}
+\subtituloapa{E1: lectura de los resultados}
 La detección completa de D4 es el resultado más favorable de E1, pero debe leerse con su alcance. D4 es una degradación compuesta, que altera a la vez la ventana de devolución, el umbral del supervisor y las categorías excluidas, y por eso cambia el desenlace de muchos escenarios a la vez. El resultado no indica que AgentProof detectaría una alteración más pequeña de la política, como cambiar solo la ventana, que según el cálculo del diseño experimental afecta a muy pocos escenarios. El control negativo, en cambio, sí permite una conclusión directa: el criterio no declaró ninguna regresión cuando el agente no cambió.
 \par
 La ausencia de una regresión estadísticamente significativa no significa que el agente no haya empeorado. D1 y D3 bajan la tasa de aprobación de la suite en 26 y 30 puntos porcentuales sin que se declare ninguna regresión. La causa es la resolución del criterio pre-registrado: con cinco repeticiones, el valor p más pequeño posible para un escenario es 0.0079, el de una caída del 100\,\% al 0\,\%, y la corrección de Benjamini-Hochberg sobre veinte escenarios solo lo acepta si al menos cuatro escenarios caen así a la vez. D1 tiene tres caídas completas y D3 reparte su efecto en nueve señales débiles, de modo que ninguno alcanza el umbral. El criterio no se modifica, porque fue aprobado y congelado antes del experimento, pero su lectura debe acompañarse de la caída en toda la suite y de las señales débiles, que en estos dos operadores son la evidencia de que el agente empeoró. Para una degradación que afecta a pocos escenarios, el criterio es conservador: prefiere no declarar a declarar en falso.
@@ -82,11 +82,11 @@ El segundo eje es el origen de la diferencia de clasificación. Si los dos mecan
   \end{tabular}
 \end{table}
 
-Que una discordancia provenga del evaluador, de los criterios inducidos o de las reglas del oráculo lo determinará la revisión humana, con un procedimiento fijado antes de que nadie vea las trazas. De cada corrida y dirección con repeticiones discordantes de un escenario se sortea una repetición con semilla fija: son veintitrés combinaciones y veintidós trazas distintas, porque una traza de la línea base cae en dos operadores. Los tres anotadores externos las etiquetan a ciegas, mezcladas con las de la auditoría y de E2. No atribuyen nada: indican qué decisión comunicó el agente, si enunció un dato que contradice la base o no entregó el estado pedido, y si se cumple cada criterio del escenario. La atribución se calcula con la mayoría de los tres. Si el predicado aplicado a sus etiquetas da distinto que el del oráculo, el error es de las reglas del oráculo; si la aprobación según sus etiquetas da distinto que el veredicto del evaluador, el error es del evaluador; y si ninguno se equivocó, los dos miden aspectos distintos: los criterios no cubren el fallo del predicado, o exigen algo que el predicado no mide. Este análisis se agregó después de conocer los resultados de E1, a pedido del tutor, y se declara como exploratorio: no cambia ningún resultado ni la definición del conjunto manifestado.
+Que una discordancia provenga del evaluador, de los criterios inducidos o de las reglas del oráculo lo determinó la revisión humana, con un procedimiento fijado antes de que nadie viera las trazas. De cada corrida y dirección con repeticiones discordantes de un escenario se sortea una repetición con semilla fija: son veintitrés combinaciones y veintidós trazas distintas, porque una traza de la línea base cae en dos operadores. Los tres anotadores externos las etiquetaron a ciegas, mezcladas con las de la auditoría y de E2. No atribuyeron nada: indicaron qué decisión comunicó el agente, si enunció un dato que contradice la base o no entregó el estado pedido, y si se cumple cada criterio del escenario. La atribución se calcula con la mayoría de los tres. Si el predicado aplicado a sus etiquetas da distinto que el del oráculo, el error es de las reglas del oráculo; si la aprobación según sus etiquetas da distinto que el veredicto del evaluador, el error es del evaluador; y si ninguno se equivocó, los dos miden aspectos distintos: los criterios no cubren el fallo del predicado, o exigen algo que el predicado no mide. Este análisis se agregó después de conocer los resultados de E1, a pedido del tutor, y se declara como exploratorio: no cambia ningún resultado ni la definición del conjunto manifestado. Su resultado se presenta al final del capítulo.
 \par
 D2 y D5 casi no se manifestaron. Sin la instrucción de consultar la política, el agente la siguió consultando, y ante la instrucción de aprobar todo reembolso no aprobó los que la política niega, la misma propensión débil que ya mostró la calibración del oráculo. Como no hubo fallos que detectar, estos operadores no permiten estimar la sensibilidad del instrumento.
 \par
-Los resultados de E1 son válidos como resultados preliminares. Si la auditoría del oráculo o el análisis de desacuerdos identifican errores que obliguen a modificar sus reglas, cada cambio se registrará como una enmienda del pre-registro, con su motivo y la versión nueva de las reglas; E1 se volverá a puntuar con ellas, lo que no requiere volver a ejecutar ninguna conversación, y se reportarán las dos puntuaciones con el efecto del cambio sobre cada cifra de este capítulo.
+El protocolo preveía que, si la auditoría del oráculo encontraba errores en sus reglas, cada corrección sería una enmienda del pre-registro y E1 se volvería a puntuar sobre las trazas guardadas, reportando las dos puntuaciones. Antes de la auditoría hubo una enmienda de ese tipo, la 2, que se describe a continuación. La auditoría no llevó a ninguna otra: sus discrepancias se reportan tal cual al final del capítulo, y la principal resultó ser una diferencia en lo que los anotadores leyeron como decisión, no un error de las reglas.
 \par
 
 \subtituloapa{E1: segunda puntuación tras la enmienda 2}
@@ -122,5 +122,105 @@ La línea base en LangGraph aprueba el 65\,\% de las repeticiones, contra el 67\
 \end{table}
 
 E4 reproduce el patrón de E1 operador por operador, como predecía el pre-registro. D4 se detecta por completo en los dos frameworks, con las mismas seis regresiones verdaderas y un falso positivo más en LangGraph. D1 vuelve a degradar la suite en unos veinticinco puntos sin que ninguna caída alcance la significancia, por la resolución del criterio descrita para E1. D6 vuelve a producir cinco regresiones con el conjunto manifestado vacío: en LangGraph, como en el SDK, el corte llega después de que el agente creó el ticket y antes de que comunicara su número, el fallo que el evaluador registra y el predicado del oráculo no. Que las cifras coincidan tanto con dos implementaciones distintas del mismo agente indica que el comportamiento del instrumento no depende del framework, en lo que E4 permite observar: un solo dominio, un solo modelo y tres operadores.
+\par
+
+\subtituloapa{Sensibilidad al umbral de manifestación}
+El conjunto manifestado, la verdad de referencia de la detección, depende de un umbral: un escenario expuesto está manifestado si la tasa de fallo del predicado sube al menos 0.4 respecto de la línea base. Como prevé el pre-registro, la Tabla~\ref{tab:sensibilidad} repite el cálculo con umbrales de 0.2 y 0.6, sin cambiar las regresiones que declaró AgentProof.
+\par
+
+\begin{table}[H]
+  \setstretch{0.952}
+  \caption{Sensibilidad de la detección al umbral de manifestación, en E1 (Claude Agent SDK) y E4 (LangGraph). Cada celda da los escenarios manifestados, la TPR y la FPR; el umbral de 0.4 es el de las Tablas~\ref{tab:e1-deteccion} y~\ref{tab:e4-deteccion}}
+  \label{tab:sensibilidad}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{0.45in}|>{\raggedright\arraybackslash}p{0.85in}|>{\raggedright\arraybackslash}p{1.35in}|>{\raggedright\arraybackslash}p{1.35in}|>{\raggedright\arraybackslash}p{1.35in}|}
+    \hline
+    \textbf{Op.} & \textbf{Framework} & \textbf{0.2} & \textbf{0.4} & \textbf{0.6} \\ \hline
+    D1 & SDK & 12 · 0\,\% · 0\,\% & 11 · 0\,\% · 0\,\% & 9 · 0\,\% · 0\,\% \\ \hline
+    D1 & LangGraph & 12 · 0\,\% · 0\,\% & 10 · 0\,\% · 0\,\% & 10 · 0\,\% · 0\,\% \\ \hline
+    D4 & SDK & 7 · 100\,\% · 0\,\% & 6 · 100\,\% · 7\,\% & 6 · 100\,\% · 7\,\% \\ \hline
+    D4 & LangGraph & 7 · 100\,\% · 8\,\% & 6 · 100\,\% · 14\,\% & 6 · 100\,\% · 14\,\% \\ \hline
+    D6 & SDK & 3 · 67\,\% · 18\,\% & 0 · --- · 25\,\% & 0 · --- · 25\,\% \\ \hline
+    D6 & LangGraph & 0 · --- · 25\,\% & 0 · --- · 25\,\% & 0 · --- · 25\,\% \\ \hline
+  \end{tabular}
+\end{table}
+
+Las conclusiones no dependen del umbral. D4 se detecta por completo con los tres, y con 0.2 su falso positivo de E1, tc-07, pasa a ser verdadero: en ese escenario el predicado ya fallaba en cuatro de las cinco repeticiones de la línea base y falla en las cinco de la candidata, una subida de 0.2. D1 no se detecta con ningún umbral, aunque tenga entre nueve y doce escenarios manifestados. D6 solo cambia en E1 con el umbral más bajo: el oráculo registra una subida pequeña de la tasa de fallo en tres escenarios, dos de ellos entre las cinco regresiones declaradas. Con 0.4 y 0.6, y en E4 con cualquier umbral, su conjunto manifestado sigue vacío. En la familia B tampoco cambia nada: D2 y D5 no tienen ninguna regresión declarada con ningún umbral. Con la enmienda 2, las cifras de E1 son las mismas, salvo D2, que ya no tiene escenarios manifestados con 0.4.
+\par
+
+\subtituloapa{Validación humana: los anotadores}
+Tres anotadores externos, identificados como X1, X2 y X3, etiquetaron a ciegas las muestras que se habían sorteado sobre E1 antes de que nadie viera las trazas. Trabajaron en dos sesiones, en días distintos, cada una en una página que funciona sin conexión. Los casos llevaban un identificador opaco, en un orden sorteado e igual para los tres, y no mostraban la condición, la variante, el modelo, el veredicto del evaluador ni la lectura del oráculo.
+\par
+En la primera sesión etiquetaron 94 trazas de E1: los 40 pares de E2, 36 de las 40 trazas de la auditoría y las 22 de la atribución de desacuerdos, cada traza una sola vez aunque estuviera en más de una muestra. Las otras cuatro trazas de la auditoría son de tarjetas sin decisión ni pedido, en que el oráculo no lee nada, y quedaron fuera. Las llamadas a herramientas se ocultan en la auditoría, porque sus resultados delatan la mutación, pero tres de sus trazas estaban además en E2 o en los desacuerdos y las mostraron; es un desvío menor y se declara. En la segunda sesión calificaron los veinte escenarios de E3. Los tres devolvieron todas las etiquetas completas, y todas las cifras de esta parte se calculan con un comando a partir de ellas, con el voto de la mayoría como referencia.
+\par
+
+\subtituloapa{E2: concordancia del evaluador}
+La Tabla~\ref{tab:e2} resume E2. Los tres anotadores coinciden mucho entre sí, tanto en la aprobación de cada conversación como en cada criterio. El evaluador automático coincide con la mayoría en 34 de las 40 conversaciones, con $\kappa = 0.70$, y en el 90.5\,\% de los criterios.
+\par
+
+\begin{table}[H]
+  \setstretch{0.952}
+  \caption{Concordancia en E2, sobre 40 pares estratificados: 20 que el evaluador aprobó y 20 que reprobó. La aprobación de una conversación es que se cumplan todos sus criterios}
+  \label{tab:e2}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{2.6in}|>{\raggedright\arraybackslash}p{1.6in}|>{\raggedright\arraybackslash}p{1.4in}|}
+    \hline
+    \textbf{Medida} & \textbf{Aprobación} & \textbf{Criterios} \\ \hline
+    Entre los tres anotadores ($\kappa$ de Fleiss) & 0.86 & 0.80 \\ \hline
+    X1 y X2 ($\kappa$ de Cohen) & 0.79 & 0.74 \\ \hline
+    X1 y X3 ($\kappa$ de Cohen) & 0.84 & 0.75 \\ \hline
+    X2 y X3 ($\kappa$ de Cohen) & 0.95 & 0.91 \\ \hline
+    Evaluador contra la mayoría & 34 de 40 (85\,\%), $\kappa = 0.70$ & 143 de 158 (90.5\,\%), $\kappa = 0.69$ \\ \hline
+  \end{tabular}
+\end{table}
+
+Los desacuerdos del evaluador no son simétricos. De las veinte conversaciones que aprobó, la mayoría aprobó diecinueve; de las veinte que reprobó, la mayoría aprobó cinco. Cuando el evaluador se aparta de las personas, casi siempre es porque reprueba lo que ellas aprueban: es más estricto. La muestra se estratificó en partes iguales para evitar la paradoja de $\kappa$ por prevalencia; en todo E1, el evaluador aprobó 413 de las 800 conversaciones, el 51.6\,\%.
+\par
+Para la detección, la severidad del evaluador pesa igual en la línea base y en la candidata, porque se compara al mismo evaluador consigo mismo. Su efecto es otro: baja la aprobación del agente sano y le deja menos margen para registrar una caída, que es lo que se observó en la línea base de D1.
+\par
+
+\subtituloapa{E3: fidelidad de la inducción}
+Los veinte escenarios tienen una mediana de 4 o más: el 100\,\%, la métrica principal de E3. De las sesenta calificaciones, 49 son 5 y 11 son 4, y ninguna es menor. Por mayoría, ningún escenario requeriría corrección; solo un anotador marcó uno, con la nota de que en la conversación semilla el agente da un pago por confirmado y uno de los criterios dice lo contrario. Entre cada par de anotadores, entre 12 y 14 de las veinte calificaciones son iguales, y ninguna difiere en más de un punto.
+\par
+El $\alpha$ de Krippendorff ordinal, en cambio, da $-0.20$. No indica que los anotadores discrepen, sino que casi no hay variación: cuando casi todas las calificaciones son 5, el desacuerdo que se espera por azar es muy pequeño, y las pocas diferencias entre 4 y 5 pesan como si fueran aleatorias. El pre-registro lo había previsto: la poca varianza de calificaciones concentradas en valores altos deprime el coeficiente. Para los tres anotadores, los escenarios que reejecuta AgentProof recogen fielmente lo que pasó en cada conversación semilla.
+\par
+La planificación preveía además un análisis secundario con la suite curada, la que resulta de que una persona revise y corrija los escenarios, para cuantificar cuánto mejoraría la detección con esa supervisión opcional. Como la mayoría de los anotadores no marcó ningún escenario para corrección, la suite curada coincide con la automática, y la mejora atribuible a la revisión humana es nula en este corpus; no hizo falta reejecutar nada. La revisión queda disponible en la herramienta como función opcional, con el comando \texttt{review} (Tabla~\ref{tab:comandos}).
+\par
+
+\subtituloapa{Auditoría del oráculo}
+La Tabla~\ref{tab:auditoria} compara la lectura del oráculo, con sus reglas solas, con la mayoría de los anotadores. Las trazas con ticket, el punto débil conocido de las reglas, se sobrerrepresentaron en la muestra, así que los resultados se dan por estrato y ponderados por la proporción de trazas con ticket en E1, que es de 0.502. Se midieron dos versiones del oráculo, la de la enmienda 2 y la anterior, y la auditoría da exactamente lo mismo con las dos: las reglas que cambió la enmienda no intervienen en ninguna de las 36 trazas.
+\par
+
+\begin{table}[H]
+  \setstretch{0.952}
+  \caption{Auditoría del oráculo sobre E1 contra la mayoría de tres anotadores. Exacta: la misma decisión; al revés: otra decisión; de más: el oráculo lee una decisión donde la mayoría no ve ninguna clara; a la cola: las reglas no la resuelven y la envían a anotación manual; omitida: el oráculo no lee la decisión que la mayoría sí ve. Atributos: si el agente enunció un importe, una fecha o un estado que contradice la base}
+  \label{tab:auditoria}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{1.8in}|>{\raggedright\arraybackslash}p{1.2in}|>{\raggedright\arraybackslash}p{1.2in}|>{\raggedright\arraybackslash}p{1.2in}|}
+    \hline
+    \textbf{Resultado} & \textbf{Con ticket} & \textbf{Sin ticket} & \textbf{Ponderado} \\ \hline
+    Decisión exacta & 12 & 7 & 66.6\,\% \\ \hline
+    Decisión al revés & 5 & 0 & 13.2\,\% \\ \hline
+    Decisión de más & 2 & 0 & 5.3\,\% \\ \hline
+    Decisión a la cola & 0 & 2 & 10.0\,\% \\ \hline
+    Decisión omitida & 0 & 1 & 5.0\,\% \\ \hline
+    Atributos: falsos positivos & 0 de 23 & 1 de 13 & 3.8\,\% \\ \hline
+    Atributos: verdaderos positivos & 1 de 23 & 0 de 13 & 2.2\,\% \\ \hline
+    Estado comunicado (consultas) & 3 de 3 & 3 de 3 & 100\,\% \\ \hline
+  \end{tabular}
+\end{table}
+
+El oráculo lee exactamente la decisión de la mayoría en dos de cada tres trazas, y la lee al revés en el 13.2\,\%. Las cinco trazas al revés son el mismo caso. Son de las tarjetas de garantía: un producto defectuoso entregado hace más de treinta días. El agente explica que ya no aplica el reembolso directo, escala el caso como reclamo de garantía y crea el ticket. La tarjeta espera un escalamiento y el oráculo lee un escalamiento, pero los tres anotadores, por unanimidad, marcaron que el reembolso no procede. La guía que recibieron define el escalamiento como dejar la decisión del reembolso en manos de otro, incluido un reclamo de garantía; aun así, leyeron como decisión la negativa del reembolso directo y no la derivación. No es un error de las reglas, que siguen la tarjeta y la guía, sino una diferencia en lo que las personas toman como la decisión. Por eso no se hizo ninguna enmienda: cambiar las reglas para que coincidan contradiría la tarjeta, y cambiar las etiquetas de los anotadores no es admisible. Las cifras se reportan tal cual, con la mayoría como referencia.
+\par
+El resto de las discrepancias son pocas. En dos trazas el oráculo lee un escalamiento donde la mayoría no ve una decisión clara; en una de ellas, el agente ofrece el reembolso y el cliente prefiere un reemplazo. En dos trazas las reglas no resuelven la decisión, un caso que el protocolo envía a anotación manual cuando un predicado la necesita, y en una el oráculo no lee la decisión. En los atributos hay un falso positivo y un verdadero positivo, y el estado del pedido coincide en las seis consultas de estado. Los predicados siguen a las decisiones: el de D1 coincide en ocho de nueve trazas, y de las siete diferencias en los predicados de D2 y D4, cinco vienen de las trazas de garantía.
+\par
+Entre los anotadores, la decisión tiene un $\kappa$ de Fleiss de 0.80, con 24 de 30 trazas unánimes. La contradicción con la base da un $\kappa$ de 0.31 aunque 34 de las 36 trazas son unánimes: casi ninguna traza tiene una contradicción, y con tan poca prevalencia dos desacuerdos bastan para hundir el coeficiente, la misma paradoja que la estratificación evitó en E2. Una traza no tiene mayoría en la decisión y se informa aparte.
+\par
+
+\subtituloapa{Origen de los desacuerdos entre el oráculo y el evaluador}
+La atribución de los desacuerdos de la Tabla~\ref{tab:desacuerdos} se calculó con la mayoría de los tres anotadores sobre las veintitrés combinaciones sorteadas. En trece, ninguno de los dos mecanismos se equivocó según las personas: miden aspectos distintos, porque los criterios inducidos describen el desenlace y el predicado del oráculo lee la decisión y los datos del pedido. Es el origen de casi todos los desacuerdos de D1. En cuatro, el error es del evaluador, y en las cuatro el evaluador reprobó en la línea base una conversación que las personas aprueban, la misma severidad que mostró E2. En seis, el error es de las reglas del oráculo. Dos son de D1, en que el oráculo encuentra un dato que contradice la base y las personas no; una es de la línea base de D4 en tc-07, donde el oráculo lee un escalamiento y la mayoría que no procede; y tres son de D6. Dos de estas últimas, en tc-13 y tc-15, son la misma diferencia de lectura de las garantías que en la auditoría, y en la tercera, en tc-14, la mayoría no ve ninguna decisión comunicada después del corte, mientras el oráculo lee el escalamiento que el agente anunció. Ninguna combinación se atribuye a la vez al evaluador y al oráculo.
+\par
+En repeticiones discordantes, el peso cambia poco: 42 provienen de un alcance distinto, 20 de las reglas del oráculo y 13 del evaluador. El análisis es exploratorio y no cambia ningún resultado de E1.
+\par
+
+\subtituloapa{Lo que la validación humana dice de E1 y E4}
+La validación humana sostiene las piezas de las que dependen los experimentos de detección, con matices. Los escenarios que se reejecutan son fieles a las conversaciones semilla. El evaluador concuerda sustancialmente con las personas y, cuando no, es más estricto, de modo que la aprobación del agente sano en E1 está, si acaso, por debajo de la que darían las personas; E2 se midió sobre E1, pero el evaluador de E4 es el mismo. El oráculo lee bien la mayoría de las decisiones, y su desacuerdo más frecuente con las personas está en la definición del escalamiento en los reclamos de garantía, no en errores de lectura. Como no hubo enmiendas tras la auditoría, las cifras de detección de E1 y E4 se mantienen. Se miden, eso sí, contra una referencia que coincide con las personas en dos de cada tres decisiones, y así deben leerse.
 \par
 \endgroup

@@ -1,0 +1,106 @@
+{
+  "annotator": "X3",
+  "session": 2,
+  "labels": [
+    {
+      "item": "c01",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c02",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c03",
+      "likert": 4,
+      "correction": false
+    },
+    {
+      "item": "c04",
+      "likert": 4,
+      "correction": false
+    },
+    {
+      "item": "c05",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c06",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c07",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c08",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c09",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c10",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c11",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c12",
+      "likert": 4,
+      "correction": false
+    },
+    {
+      "item": "c13",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c14",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c15",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c16",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c17",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c18",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c19",
+      "likert": 5,
+      "correction": false
+    },
+    {
+      "item": "c20",
+      "likert": 5,
+      "correction": false
+    }
+  ]
+}

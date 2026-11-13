@@ -33,8 +33,17 @@ E2_SEED = 20261018
 E2_PER_STRATUM = 20
 E2_CAP = 2
 E2_CAP_CONTINGENCY = 3
+E1_ADAPTER = "claude_sdk"
 
 Stratum = Literal["con ticket", "sin ticket", "aprobado", "reprobado"]
+
+
+def e1_runs(store: Store) -> list[str]:
+    """The runs of E1: those of the Claude Agent SDK edition.
+
+    E4 keeps its runs in the same folder, so the draws, frozen over E1, filter by adapter.
+    """
+    return [run_id for run_id in store.runs() if store.manifest(run_id).adapter == E1_ADAPTER]
 
 
 class Drawn(BaseModel):
@@ -155,7 +164,7 @@ DATA = typer.Option(Path("."), "--data", help="Carpeta que contiene corpus/ y re
 def main(data: Path = DATA):
     """Escribe results/samples/auditoria.json y results/samples/e2.json."""
     store = Store(data)
-    runs = store.runs()
+    runs = e1_runs(store)
     audit = AuditSample(
         seed=AUDIT_SEED, traces=audit_sample(store, runs), ticket_share=ticket_share(store, runs)
     )

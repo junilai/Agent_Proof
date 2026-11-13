@@ -86,22 +86,22 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 
 - [x] E1: ~800 conversaciones en el framework principal (§5.8). Evidencia: [`docs/e1.md`](e1.md) y `results/`, 18-oct-2026. Las 800 conversaciones y sus juicios, sin un solo reintento ni error del agente; 13 casos anotados a mano. USD 37.89 según la consola
 - [x] E4: ~400 conversaciones en LangGraph (§5.8). Evidencia: [`docs/e4.md`](e4.md) y `results/`, 11-nov-2026. Las 400 conversaciones y sus juicios, sin un solo reintento ni error del agente; 5 casos anotados a mano. USD 20.40, conciliado con la consola
-- [ ] **Hito:** datos crudos en `results/`
+- [x] **Hito:** datos crudos en `results/`. Evidencia: las corridas de E1 y E4 con sus juicios y las anotaciones manuales (`results/oracle/annotations.json`), en main desde el 12-nov-2026
 
 ## F6 E2 y E3 — objetivo: noviembre – diciembre
 
 - [x] Muestra estratificada de 40 pares con semilla registrada (§5.5). Evidencia: `results/samples/e2.json`, 19-oct-2026, semilla `20261018`; 20 aprobados y 20 reprobados, con la contingencia activada (topes de tres por escenario y por versión, [D-011](decisiones.md)). Con el mismo comando, `python -m experiments.samples --data .`, se sortearon las 40 trazas de la auditoría del oráculo (`results/samples/auditoria.json`, semilla `20261021`, 3 con ticket y 2 sin ticket por condición)
 - [x] Sorteo de los desacuerdos entre el oráculo y AgentProof en E1 ([D-016](decisiones.md)), agregado a pedido del tutor como análisis exploratorio. Evidencia: `results/samples/desacuerdos.json`, 21-oct-2026, semilla `20261022`: 18 desacuerdos, 17 con repeticiones discordantes en la línea base o la candidata y en cualquier dirección; 3 de origen en la agregación y 15 en las trazas; 23 celdas y 22 trazas para los anotadores
-- [ ] Paquetes ciegos para los anotadores (§5.5)
-- [ ] Fichas Likert de fidelidad (§5.8)
-- [ ] Función opcional de revisión de escenarios y suite curada (§5.3)
-- [ ] **Hito:** calificaciones de los tres anotadores recogidas
+- [x] Paquetes ciegos para los anotadores (§5.5). Evidencia: spec [`docs/specs/2026-11-10-f6-anotacion.md`](specs/2026-11-10-f6-anotacion.md) y `python -m experiments.annotators`: una página sin conexión por anotador y sesión, con identificadores opacos (semilla `20261111`) y la clave aparte; sesión 1 con 94 trazas de E2, la auditoría y los desacuerdos. Páginas y clave en `evidence/f6/`
+- [x] Fichas Likert de fidelidad (§5.8). Evidencia: sesión 2 de los mismos paquetes, los 20 escenarios junto a su conversación semilla, con los anclajes del pre-registro y la pregunta de corrección
+- [x] Función opcional de revisión de escenarios y suite curada (§5.3). Evidencia: `agentproof review` (`src/agentproof/review.py`), 12-nov-2026: copia el corpus a otra carpeta y aprueba o corrige cada escenario junto a su conversación semilla, sin tocar el original. El análisis secundario no requiere corridas: por mayoría, E3 no marcó ningún escenario para corrección, así que la suite curada coincide con la automática
+- [x] **Hito:** calificaciones de los tres anotadores recogidas. Evidencia: `evidence/f6/etiquetas/`, 12-nov-2026: X1, X2 y X3, las dos sesiones en días distintos, completas y validadas contra la clave
 
 ## F7 Análisis — objetivo: diciembre
 
-- [ ] Métricas de detección, análisis de sensibilidad y efecto de D3 (§5.4, §5.5)
-- [ ] κ de Fleiss, κ de Cohen y α de Krippendorff (§5.5, §5.8)
-- [ ] Reporte de costo y latencia por componente (§5.8)
+- [x] Métricas de detección, análisis de sensibilidad y efecto de D3 (§5.4, §5.5). Evidencia: `python -m experiments.analysis`, `results/analysis/e1.txt` y `e4.txt`, con TPR y FPR para los umbrales 0.2, 0.4 y 0.6
+- [x] κ de Fleiss, κ de Cohen y α de Krippendorff (§5.5, §5.8). Evidencia: `python -m experiments.f6 --data . --labels evidence/f6/etiquetas --keys evidence/f6/clave` y `results/f6/analisis.json`, 12-nov-2026. E2: κ de Fleiss 0.86, evaluador contra la mayoría 34/40 (κ 0.70). E3: 20/20 escenarios con mediana ≥ 4, α ordinal −0.20 por la concentración en 5. Auditoría: decisión exacta 66.6 % ponderado; las 5 al revés son reclamos de garantía que los anotadores leyeron como «no procede», sin enmienda. Medida también con el oráculo de `preregistro-v2` (`results/f6/analisis-oraculo-v2.json`): idéntica. Atribución de D-016: alcance distinto 13, reglas del oráculo 6, evaluador 4
+- [x] Reporte de costo y latencia por componente (§5.8). Evidencia: `agentproof cost`, `results/analysis/cost-e1.txt` y `cost-e4.txt`, conciliados con la consola en [`docs/e1.md`](e1.md) y [`docs/e4.md`](e4.md)
 - [ ] **Hito:** todas las cifras, tablas y figuras de la tesis se regeneran con un solo comando
 
 ## Redacción
@@ -119,4 +119,8 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [ ] T4 Resultados y conclusiones; al final, introducción, resumen y abstract — nov – dic
   - [x] Borrador de la introducción, adelantado para el primer entregable del 27 de septiembre
   - [x] Resultados preliminares de E1, para el segundo entregable: ejecución, detección por operador y lectura, sujetos a la auditoría del oráculo y a E2
+  - [x] E4 y la segunda puntuación de E1 en el capítulo 6 (11-nov-2026); la validación humana (E2, E3, auditoría y desacuerdos), 12-nov-2026
+  - [x] Capítulo 7, conclusiones, limitaciones y trabajo futuro, 11–12-nov-2026
+  - [x] Sensibilidad de la detección (umbrales 0.2 y 0.6) en el capítulo 6, 12-nov-2026
+  - [ ] Resumen y abstract
 - [ ] T5 Defensa, entrega, tag `entrega-final` y decisión sobre el historial del prototipo previo — dic
