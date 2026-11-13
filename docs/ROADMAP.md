@@ -123,4 +123,5 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
   - [x] Capítulo 7, conclusiones, limitaciones y trabajo futuro, 11–12-nov-2026
   - [x] Sensibilidad de la detección (umbrales 0.2 y 0.6) en el capítulo 6, 12-nov-2026
   - [ ] Resumen y abstract
+- [ ] Prueba de consistencia de las cifras del texto: verifica contra el análisis unas 30–40 cifras clave de los capítulos 6 y 7 (TPR, FPR, κ, porcentajes y conteos), y falla en la integración continua si alguna no coincide. Decidida el 12-nov-2026 en lugar de convertir cada cifra en una macro; se hace al cerrar el documento, después del resumen, el abstract y la lectura completa del autor, y antes del tag `entrega-final`
 - [ ] T5 Defensa, entrega, tag `entrega-final` y decisión sobre el historial del prototipo previo — dic
