@@ -121,6 +121,6 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
   - [x] Resultados preliminares de E1, para el segundo entregable: ejecución, detección por operador y lectura, sujetos a la auditoría del oráculo y a E2
   - [x] E4 y la segunda puntuación de E1 en el capítulo 6 (11-nov-2026); la validación humana (E2, E3, auditoría y desacuerdos), 12-nov-2026
   - [x] Capítulo 7, conclusiones, limitaciones y trabajo futuro, 11–12-nov-2026
-  - [ ] Sensibilidad de la detección (umbrales 0.2 y 0.6) en el capítulo 6
+  - [x] Sensibilidad de la detección (umbrales 0.2 y 0.6) en el capítulo 6, 12-nov-2026
   - [ ] Resumen y abstract
 - [ ] T5 Defensa, entrega, tag `entrega-final` y decisión sobre el historial del prototipo previo — dic
