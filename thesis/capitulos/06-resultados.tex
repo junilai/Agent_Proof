@@ -19,7 +19,7 @@ E1 costó USD 37.89 según la facturación del proveedor: 19.44 del evaluador, 1
 \subtituloapa{E1: detección por operador}
 La línea base de referencia aprueba el 67\,\% de las repeticiones, y la de control, que es el mismo agente corrido otra vez, también el 67\,\%. Once escenarios aprueban en las cinco repeticiones y cuatro no aprueban en ninguna. En estos últimos ninguna regresión puede detectarse, porque no hay de dónde caer. La aprobación en todas las repeticiones a la vez, pass$^k$, baja del 67\,\% con $k = 1$ al 55\,\% con $k = 5$, de modo que incluso el agente sano es inconsistente en parte de la suite (Figura~\ref{fig:pass-k}).
 \par
-La Figura~\ref{fig:aprobacion} muestra, escenario por escenario, cuántas de las cinco repeticiones aprobó el evaluador en cada condición. Se lee como la huella de cada mutación: la columna de D4 se vacía en las siete tarjetas cuya decisión cambia la política corrupta, de tc-06 a tc-15, y la de D6 en las cinco tarjetas de escalamiento, de tc-11 a tc-15, donde el corte deja el ticket sin comunicar. La de D1 baja de forma más repartida, y la del control repite la de la línea base con diferencias de una o dos repeticiones.
+La Figura~\ref{fig:aprobacion} muestra, escenario por escenario, cuántas de las cinco repeticiones aprobó el evaluador en cada condición. Se lee como la huella de cada mutación: la columna de D4 pasa de cinco repeticiones aprobadas a ninguna en las siete tarjetas cuya decisión cambia la política corrupta (tc-06, tc-07, tc-08, tc-11, tc-12, tc-13 y tc-15), y la de D6 en las cinco tarjetas de escalamiento, de tc-11 a tc-15, donde el corte deja el ticket sin comunicar. La de D1 baja de forma más repartida, y la del control repite la de la línea base con diferencias de una o dos repeticiones.
 \par
 
 \begin{figure}[H]
@@ -123,7 +123,7 @@ La Tabla~\ref{tab:costo} desglosa el costo y la latencia por componente en los d
 \begin{table}[H]
   \setstretch{0.952}
   \small
-  \caption{Costo y latencia por componente en E1 y E4. Registros: conversaciones o juicios; s medios: segundos por conversación o juicio. El costo del agente de E1 no se calcula con la tabla de precios porque usa caché de prompts: según la facturación fue de USD 13.26}
+  \caption{Costo y latencia por componente en E1 y E4. Registros: conversaciones o juicios; s medios: segundos por conversación o juicio. El costo del agente de E1 no se calcula con la tabla de precios porque usa caché de prompts: según la facturación, el agente con Claude Sonnet 5 costó USD 13.26, y el de D3, con el modelo menor, va junto al usuario simulado en los USD 5.19 de ese modelo}
   \label{tab:costo}
   \input{generadas/costo}
 \end{table}
@@ -172,15 +172,15 @@ La Figura~\ref{fig:matrices} presenta la detección de la familia A como matrice
   \input{generadas/clasificacion}
 \end{table}
 
-El desglose de los falsos positivos, previsto en la planificación como análisis secundario, es uniforme: los trece están en escenarios expuestos sin regresión manifestada, y ninguno en un escenario que la mutación no podía afectar. AgentProof nunca declaró una regresión donde el agente no cambió; sus errores están en casos que la mutación alteró sin que el predicado del oráculo registrara un empeoramiento.
+El desglose de los falsos positivos, previsto en la planificación como análisis secundario, es uniforme: los trece están en escenarios expuestos sin regresión manifestada, y ninguno en un escenario que la mutación no podía afectar. AgentProof nunca declaró una regresión en un escenario que la mutación no podía afectar; sus errores están en escenarios expuestos en que el predicado del oráculo no registró un empeoramiento.
 \par
-La Figura~\ref{fig:tasas} muestra de dónde vienen esas celdas. Cada punto es un escenario, con la tasa de fallo del predicado del oráculo en la línea base y en la candidata; los que caen en la zona sombreada, por encima de la diagonal desplazada en 0.4, son los manifestados. En D4, las regresiones declaradas se agrupan arriba a la izquierda, donde el predicado pasa de no fallar a fallar siempre, y el falso positivo de E1, tc-07, aparece aislado arriba a la derecha, porque el predicado ya fallaba en la línea base. En D1, muchos escenarios están en la zona manifestada pero quedan como ``ok'' o señal débil: el oráculo ve el fallo y el evaluador no lo registra con la fuerza que exige el criterio. En D6 ocurre lo contrario: las regresiones declaradas quedan abajo, porque el predicado casi no falla aunque el evaluador repruebe.
+La Figura~\ref{fig:tasas} muestra de dónde vienen esas celdas. Cada punto es un escenario, con la tasa de fallo del predicado del oráculo en la línea base y en la candidata; los que caen en la zona sombreada, por encima de la diagonal desplazada en 0.4, son los manifestados. En D4, las regresiones declaradas se agrupan arriba a la izquierda, donde el predicado pasa de no fallar a fallar en la mayoría de las repeticiones o en todas. El falso positivo de tc-07 aparece aislado arriba a la derecha en los dos frameworks, porque el predicado ya fallaba en cuatro de cinco repeticiones de la línea base, y el segundo de E4, tc-18, abajo a la izquierda, porque el predicado no falla en ninguna de las dos corridas. En D1, muchos escenarios están en la zona manifestada pero quedan como ``ok'' o señal débil: el oráculo ve el fallo y el evaluador no lo registra con la fuerza que exige el criterio. En D6 ocurre lo contrario: las regresiones declaradas quedan abajo, porque el predicado casi no falla aunque el evaluador repruebe.
 \par
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{generadas/tasas-conjuntas.pdf}
-  \caption{Tasas de fallo del predicado del oráculo en la línea base y en la candidata, por escenario, en E1 (arriba) y E4 (abajo). La forma y el color indican lo que declaró AgentProof; el relleno, si el escenario está manifestado. La zona sombreada es la de manifestación, con el umbral de 0.4. Los puntos se desplazan levemente para que no se superpongan}
+  \caption{Tasas de fallo del predicado del oráculo en la línea base y en la candidata, por escenario, en E1 (arriba) y E4 (abajo). La forma y el color indican lo que declaró AgentProof; el relleno, si el escenario está manifestado. La zona sombreada es la de manifestación de un escenario expuesto, con el umbral de 0.4. Los puntos se desplazan levemente para que no se superpongan}
   \label{fig:tasas}
 \end{figure}
 
@@ -233,7 +233,7 @@ La Tabla~\ref{tab:e2} resume E2. Los tres anotadores coinciden mucho entre sí, 
   \end{tabular}
 \end{table}
 
-Los desacuerdos del evaluador no son simétricos, como muestra la Figura~\ref{fig:validacion}a. De las veinte conversaciones que aprobó, la mayoría aprobó diecinueve; de las veinte que reprobó, la mayoría aprobó cinco. Visto como un clasificador de la aprobación frente a las personas, el evaluador tiene una precisión del 95\,\%, un recall del 79\,\% y un F1 de 0.86. Cuando el evaluador se aparta de las personas, casi siempre es porque reprueba lo que ellas aprueban: es más estricto. La muestra se estratificó en partes iguales para evitar la paradoja de $\kappa$ por prevalencia; en todo E1, el evaluador aprobó 413 de las 800 conversaciones, el 51.6\,\%.
+Los desacuerdos del evaluador no son simétricos, como muestra la Figura~\ref{fig:validacion}a. De las veinte conversaciones que aprobó, la mayoría aprobó diecinueve; de las veinte que reprobó, la mayoría aprobó cinco. Visto como un clasificador de la aprobación frente a las personas, el evaluador tiene en esta muestra una precisión del 95\,\%, un recall del 79\,\% y un F1 de 0.86. La precisión depende de la proporción de aprobados, que la estratificación fijó en la mitad, así que estas cifras describen la muestra y no todo E1. Cuando el evaluador se aparta de las personas, casi siempre es porque reprueba lo que ellas aprueban: es más estricto. La muestra se estratificó en partes iguales para evitar la paradoja de $\kappa$ por prevalencia; en todo E1, el evaluador aprobó 413 de las 800 conversaciones, el 51.6\,\%.
 \par
 Para la detección, la severidad del evaluador pesa igual en la línea base y en la candidata, porque se compara al mismo evaluador consigo mismo. Su efecto es otro: baja la aprobación del agente sano y le deja menos margen para registrar una caída, que es lo que se observó en la línea base de D1.
 \par
