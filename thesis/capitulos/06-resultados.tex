@@ -124,6 +124,29 @@ La línea base en LangGraph aprueba el 65\,\% de las repeticiones, contra el 67\
 E4 reproduce el patrón de E1 operador por operador, como predecía el pre-registro. D4 se detecta por completo en los dos frameworks, con las mismas seis regresiones verdaderas y un falso positivo más en LangGraph. D1 vuelve a degradar la suite en unos veinticinco puntos sin que ninguna caída alcance la significancia, por la resolución del criterio descrita para E1. D6 vuelve a producir cinco regresiones con el conjunto manifestado vacío: en LangGraph, como en el SDK, el corte llega después de que el agente creó el ticket y antes de que comunicara su número, el fallo que el evaluador registra y el predicado del oráculo no. Que las cifras coincidan tanto con dos implementaciones distintas del mismo agente indica que el comportamiento del instrumento no depende del framework, en lo que E4 permite observar: un solo dominio, un solo modelo y tres operadores.
 \par
 
+\subtituloapa{Sensibilidad al umbral de manifestación}
+El conjunto manifestado, la verdad de referencia de la detección, depende de un umbral: un escenario expuesto está manifestado si la tasa de fallo del predicado sube al menos 0.4 respecto de la línea base. Como prevé el pre-registro, la Tabla~\ref{tab:sensibilidad} repite el cálculo con umbrales de 0.2 y 0.6, sin cambiar las regresiones que declaró AgentProof.
+\par
+
+\begin{table}[H]
+  \setstretch{0.952}
+  \caption{Sensibilidad de la detección al umbral de manifestación, en E1 (Claude Agent SDK) y E4 (LangGraph). Cada celda da los escenarios manifestados, la TPR y la FPR; el umbral de 0.4 es el de las Tablas~\ref{tab:e1-deteccion} y~\ref{tab:e4-deteccion}}
+  \label{tab:sensibilidad}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{0.45in}|>{\raggedright\arraybackslash}p{0.85in}|>{\raggedright\arraybackslash}p{1.35in}|>{\raggedright\arraybackslash}p{1.35in}|>{\raggedright\arraybackslash}p{1.35in}|}
+    \hline
+    \textbf{Op.} & \textbf{Framework} & \textbf{0.2} & \textbf{0.4} & \textbf{0.6} \\ \hline
+    D1 & SDK & 12 · 0\,\% · 0\,\% & 11 · 0\,\% · 0\,\% & 9 · 0\,\% · 0\,\% \\ \hline
+    D1 & LangGraph & 12 · 0\,\% · 0\,\% & 10 · 0\,\% · 0\,\% & 10 · 0\,\% · 0\,\% \\ \hline
+    D4 & SDK & 7 · 100\,\% · 0\,\% & 6 · 100\,\% · 7\,\% & 6 · 100\,\% · 7\,\% \\ \hline
+    D4 & LangGraph & 7 · 100\,\% · 8\,\% & 6 · 100\,\% · 14\,\% & 6 · 100\,\% · 14\,\% \\ \hline
+    D6 & SDK & 3 · 67\,\% · 18\,\% & 0 · --- · 25\,\% & 0 · --- · 25\,\% \\ \hline
+    D6 & LangGraph & 0 · --- · 25\,\% & 0 · --- · 25\,\% & 0 · --- · 25\,\% \\ \hline
+  \end{tabular}
+\end{table}
+
+Las conclusiones no dependen del umbral. D4 se detecta por completo con los tres, y con 0.2 su falso positivo de E1, tc-07, pasa a ser verdadero: en ese escenario el predicado ya fallaba en cuatro de las cinco repeticiones de la línea base y falla en las cinco de la candidata, una subida de 0.2. D1 no se detecta con ningún umbral, aunque tenga entre nueve y doce escenarios manifestados. D6 solo cambia en E1 con el umbral más bajo: el oráculo registra una subida pequeña de la tasa de fallo en tres escenarios, dos de ellos entre las cinco regresiones declaradas. Con 0.4 y 0.6, y en E4 con cualquier umbral, su conjunto manifestado sigue vacío. En la familia B tampoco cambia nada: D2 y D5 no tienen ninguna regresión declarada con ningún umbral. Con la enmienda 2, las cifras de E1 son las mismas, salvo D2, que ya no tiene escenarios manifestados con 0.4.
+\par
+
 \subtituloapa{Validación humana: los anotadores}
 Tres anotadores externos, identificados como X1, X2 y X3, etiquetaron a ciegas las muestras que se habían sorteado sobre E1 antes de que nadie viera las trazas. Trabajaron en dos sesiones, en días distintos, cada una en una página que funciona sin conexión. Los casos llevaban un identificador opaco, en un orden sorteado e igual para los tres, y no mostraban la condición, la variante, el modelo, el veredicto del evaluador ni la lectura del oráculo.
 \par
