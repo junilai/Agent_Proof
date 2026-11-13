@@ -87,9 +87,10 @@ def cards(store: Store) -> dict[str, str]:
 
 def approval_by_scenario(store: Store, exp: Experiment) -> dict[str, dict[str, Fraction]]:
     """Run label -> scenario -> share of judged repetitions that passed."""
-    labels = {exp.reference: "línea base"} | {run: op.upper() for op, run in exp.candidates.items()}
+    labels = {exp.reference: "línea base"}
     if exp.control:
         labels[exp.control] = "control"
+    labels |= {run: op.upper() for op, run in exp.candidates.items()}
     table: dict[str, dict[str, Fraction]] = {}
     for run, label in labels.items():
         passed: dict[str, list[bool]] = defaultdict(list)
