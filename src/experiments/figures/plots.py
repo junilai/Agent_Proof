@@ -159,7 +159,7 @@ def approval_heatmap(store: Store, path: Path) -> Path:
     panels = [(exp, data.approval_by_scenario(store, exp)) for exp in data.EXPERIMENTS]
     scenarios = sorted(panels[0][1]["línea base"], key=lambda s: names[s])
     fig, axes = plt.subplots(
-        1, 2, figsize=(WIDTH, 5.2), gridspec_kw={"width_ratios": [8, 4]}, sharey=True
+        1, 2, figsize=(WIDTH, 4.1), gridspec_kw={"width_ratios": [8, 4]}, sharey=True
     )
     for ax, (exp, table) in zip(axes, panels, strict=True):
         columns = list(table)

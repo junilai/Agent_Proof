@@ -19,7 +19,7 @@ ORDER = (
 )
 
 
-CLASSIFICATION_WIDTHS = [0.3, 0.72, 0.25, 0.25, 0.25, 0.25, 0.55, 0.45, 0.35, 0.4, 0.75]
+CLASSIFICATION_WIDTHS = [0.3, 0.8, 0.25, 0.25, 0.25, 0.25, 0.62, 0.48, 0.35, 0.4, 0.75]
 
 
 def _pct(value: Fraction | None) -> str:
@@ -81,7 +81,7 @@ def _int(n: int) -> str:
 def cost_table(experiments: list[tuple[str, bool, list[ComponentCost]]]) -> str:
     """Rows per experiment; an agent with prompt caching has no price-table cost (D-007)."""
     head = [
-        "Experimento",
+        "Exp.",
         "Componente",
         "Registros",
         "Tokens de entrada",
@@ -90,7 +90,7 @@ def cost_table(experiments: list[tuple[str, bool, list[ComponentCost]]]) -> str:
         "USD (tabla)",
     ]
     lines = [
-        f"\\begin{{tabular}}{{{_cols([0.85, 1.05, 0.65, 0.9, 0.85, 0.55, 0.6])}}}",
+        f"\\begin{{tabular}}{{{_cols([0.4, 1.05, 0.65, 0.85, 0.8, 0.55, 0.6])}}}",
         "  \\hline",
         "  " + " & ".join(f"\\textbf{{{h}}}" for h in head) + " \\\\ \\hline",
     ]
