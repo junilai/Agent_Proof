@@ -1,4 +1,4 @@
-"""AgentProof command line: record | induce | run | resume | judge | report | cost.
+"""AgentProof command line: record | induce | review | run | resume | judge | report | cost.
 
 The adapter is loaded by name (``claude_sdk`` -> ``agentproof.adapters.claude_sdk``,
 or a full module path) and the agent by ``module:attribute``, so adding a
@@ -14,8 +14,10 @@ from pathlib import Path
 from typing import Any
 
 import typer
+from pydantic import ValidationError
 
 from agentproof import models
+from agentproof import review as curation
 from agentproof.conversation import Exchange, TraceContext, UserDriver, converse, utc_now
 from agentproof.cost import cost_summary, render_cost
 from agentproof.induction import induce_missing, induce_scenario
@@ -26,6 +28,7 @@ from agentproof.schema import RunManifest, Scenario, Trace, Verdict, run_id_for
 from agentproof.session import SessionFactory
 from agentproof.simulator import SimulatedUser
 from agentproof.store import Store
+from agentproof.transcript import render_transcript
 
 app = typer.Typer(
     help="AgentProof: detección de regresiones en agentes basados en LLM.", no_args_is_help=True
@@ -39,6 +42,8 @@ RUNS = typer.Option(None, "--run", help="Corrida a incluir; se repite. Por omisi
 SCENARIOS = typer.Option(
     None, "--scenario", help="Escenario a reejecutar; se repite. Por omisión, todos."
 )
+CURATED = typer.Option(..., "--out", help="Carpeta de la suite curada, aparte del corpus.")
+REVIEWER = typer.Option(..., "--reviewer", help="Quién revisa.")
 
 
 def load_object(path: str) -> Any:
@@ -139,6 +144,68 @@ def induce(data: Path = DATA):
         typer.echo(f"falló: {scenario_id} ({reason})", err=True)
     if summary.failed:
         raise typer.Exit(1)
+
+
+@app.command()
+def review(
+    out: Path = CURATED,
+    reviewer: str = REVIEWER,
+    scenario: list[str] | None = SCENARIOS,
+    data: Path = DATA,
+):
+    """Revisión humana opcional de los escenarios: guarda la suite curada en otra carpeta."""
+    copy = Store(out)
+    curation.start(Store(data), copy)
+    done = curation.reviews(copy)
+    seeds = {seed.trace_id: seed for seed in copy.seeds()}
+    scenarios = [s for s in copy.scenarios() if not scenario or s.scenario_id in scenario]
+    typer.echo(
+        f"{sum(s.scenario_id in done for s in scenarios)} de {len(scenarios)} "
+        "escenarios ya revisados."
+    )
+    for current in (s for s in scenarios if s.scenario_id not in done):
+        typer.echo(f"\n{'=' * 72}\n{current.scenario_id}\n\nConversación semilla:")
+        typer.echo(render_transcript(seeds[current.seed_trace_id]))
+        typer.echo(f"\nObjetivo del cliente: {current.user_goal}")
+        typer.echo(f"Primer mensaje: {current.opening_message}\nCriterios de éxito:")
+        for n, criterion in enumerate(current.success_criteria, start=1):
+            typer.echo(f"  {n}. {criterion}")
+        choice = typer.prompt("[a]probar, [c]orregir o [s]altar", default="s")
+        if choice == "a":
+            curation.save(copy, current, _review_of(current, reviewer, corrected=False))
+        elif choice == "c":
+            try:
+                fixed = _correct(current, reviewer)
+            except ValidationError as error:
+                typer.echo(f"No se guardó: {error.errors()[0]['msg']}", err=True)
+                continue
+            curation.save(copy, fixed, _review_of(fixed, reviewer, corrected=True))
+    typer.echo(f"\nSuite curada en {out}. Se corre con: agentproof run --data {out} ...")
+
+
+def _review_of(scenario: Scenario, reviewer: str, *, corrected: bool) -> curation.Review:
+    return curation.Review(
+        scenario_id=scenario.scenario_id,
+        reviewer=reviewer,
+        corrected=corrected,
+        reviewed_at=utc_now(),
+    )
+
+
+def _correct(scenario: Scenario, reviewer: str) -> Scenario:
+    """Enter keeps each text; "-" removes a criterion; new ones until an empty line."""
+    goal = typer.prompt("Objetivo", default=scenario.user_goal)
+    opening = typer.prompt("Primer mensaje", default=scenario.opening_message)
+    criteria = []
+    for n, criterion in enumerate(scenario.success_criteria, start=1):
+        answer = typer.prompt(f"Criterio {n} (- lo quita)", default=criterion)
+        if answer != "-":
+            criteria.append(answer)
+    while added := typer.prompt("Criterio nuevo (vacío termina)", default="", show_default=False):
+        criteria.append(added)
+    return curation.corrected(
+        scenario, goal=goal, opening=opening, criteria=criteria, reviewer=reviewer, now=utc_now()
+    )
 
 
 @app.command()

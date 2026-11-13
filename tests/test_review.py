@@ -1,7 +1,11 @@
+import json
+
 import pytest
 from pydantic import ValidationError
+from typer.testing import CliRunner
 
 from agentproof import review as curation
+from agentproof.cli import app
 from agentproof.store import Store
 from tests.factories import T0, scenario, trace
 
@@ -58,3 +62,39 @@ def test_a_correction_still_needs_two_to_five_criteria():
         curation.corrected(
             scenario(), goal="g", opening="o", criteria=["Solo uno"], reviewer="autor", now=T0
         )
+
+
+def test_the_command_approves_corrects_and_resumes_without_touching_the_corpus(tmp_path):
+    data, out = tmp_path / "data", tmp_path / "curada"
+    corpus(data)
+    before = snapshot(data)
+    args = ["review", "--data", str(data), "--out", str(out), "--reviewer", "autor"]
+    # The first scenario is approved; in the second the goal is kept, the opening
+    # rewritten, the first criterion removed, the second kept and one added.
+    answers = "a\nc\n\nNuevo mensaje\n-\n\nCriterio nuevo\n\n"
+    result = CliRunner().invoke(app, args, input=answers)
+    assert result.exit_code == 0, result.output
+    assert snapshot(data) == before
+    copy = Store(out)
+    first, second = copy.scenarios()
+    assert first == Store(data).scenarios()[0]
+    assert second.opening_message == "Nuevo mensaje"
+    assert second.success_criteria == ["El agente se refiere al pedido AT-1001", "Criterio nuevo"]
+    log = json.loads((out / "corpus" / "revision.json").read_text())
+    assert [(r["scenario_id"], r["corrected"]) for r in log] == [
+        (first.scenario_id, False),
+        (second.scenario_id, True),
+    ]
+    again = CliRunner().invoke(app, args, input="")
+    assert again.exit_code == 0, again.output
+    assert "2 de 2 escenarios ya revisados" in again.output
+
+
+def test_a_skipped_scenario_stays_as_induced_and_pending(tmp_path):
+    data, out = tmp_path / "data", tmp_path / "curada"
+    corpus(data, n=1)
+    args = ["review", "--data", str(data), "--out", str(out), "--reviewer", "autor"]
+    result = CliRunner().invoke(app, args, input="s\n")
+    assert result.exit_code == 0, result.output
+    assert Store(out).scenarios() == Store(data).scenarios()
+    assert curation.reviews(Store(out)) == {}
