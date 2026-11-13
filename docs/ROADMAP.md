@@ -102,7 +102,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] Métricas de detección, análisis de sensibilidad y efecto de D3 (§5.4, §5.5). Evidencia: `python -m experiments.analysis`, `results/analysis/e1.txt` y `e4.txt`, con TPR y FPR para los umbrales 0.2, 0.4 y 0.6
 - [x] κ de Fleiss, κ de Cohen y α de Krippendorff (§5.5, §5.8). Evidencia: `python -m experiments.f6 --data . --labels evidence/f6/etiquetas --keys evidence/f6/clave` y `results/f6/analisis.json`, 12-nov-2026. E2: κ de Fleiss 0.86, evaluador contra la mayoría 34/40 (κ 0.70). E3: 20/20 escenarios con mediana ≥ 4, α ordinal −0.20 por la concentración en 5. Auditoría: decisión exacta 66.6 % ponderado; las 5 al revés son reclamos de garantía que los anotadores leyeron como «no procede», sin enmienda. Medida también con el oráculo de `preregistro-v2` (`results/f6/analisis-oraculo-v2.json`): idéntica. Atribución de D-016: alcance distinto 13, reglas del oráculo 6, evaluador 4
 - [x] Reporte de costo y latencia por componente (§5.8). Evidencia: `agentproof cost`, `results/analysis/cost-e1.txt` y `cost-e4.txt`, conciliados con la consola en [`docs/e1.md`](e1.md) y [`docs/e4.md`](e4.md)
-- [ ] **Hito:** todas las cifras, tablas y figuras de la tesis se regeneran con un solo comando
+- [x] **Hito:** las figuras y tablas generadas de la tesis se regeneran con un solo comando. Evidencia: `python -m experiments.figures` escribe en `thesis/generadas/` seis figuras (matrices de confusión, tasas de fallo conjuntas, aprobación por escenario, pass^k, la validación humana como matrices y las calificaciones de E3) y las tablas de clasificación (precisión, recall, F1, FPR y desglose de falsos positivos) y de costo y latencia, 12-nov-2026; una prueba verifica que las tablas publicadas son las que genera y que no falta ninguna figura. Las cifras del texto se escriben a mano y se verifican contra `results/analysis/` y `results/f6/`
 
 ## Redacción
 
@@ -123,4 +123,5 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
   - [x] Capítulo 7, conclusiones, limitaciones y trabajo futuro, 11–12-nov-2026
   - [x] Sensibilidad de la detección (umbrales 0.2 y 0.6) en el capítulo 6, 12-nov-2026
   - [ ] Resumen y abstract
+- [ ] Prueba de consistencia de las cifras del texto: verifica contra el análisis unas 30–40 cifras clave de los capítulos 6 y 7 (TPR, FPR, κ, porcentajes y conteos), y falla en la integración continua si alguna no coincide. Decidida el 12-nov-2026 en lugar de convertir cada cifra en una macro; se hace al cerrar el documento, después del resumen, el abstract y la lectura completa del autor, y antes del tag `entrega-final`
 - [ ] T5 Defensa, entrega, tag `entrega-final` y decisión sobre el historial del prototipo previo — dic
