@@ -115,7 +115,7 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
   - [x] Borrador del capítulo, con sus seis secciones y las referencias de Benjamini-Hochberg, Fleiss y Hayes-Krippendorff verificadas en Crossref
   - [x] Cifras del corpus y conjuntos expuestos, al cerrar el corpus
 - [ ] T3 Desarrollo del prototipo — nov
-  - [x] Borrador del capítulo, adelantado para el segundo entregable del 25 de octubre: organización del código, núcleo, agente del caso de estudio, operadores de mutación, oráculo y pruebas. La sección de portabilidad, con dos capturas de LangGraph Studio, y el anexo de OpenTelemetry se escribieron el 11-nov-2026, y el resultado de CrewAI se agregó el 12-nov-2026
+  - [x] Borrador del capítulo, adelantado para el segundo entregable del 25 de octubre: organización del código, núcleo, agente del caso de estudio, operadores de mutación, oráculo y pruebas. La sección de portabilidad, con dos capturas de LangGraph Studio, y el anexo de OpenTelemetry se escribieron el 11-nov-2026, y el resultado de CrewAI se agregó el 12-nov-2026. El 14-nov-2026 se agregaron las capturas de smolagents en Gradio y de la consola de CrewAI; antes se corrigió la interfaz de Gradio, que dibujaba como fórmula el texto entre dos `$`
 - [ ] T4 Resultados y conclusiones; al final, introducción, resumen y abstract — nov – dic
   - [x] Borrador de la introducción, adelantado para el primer entregable del 27 de septiembre
   - [x] Resultados preliminares de E1, para el segundo entregable: ejecución, detección por operador y lectura, sujetos a la auditoría del oráculo y a E2
