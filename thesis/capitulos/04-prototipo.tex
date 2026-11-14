@@ -155,7 +155,7 @@ Lo que cambia es lo que ve el cliente cuando se agotan los pasos. Claude Agent S
     \textbf{Framework} & \textbf{Adaptador} & \textbf{Edición} & \textbf{Pruebas} & \textbf{En vivo} & \textbf{Archivos del núcleo modificados} \\ \hline
     Claude Agent SDK (referencia) & 124 (98) & 49 (34) & 203 & 116 & --- \\ \hline
     LangGraph & 130 (102) & 74 (66) & 524 & 45 & 0 \\ \hline
-    smolagents & 142 (118) & 57 (48) & 623 & 0 & 0 \\ \hline
+    smolagents & 142 (118) & 57 (48) & 634 & 0 & 0 \\ \hline
     CrewAI & 150 (115) & 62 (43) & 740 & 0 & 0 \\ \hline
   \end{tabular}
 \end{table}
@@ -167,6 +167,6 @@ La edición LangGraph es además la del experimento E4, que se describe en el ca
 \par
 \subsubtituloapa{Exportación a OpenTelemetry} Las trazas también se pueden exportar al formato de OpenTelemetry, siguiendo sus convenciones semánticas para IA generativa. Esas convenciones cambian casi cada semana y no publican versiones, así que se fijó un commit de su repositorio. Cada conversación se convierte en un span raíz propio, un span por turno y un span por llamada a herramienta, y lo que la convención no contempla, como la condición o el motivo de terminación, va con un prefijo propio. La conversión es una función pura que no modifica el esquema ni ningún dato de los experimentos. El Anexo~A detalla el mapeo.
 \par
-Al cierre, con las tres ediciones nuevas, el análisis de la validación humana y la revisión opcional de escenarios, el prototipo tiene 1153 pruebas automatizadas sin acceso a la API, en 80 módulos de prueba, y 26 pruebas en vivo.
+Al cierre, con las tres ediciones nuevas, el análisis de la validación humana y la revisión opcional de escenarios, el prototipo tiene 1169 pruebas automatizadas sin acceso a la API, en 84 módulos de prueba, y 26 pruebas en vivo.
 \par
 \endgroup
