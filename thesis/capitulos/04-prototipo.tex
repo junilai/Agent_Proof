@@ -123,7 +123,7 @@ Cada framework se usó a su manera nativa, aunque eso significara diferencias qu
 \par
 \subsubtituloapa{Que nada salga del equipo} Los tres frameworks traen por omisión algún envío de datos a un servicio externo: el rastreo de LangChain, la descarga de una tabla de precios y los callbacks de litellm en smolagents, y la telemetría y las trazas de ejecución de CrewAI. Cada adaptador se niega a correr si alguno está activo, y lo comprueba antes de la primera conversación de una corrida.
 \par
-\subsubtituloapa{Cada framework en su propia interfaz} Una edición que solo corre dentro del experimento no demuestra que sea un agente ordinario de su framework. Por eso cada una se abre también en la interfaz de desarrollo de su framework, con la configuración incluida en el repositorio. La edición LangGraph se abre en LangGraph Studio con un servidor local, sin enviar trazas a LangSmith. La Figura~\ref{fig:studio-grafo} muestra el grafo tal como lo dibuja Studio, y la Figura~\ref{fig:studio-corte} una conversación con la variante D6, donde se ve paso a paso cómo el agente crea el ticket y el nodo de corte termina el turno antes de que pueda comunicar su número. La edición smolagents se abre en la interfaz de Gradio del framework, solo en el equipo local y con el enlace público desactivado. CrewAI no ofrece una interfaz equivalente para un agente individual, así que el repositorio trae una consola mínima que muestra cada llamada a herramienta y el corte. Ninguna interfaz estuvo abierta durante los experimentos.
+\subsubtituloapa{Cada framework en su propia interfaz} Una edición que solo corre dentro del experimento no demuestra que sea un agente ordinario de su framework. Por eso cada una se abre también en la interfaz de desarrollo de su framework, con la configuración incluida en el repositorio. La edición LangGraph se abre en LangGraph Studio con un servidor local, sin enviar trazas a LangSmith. La Figura~\ref{fig:studio-grafo} muestra el grafo tal como lo dibuja Studio, y la Figura~\ref{fig:studio-corte} una conversación con la variante D6, donde se ve paso a paso cómo el agente crea el ticket y el nodo de corte termina el turno antes de que pueda comunicar su número. La edición smolagents se abre en la interfaz de Gradio del framework, solo en el equipo local y con el enlace público desactivado; la Figura~\ref{fig:gradio-base} muestra una conversación de la línea base, en la que el agente consulta el pedido y responde por la herramienta interna de smolagents. CrewAI no ofrece una interfaz equivalente para un agente individual, así que el repositorio trae una consola mínima que muestra cada llamada a herramienta y el corte (Figura~\ref{fig:crewai-d6}). Ninguna interfaz estuvo abierta durante los experimentos.
 \par
 
 \begin{figure}[H]
@@ -141,8 +141,33 @@ Cada framework se usó a su manera nativa, aunque eso significara diferencias qu
 \end{figure}
 
 \subsubtituloapa{El límite de pasos de D6 en cada framework} Como un paso no significa exactamente lo mismo en cada framework, la calibración de D6 se repitió en cada edición con los mismos tres casos de una, dos y tres llamadas a herramientas. Las otras tres ediciones dieron la misma tabla que Claude Agent SDK: con dos pasos se completan los casos de una y dos llamadas y se trunca el de tres, así que D6 usa dos pasos en las cuatro. En CrewAI el límite cuenta rondas de herramientas y no llamadas al modelo, pero el resultado es el mismo.
-Lo que cambia es lo que ve el cliente cuando se agotan los pasos. Claude Agent SDK y LangGraph cortan el turno sin responder, y en el caso de garantía el ticket queda creado sin que el cliente conozca su número, que es el comportamiento que explica los falsos positivos de D6 en E1. smolagents y CrewAI, en cambio, hacen una llamada más que obliga al modelo a responder, y en esa respuesta el agente comunicó el número del ticket en los dos frameworks. La misma mutación, con el mismo número, se manifiesta distinto según el framework, y por eso su efecto no puede trasladarse de un framework a otro sin medirlo.
+Lo que cambia es lo que ve el cliente cuando se agotan los pasos. Claude Agent SDK y LangGraph cortan el turno sin responder, y en el caso de garantía el ticket queda creado sin que el cliente conozca su número, que es el comportamiento que explica los falsos positivos de D6 en E1. smolagents y CrewAI, en cambio, hacen una llamada más que obliga al modelo a responder, y en esa respuesta el agente comunicó el número del ticket en los dos frameworks (Figuras~\ref{fig:gradio-d6} y~\ref{fig:crewai-d6}). La misma mutación, con el mismo número, se manifiesta distinto según el framework, y por eso su efecto no puede trasladarse de un framework a otro sin medirlo.
 \par
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figuras/smolagents-base-pasos.png}\\[4pt]
+  \includegraphics[width=\textwidth]{figuras/smolagents-base-respuesta.png}
+  \caption{Una conversación de la línea base de la edición smolagents en la interfaz de Gradio del framework. Arriba, el primer paso, en el que el agente consulta el pedido AT-1001. Abajo, el segundo paso: la respuesta al cliente por la herramienta \texttt{final\_answer}, que aprueba el reembolso de USD 89.90 porque los audífonos se entregaron hace diez días. Se omitió la línea final de despedida}
+  \label{fig:gradio-base}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figuras/smolagents-d6-pasos.png}\\[4pt]
+  \includegraphics[width=\textwidth]{figuras/smolagents-d6-ticket.png}\\[4pt]
+  \includegraphics[width=\textwidth]{figuras/smolagents-d6-respuesta.png}
+  \caption{Un caso de garantía con la variante D6 de la edición smolagents en la interfaz de Gradio. Arriba, el primer paso consulta el pedido AT-1003; en medio, el segundo y último paso crea el ticket con \texttt{create\_ticket}; abajo, la respuesta que smolagents fuerza al agotarse los pasos, en la que el agente comunica el ticket TCK-6AE7E2F0. Al agotarse los pasos, la interfaz vuelve a mostrar el último paso antes de la respuesta; esa repetición se recortó}
+  \label{fig:gradio-d6}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figuras/crewai-d6.png}
+  \caption{El mismo caso de garantía con la variante D6 de la edición CrewAI, en la consola del repositorio. Las flechas muestran cada llamada a herramienta y su resultado. Tras crear el ticket se agotan las dos rondas, CrewAI fuerza una respuesta y el agente comunica el ticket TCK-9EF8172B. La última línea la escribe la consola: motivo de terminación, llamadas a herramientas, límite, tokens y costo según la tabla de precios. Se omitieron los recuadros que CrewAI imprime con el prompt y cada herramienta}
+  \label{fig:crewai-d6}
+\end{figure}
+
 \subsubtituloapa{Costo de incorporación} Para medir cuánto cuesta incorporar un framework se fijó la regla de conteo antes de medir: líneas físicas con código, sin líneas en blanco, comentarios ni docstrings, y como complemento líneas lógicas, una por sentencia. Un comando calcula la Tabla~\ref{tab:incorporacion} a partir del repositorio y de su historia en git.
 \par
 
