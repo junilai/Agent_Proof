@@ -584,7 +584,9 @@ El spec de F4 (§8) pide medir cuánto cuesta incorporar un framework: líneas d
 | Claude Agent SDK (referencia) | 124 | 49 | 203 | 116 | — | — | 98 / 34 |
 | LangGraph | 130 | 74 | 524 | 45 | 0 | 14 | 102 / 66 |
 | CrewAI | 150 | 62 | 740 | 0 | 0 | 54 | 115 / 43 |
-| smolagents | 142 | 57 | 623 | 0 | 0 | 16 | 118 / 48 |
+| smolagents | 142 | 57 | 634 | 0 | 0 | 19 | 118 / 48 |
+
+La fila de smolagents se actualizó el 14 de noviembre de 2026: la interfaz de Gradio dejó de mostrar como fórmula el texto entre dos `$` (antes, 623 líneas de pruebas y 16 de interfaz).
 
 Ningún framework obligó a modificar el núcleo. Sus adaptadores miden entre 130 y 150 líneas, cerca de las 124 del de Claude Agent SDK.
 
