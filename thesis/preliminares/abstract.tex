@@ -2,10 +2,10 @@
 \clearpage
 \blank
 \caratula{ABSTRACT}
-\begingroup\dobleesp\color{rojo}
+\begingroup\dobleesp
 \vspace{6pt}
-En texto normal, debe ser una traducción precisa del resumen.
+When the model, the prompt or the tools of an LLM-based conversational agent change, there is no established way to tell whether the new version behaves worse than the previous one: its responses vary between runs, and a multi-turn conversation cannot be repeated word for word. This work presents AgentProof, an open-source tool that automatically induces a scenario from each conversation the agent has already held, replays it several times against the new version with a simulated user, judges each repetition blindly with an automated evaluator, and declares a regression only on statistical evidence corrected for multiple comparisons. Its detection capability was measured with a preregistered protocol on a customer service agent, twenty elicited seed conversations and six degradations introduced as mutations. Across 1200 replayed conversations, a corrupted refund policy was detected in every scenario where it manifested, with the agent built in two frameworks, and the negative control declared no regression. In contrast, two degradations whose effect is spread across scenarios lowered the suite's pass rate by 25 to 30 points without being declared, because of the resolution of the criterion. Three external annotators validated the evaluator, which agrees with their majority in 34 of 40 conversations ($\kappa = 0.70$), and the fidelity of the induced scenarios. The agent was also built with smolagents and CrewAI without modifying the core, and the same step-limit mutation manifested differently depending on the framework. The results indicate that replay with simulated users detects systematic degradations without raising alarms when the agent does not change, and that for spread-out degradations the report must be read together with the suite's drop.
 \par\vspace{6pt}
-\textbf{Key words:} Presentar una traducción precisa de las palabras clave.
+\textbf{Key words:} LLM-based agents, regression detection, simulated users, LLM-as-a-judge, mutation testing, scenario induction, multi-turn conversations, preregistration.
 \par
 \endgroup
