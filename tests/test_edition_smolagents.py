@@ -8,6 +8,7 @@ import asyncio
 import os
 import runpy
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from smolagents.models import get_clean_message_list, tool_role_conversions
@@ -379,12 +380,19 @@ STUDIO = Path(__file__).resolve().parents[1] / "studio" / "smolagents"
 
 
 class _FakeGradioUI:
-    """Stands in for smolagents.GradioUI, so no server starts and gradio is not needed."""
+    """Stands in for smolagents.GradioUI, so no server starts."""
 
     launched: list[dict] = []
 
     def __init__(self, agent):
         self.agent = agent
+
+    def create_app(self):
+        return self
+
+    @property
+    def chatbot(self):
+        return SimpleNamespace(latex_delimiters=[{"left": "$"}])
 
     def launch(self, **kwargs):
         _FakeGradioUI.launched.append({"agent": self.agent, **kwargs})
@@ -407,3 +415,12 @@ def test_the_gradio_ui_opens_the_edition_locally_and_never_shares(monkeypatch, v
     assert launch == {"share": False, "server_name": "127.0.0.1", "server_port": 7860}
     assert agent.instructions == system_prompt(MUTATIONS[variant or "baseline"])
     assert agent.max_steps == step_limit(MUTATIONS[variant or "baseline"])
+
+
+def test_the_gradio_ui_shows_a_single_dollar_as_text():
+    # The agent quotes prices ("$89.90 ... $500"): with smolagents' "$" delimiter,
+    # everything between two prices is drawn as an inline formula.
+    app = runpy.run_path(str(STUDIO / "app.py"), run_name="app")["build_ui"]()
+    lefts = [d["left"] for d in app.chatbot.latex_delimiters]
+    assert "$" not in lefts
+    assert "$$" in lefts

@@ -4,6 +4,9 @@ VARIANT picks the mutation (baseline by default). The UI is local only: bound to
 127.0.0.1, never shared through a public Gradio link, and with Gradio analytics
 and litellm's cost map download turned off before either library is imported.
 One agent serves the whole session: restart the script to start a new conversation.
+
+smolagents' chat draws the text between two "$" as an inline formula, which
+garbles any reply that quotes two prices; only "$$" is kept as a formula.
 """
 
 import os
@@ -23,7 +26,10 @@ def build_ui(variant: str | None = None):
 
     agent = builder(variant or os.environ.get("VARIANT", "baseline"))
     agent.name = NAME
-    return GradioUI(agent)
+    app = GradioUI(agent).create_app()
+    chatbot = app.chatbot
+    chatbot.latex_delimiters = [d for d in chatbot.latex_delimiters if d["left"] != "$"]
+    return app
 
 
 def main() -> None:
