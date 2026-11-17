@@ -17,7 +17,7 @@ En desarrollo. El avance por fases está en [`docs/ROADMAP.md`](docs/ROADMAP.md)
 Requiere [uv](https://docs.astral.sh/uv/); Python 3.12 se instala automáticamente.
 
 ```bash
-uv sync                        # entorno y dependencias
+uv sync --group studio         # entorno y dependencias, con las de las interfaces
 uv run pytest                  # pruebas
 uv run ruff check .            # análisis de estilo
 uv run ruff format --check .   # formato
