@@ -114,14 +114,15 @@ Estado vivo del [plan maestro](specs/2026-09-21-plan-maestro.md). Cada ítem cit
 - [x] T2 Diseño experimental y pre-registro — oct. Capítulo 5 completo, con el corpus y la validación del oráculo (Tabla 4); 43 páginas al 17-oct-2026
   - [x] Borrador del capítulo, con sus seis secciones y las referencias de Benjamini-Hochberg, Fleiss y Hayes-Krippendorff verificadas en Crossref
   - [x] Cifras del corpus y conjuntos expuestos, al cerrar el corpus
-- [ ] T3 Desarrollo del prototipo — nov
+- [x] T3 Desarrollo del prototipo — nov. Capítulo 4 completo, con la portabilidad a los cuatro frameworks, cinco capturas de sus interfaces y las cifras finales de pruebas
   - [x] Borrador del capítulo, adelantado para el segundo entregable del 25 de octubre: organización del código, núcleo, agente del caso de estudio, operadores de mutación, oráculo y pruebas. La sección de portabilidad, con dos capturas de LangGraph Studio, y el anexo de OpenTelemetry se escribieron el 11-nov-2026, y el resultado de CrewAI se agregó el 12-nov-2026. El 14-nov-2026 se agregaron las capturas de smolagents en Gradio y de la consola de CrewAI; antes se corrigió la interfaz de Gradio, que dibujaba como fórmula el texto entre dos `$`
-- [ ] T4 Resultados y conclusiones; al final, introducción, resumen y abstract — nov – dic
+- [x] T4 Resultados y conclusiones; al final, introducción, resumen y abstract — nov – dic. Capítulos 6 y 7, resumen y abstract completos; documento de 91 páginas al 17-nov-2026
   - [x] Borrador de la introducción, adelantado para el primer entregable del 27 de septiembre
   - [x] Resultados preliminares de E1, para el segundo entregable: ejecución, detección por operador y lectura, sujetos a la auditoría del oráculo y a E2
   - [x] E4 y la segunda puntuación de E1 en el capítulo 6 (11-nov-2026); la validación humana (E2, E3, auditoría y desacuerdos), 12-nov-2026
   - [x] Capítulo 7, conclusiones, limitaciones y trabajo futuro, 11–12-nov-2026
   - [x] Sensibilidad de la detección (umbrales 0.2 y 0.6) en el capítulo 6, 12-nov-2026
-  - [ ] Resumen y abstract
+  - [x] Resumen y abstract, 15-nov-2026
+  - [x] Observaciones del tutor al tercer entregable, 17-nov-2026: integración continua en verde (instala el grupo `studio` para la prueba de la interfaz de Gradio), cifras finales de pruebas (1169 en la integración continua, 26 en vivo aparte), la portabilidad del capítulo 3 dice lo que se comprobó, D1 y D3 reconocidos como limitación de sensibilidad, el α negativo de E3 interpretado como tal y la portabilidad delimitada: arquitectura en cuatro frameworks, detección replicada en dos
 - [ ] Prueba de consistencia de las cifras del texto: verifica contra el análisis unas 30–40 cifras clave de los capítulos 6 y 7 (TPR, FPR, κ, porcentajes y conteos), y falla en la integración continua si alguna no coincide. Decidida el 12-nov-2026 en lugar de convertir cada cifra en una macro; se hace al cerrar el documento, después del resumen, el abstract y la lectura completa del autor, y antes del tag `entrega-final`
 - [ ] T5 Defensa, entrega, tag `entrega-final` y decisión sobre el historial del prototipo previo — dic
