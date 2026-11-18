@@ -11,6 +11,7 @@ jobs:
   pdf:
     name: Compilar PDF
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - name: Instalar TeX Live y la fuente Times New Roman
